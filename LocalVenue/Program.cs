@@ -12,7 +12,7 @@ builder.Services.AddDbContext<VenueContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("VenueContext")!);
 });
-
+//test push in GitHub with organization
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
