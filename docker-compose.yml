@@ -1,0 +1,15 @@
+﻿services:
+  localvenue:
+    image: localvenue
+    build:
+      context: .
+      dockerfile: LocalVenue/Dockerfile
+
+  local-venue-mssql:
+    image: mcr.microsoft.com/mssql/server:latest
+    container_name: local-venue-mysql
+    environment:
+      SA_PASSWORD: 'Password123'
+      ACCEPT_EULA: 'Y'
+    ports:
+      - "1433:1433"
