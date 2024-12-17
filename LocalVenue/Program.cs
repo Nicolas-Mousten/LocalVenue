@@ -10,7 +10,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContext<VenueContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("VenueContext")!);
+    options.UseMySql(builder.Configuration.GetConnectionString("VenueContext")!,
+    ServerVersion.Parse("8.0-mysql"));
 });
 //test push in GitHub with organization
 var app = builder.Build();
@@ -28,7 +29,6 @@ app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
-app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

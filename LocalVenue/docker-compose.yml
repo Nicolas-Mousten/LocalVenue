@@ -1,0 +1,25 @@
+version: "3"
+services:
+  self-service-mysql:
+    image: mysql
+    container_name: LocalVenueMySQL
+    environment:
+      - MYSQL_ROOT_PASSWORD=!BAT4CHAT
+      - Name LocalVenueMySQL
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+  
+  app:
+    build:
+      context: SelfService
+      dockerfile: Dockerfile
+    container_name: SelfServiceWeb
+    depends_on:
+      - self-service-mysql
+      - rabbitmq
+    ports:
+      - "8080:8080"
+    command: bash -c "dotnet ef database update"
+  
