@@ -13,12 +13,11 @@ services:
   
   app:
     build:
-      context: SelfService
+      context: LocalVenue
       dockerfile: Dockerfile
-    container_name: SelfServiceWeb
+    container_name: LocalVenue
     depends_on:
       - self-service-mysql
-      - rabbitmq
     ports:
       - "8080:8080"
     command: bash -c "dotnet ef database update"
