@@ -1,6 +1,10 @@
 using LocalVenue.Components;
 using LocalVenue.Core;
+using LocalVenue.Core.Entities;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.WebComponents;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +12,43 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContext<VenueContext>(options =>
+builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
     options.UseMySql(builder.Configuration.GetConnectionString("VenueContext")!,
     ServerVersion.Parse("8.0-mysql"));
 });
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.LoginPath = "/login";
+        options.LogoutPath = "/logout";
+        options.AccessDeniedPath = "/access-denied";
+        options.Cookie.Name = "CookieAuth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.MaxAge = TimeSpan.FromDays(1);
+        options.Cookie.IsEssential = true;
+    });
+
+builder.Services.AddIdentity<Customer, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedPhoneNumber = false;
+        options.SignIn.RequireConfirmedAccount = false;
+        
+        options.Password.RequiredLength = 3;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireDigit = false;
+        options.Password.RequiredUniqueChars = 0;
+        options.Password.RequireNonAlphanumeric = false;
+    })
+    .AddEntityFrameworkStores<VenueContext>();
+
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
+
 //test push in GitHub with organization
 var app = builder.Build();
 
@@ -28,6 +64,10 @@ app.UseHttpsRedirection();
 
 
 app.UseAntiforgery();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
