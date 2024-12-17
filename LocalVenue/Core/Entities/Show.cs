@@ -11,5 +11,6 @@ public class Show
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     
+    public ICollection<Seat> Seats { get; set; }
     
 }
