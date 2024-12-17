@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using LocalVenue.Core.Enums;
 
-namespace LocalVenue.Core;
+namespace LocalVenue.Core.Entities;
 
 public class Ticket
 {

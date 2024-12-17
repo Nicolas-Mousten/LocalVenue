@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LocalVenue.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Core;
 
@@ -11,6 +12,8 @@ public class VenueContext : DbContext
     public DbSet<Show> Shows { get; init; }
     public DbSet<Seat> Seats { get; init; }
     public DbSet<Ticket> Tickets { get; init; }
+    
+    
     
     
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LocalVenue.Core;
+namespace LocalVenue.Core.Entities;
 
 public class Seat
 {
