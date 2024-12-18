@@ -3,6 +3,7 @@ using System;
 using LocalVenue.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LocalVenue.Migrations
 {
     [DbContext(typeof(VenueContext))]
-    partial class VenueContextModelSnapshot : ModelSnapshot
+    [Migration("20241218000438_CustomerTicketRelation")]
+    partial class CustomerTicketRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

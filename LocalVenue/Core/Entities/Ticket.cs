@@ -13,4 +13,8 @@ public class Ticket
     public Seat? Seat { get; set; }
     public decimal Price { get; set; }
     public Status Status { get; set; }
+    
+    public string? CustomerId { get; set; }
+    public Customer? Customer { get; set; }
+    
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using LocalVenue.Core.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Shared.WebComponents;
 
