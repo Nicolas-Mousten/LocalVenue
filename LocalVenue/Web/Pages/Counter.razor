@@ -1,5 +1,8 @@
 ﻿@page "/counter"
+@using LocalVenue.Helpers
+@using LocalVenue.Shared.Enums
 @rendermode InteractiveServer
+@inject IJSRuntime Js;
 
 <PageTitle>Counter</PageTitle>
 
@@ -14,6 +17,7 @@
 
     private void IncrementCount()
     {
+        Toast.SimpleToast(ToastType.Success, currentCount.ToString(),Js);
         currentCount++;
     }
 
