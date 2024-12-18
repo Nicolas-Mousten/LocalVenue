@@ -1,0 +1,120 @@
+﻿@attribute [CascadingTypeParameter(nameof(T)) ]
+@using DineTime.Shared.Enums
+@typeparam T
+
+@if (Items is null || Columns is null)
+{
+    return;
+}
+<div style="overflow: auto;" class="dine-time-grid bg-white">
+    
+    <div style="display: grid; grid-template-columns : @GridTemplateColumnsCss;);">
+        @foreach (var column in Columns)
+        {
+            <div @onclick="() => SortColumn(column)" class="column-header @column.HeaderClass d-flex @(column.Sortable ? "pointer" : "") @column.TextAlign.ToCss() user-select-none fs-6">
+                @column.Title
+                @if (column.OrderDirection is OrderDirection.None && column.Sortable)
+                {
+                    <i class="ps-2 bi bi-arrow-down-up"></i>
+                } else if (column.OrderDirection is OrderDirection.Ascending && column.Sortable)
+                {
+                    <i class="ps-2 bi bi-arrow-up"></i>
+                }
+                else if (column.Sortable)
+                {
+                    <i class="ps-2 bi bi-arrow-down"></i>
+                }
+            </div>
+        }
+    </div>
+    
+    @foreach (var item in Items)
+    {
+        <div class="column-body-item-hover" @onclick="() => GridItemSelectedHandler(item)" style="display: grid; grid-template-columns : @GridTemplateColumnsCss; );">
+            @foreach (var column in Columns)
+            {
+                <div class="column-body-item user-select-none  d-flex align-items-center @column.Class @column.TextAlign.ToCss()">
+                    @if (column.CustomDisplay is null)
+                    {
+                        @column.DisplayValue(item)
+                    }
+                    else
+                    {
+                        @column.CustomDisplay(item)
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter, EditorRequired] public required RenderFragment ChildContent { get; set; }
+    [Parameter, EditorRequired] public required List<T>? Items { get; set; }
+    [Parameter] public EventCallback<T> GridItemSelected { get; set; }
+
+
+    internal List<Column<T>>? Columns { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Columns ??= [];
+    }
+
+    internal void AddColumn(Column<T> column)
+    {
+        Columns!.Add(column);
+        StateHasChanged();
+    }
+    
+    private Task GridItemSelectedHandler(T item)
+    {
+        return GridItemSelected.InvokeAsync(item);
+    }
+
+    private string GridTemplateColumnsCss => GenerateGridTemplateColumns();
+    
+    private string GenerateGridTemplateColumns() 
+    {
+        if (Columns == null) return string.Empty;
+        
+        var totalAssignedPercent = Columns
+            .Where(c => c.WidthPercent.HasValue)
+            .Sum(c => c.WidthPercent!.Value);
+
+        var remainingColumns = Columns.Count(c => !c.WidthPercent.HasValue);
+        var remainingPercent = 100 - totalAssignedPercent;
+
+        var percentForRemainingColumns = remainingColumns > 0 ? remainingPercent / remainingColumns : 0;
+
+        var returnString =  string.Join(" ", Columns.Select(c =>
+            c.WidthPercent.HasValue ? $"{c.WidthPercent.Value}fr" : $"{percentForRemainingColumns}fr"));
+
+
+        return returnString;
+    }
+
+    private void SortColumn(Column<T> column)
+    {
+        if (column.Sortable is false)
+        {
+            return;
+        }
+
+        if (column.OrderDirection is OrderDirection.None or OrderDirection.Descending)
+        {
+            Items = Items?.OrderBy(x => typeof(T).GetProperty(column.Value)?.GetValue(x)).ToList();
+            column.OrderDirection = OrderDirection.Ascending;
+        }
+        else
+        {
+            Items = Items?.OrderByDescending(x => typeof(T).GetProperty(column.Value)?.GetValue(x)).ToList();
+            column.OrderDirection = OrderDirection.Descending;
+        }
+    }
+
+}

@@ -1,0 +1,42 @@
+﻿@using DineTime.Shared.Enums
+@using TextAlign = DineTime.Shared.Enums.TextAlign
+@typeparam T
+
+@code {
+    
+
+    [Parameter, EditorRequired] public required string Title { get; set; }
+    [Parameter, EditorRequired] public required string Value { get; set; }
+    [Parameter] public bool Sortable { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? HeaderClass { get; set; }
+    [Parameter] public string? Format { get; set; }
+    [Parameter] public int? WidthPercent { get; set; }
+    [Parameter] public TextAlign TextAlign { get; set; } = TextAlign.Left;
+    [Parameter] public RenderFragment<T>? CustomDisplay { get; set; }
+    //TODO: Implement percentage width
+    // [Parameter] public int? PercentageWidth { get; set; }
+    [CascadingParameter] public required Grid<T> Parent { get; set; }
+    
+    public OrderDirection OrderDirection { get; set; } = OrderDirection.None;
+
+    
+    protected override void OnInitialized() 
+    {
+        Parent.AddColumn(this);
+    }
+
+    public string DisplayValue(T item)
+    {
+        var property = typeof(T).GetProperty(Value);
+        
+        if (property == null)
+        {
+            throw new InvalidOperationException($"Property '{Value}' not found on type '{typeof(T).Name}'.");
+        }
+        
+        var value = property.GetValue(item);
+        
+        return Format != null ? string.Format($"{{0:{Format}}}", value) : value?.ToString() ?? string.Empty;
+    }
+}

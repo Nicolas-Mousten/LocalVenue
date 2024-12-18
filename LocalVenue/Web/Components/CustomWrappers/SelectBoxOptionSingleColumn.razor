@@ -1,0 +1,18 @@
+﻿@typeparam T
+<div class="card">
+    @foreach (var item in Items)
+    {
+    <div class="pointer" @onclick="() => SetSelectedItem(item)">
+        <div class="select-box-single-option">
+            @DisplayValue(item)
+        </div>
+    </div>
+    }    
+</div>
+
+@code {
+    
+    [Parameter, EditorRequired] public required List<T> Items { get; set; }
+    [Parameter, EditorRequired] public required Action<T> SetSelectedItem { get; set; }
+    [Parameter, EditorRequired] public required Func<T, string> DisplayValue { get; set; }
+}
