@@ -1,0 +1,60 @@
+﻿@using DineTime.Shared.Enums
+@inject IJSRuntime JsRuntime
+
+<div data-ui-popover id="@Id" class="ui-popover @Class @Size.ToCssClass()" data-ui-placement="@Direction.ToDirectionString()" hidden>
+    @if (ShowCloseX)
+    {
+        <button class="ui-btn-close ui-popover-close" aria-label="Close" data-ui-dismiss></button>
+        
+    }
+    <div class="ui-popover-header @(string.IsNullOrWhiteSpace(Title) ? "p-0" : "")">
+        <div class="ui-popover-title" data-ui-popover-title>@Title</div>
+    </div>
+    <div class="ui-popover-body">
+        @Body
+    </div>
+    <div class="ui-popover-footer p-0">
+        @if (FooterContent is null)
+        {
+            <div class="d-flex justify-content-end p-3">
+                <button class="btn btn-secondary" data-ui-dismiss>Luk</button>
+            </div>
+        }
+        else
+        {
+            @FooterContent
+        }
+    </div>
+</div>
+
+@code {
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("Popover.init");
+        }
+    }
+    
+    [Parameter, EditorRequired]
+    public required string Id { get; set; }
+    
+    [Parameter, EditorRequired]
+    public required PopOverSize Size { get; set; }
+
+    [Parameter, EditorRequired] 
+    public required string Title { get; set; }
+    [Parameter]
+    public string? Class { get; set; }
+    [Parameter]
+    public RenderFragment? Body { get; set; }
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+    
+    [Parameter]
+    public bool ShowCloseX { get; set; } = true;
+    
+    [Parameter]
+    public Direction Direction { get; set; } = Direction.Bottom;
+}

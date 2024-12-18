@@ -1,0 +1,41 @@
+﻿@inject IJSRuntime Js;
+<div class="@Class">
+    <div class="pointer" @onclick="ToggleCollapse">
+        @Header
+    </div>
+    <div class="mt-0 collapse @(Collapsed ? "" : "show")" id="@Id">
+        @Body
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required RenderFragment Header { get; set; }
+    [Parameter, EditorRequired]
+    public required RenderFragment Body { get; set; }
+    [Parameter]
+    public EventCallback<bool> OpenStateChanged { get; set; }
+    [Parameter]
+    public bool Collapsed { get; set; }
+    [Parameter]
+    public string? Class { get; set; }
+    [Parameter]
+    public string? ArrowId { get; set; }
+    private string? Id { get; set; }
+    
+    protected override void OnInitialized()
+    {
+        Id ??= Guid.NewGuid().ToString();
+    }
+    
+    private async Task ToggleCollapse()
+    {
+        await Js.InvokeVoidAsync("DineTime.Collapse.toggle", Id, ArrowId);
+        await OnCollapseStateChange();
+    }
+    
+    private async Task OnCollapseStateChange()
+    {
+        await OpenStateChanged.InvokeAsync(!Collapsed);
+    }
+}

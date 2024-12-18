@@ -1,4 +1,4 @@
-using LocalVenue.Components;
+using LocalVenue.Web;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;

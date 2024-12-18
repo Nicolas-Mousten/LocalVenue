@@ -1,0 +1,87 @@
+﻿@using DineTime.Shared.Enums
+@inject IJSRuntime jsRuntime
+
+<div id="@(!string.IsNullOrWhiteSpace(Id) ? Id : $"id-{Guid.NewGuid()}")" class="modal fade @_modalClass @(Centered ? "modal-dialog-centered" : "")" tabindex="-1" role="dialog" style="display:@_modalDisplay; overflow-y: auto;">
+    <div class="modal-dialog modal-dialog-scrollable @ModalSize.ToCssClass()" style="max-height: 85vh;" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Title</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" @onclick="Close">
+                </button>
+            </div>
+            <div class="modal-body @BodyCss">
+                @Body
+            </div>
+            <div class="modal-footer">
+                @if (FooterContent is not null)
+                {
+                    @FooterContent
+                }
+            </div>
+        </div>
+        <div class="modal-content mt-3 overflow-visible border-0">
+            @ModalBackDrop
+        </div>
+    </div>
+</div>
+
+@if (_showBackdrop)
+{
+<div class="modal-backdrop fade show"></div>
+}
+@code {
+
+    
+    [Parameter, EditorRequired]
+    public required RenderFragment Body { get; set; }
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+    [Parameter]
+    public RenderFragment? ModalBackDrop { get; set; }
+    
+    [Parameter, EditorRequired] 
+    public required string Title { get; set; }
+    [Parameter, EditorRequired] 
+    public required string Id { get; set; }
+
+    [Parameter] 
+    public bool Centered { get; set; } = true;
+    [Parameter] 
+    public ModalSize ModalSize { get; set; } = ModalSize.Large;
+
+    [Parameter] 
+    public string? BodyCss { get; set; }
+
+    private string _modalDisplay = "none;";
+    private string _modalClass = string.Empty;
+    private bool _showBackdrop;
+
+    [Parameter]
+    public EventCallback<Task> OnHidden { get; set; }
+    
+    [JSInvokable]
+    public async Task BsHiddenModal()
+    {
+        await OnHidden.InvokeAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await jsRuntime.InvokeVoidAsync("DineTime.Bootstrap.ModalBindOnClose", Id, DotNetObjectReference.Create(this));
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+    
+    public void Open()
+    {
+        jsRuntime.InvokeVoidAsync("DineTime.Bootstrap.ModalShow", Id);
+    }
+
+    public void Close()
+    {
+        jsRuntime.InvokeVoidAsync("DineTime.Bootstrap.ModalClose", Id);
+    }
+
+}

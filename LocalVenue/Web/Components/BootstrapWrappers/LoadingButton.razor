@@ -1,0 +1,29 @@
+﻿<button class="btn btn-success loading-button text-cutoff @Class" type="button" style="width: @(Width)px;" @onclick="ClickButton" disabled="@Loading">
+    @if (Loading)
+    {
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden"> Loading...</span>
+        </div>
+    }
+    else
+    {
+        @ChildContent
+    }
+</button>
+
+@code {
+    [Parameter] public required RenderFragment ChildContent { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public string? Class { get; set; }
+    
+    [Parameter, EditorRequired] public required int Width { get; set; }
+
+    private void ClickButton()
+    {
+        OnClick.InvokeAsync();
+    }
+    
+    
+    
+}

@@ -1,0 +1,71 @@
+﻿@inject IJSRuntime JsRuntime
+<div>
+
+    <div id="@TabListId" class="ui-tabs m-0 h-auto" data-ui-tablist="ui-tabs">
+        @foreach (var tab in Tabs!)
+        {
+            <button class="ui-tabs-tab py-1"  data-ui-tablist-tab="@tab.Id">@tab.Title</button>
+        }
+    </div>
+    
+    @foreach(var tab in Tabs!.Select((item, index) => new {item, index}))
+    {
+        if (tab.index == 0)
+        {
+            <div class="p-3" id="@tab.item.Id">
+                @tab.item.ChildContent
+            </div>
+        }
+        else
+        {
+            <div class="p-3" id="@tab.item.Id" hidden>
+                @tab.item.ChildContent
+            </div>
+        }
+    }
+
+    @* To ensure the tabs see the tablist as its CascadingValue *@
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+
+@code {
+  [Parameter] public required RenderFragment ChildContent { get; set; }
+    
+    //only set this equal to an empty list if its null
+    private List<Tab>? Tabs { get; set; }
+    private string TabListId { get; set; } = Guid.NewGuid().ToString();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("TabList.init");
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Tabs ??= [];
+    }
+
+    //rewrite this for better performance
+    public void AddTab(Tab tab)
+    {
+        Tabs!.Add(tab);
+        StateHasChanged();
+    }
+
+    public void ShowTabById(string id)
+    {
+        JsRuntime.InvokeVoidAsync("TabList.show", id);
+    }
+    
+    public void ShowTabByIndex(int index)
+    {
+        JsRuntime.InvokeVoidAsync("TabList.show", TabListId, index);
+    }
+    
+}

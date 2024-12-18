@@ -1,0 +1,13 @@
+﻿<div class="form-floating @Class" style="@CustomStyle">
+    @ChildContent
+    <label for="@InputFieldId">@LabelText</label>
+</div>
+
+@code {
+    [Parameter] public required RenderFragment ChildContent { get; set; }
+    
+    [Parameter, EditorRequired] public required string LabelText { get; set; }
+    [Parameter, EditorRequired] public required string InputFieldId { get; set; }
+    [Parameter] public string? CustomStyle { get; set; }
+    [Parameter] public string? Class { get; set; }
+}

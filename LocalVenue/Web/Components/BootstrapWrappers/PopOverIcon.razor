@@ -1,0 +1,27 @@
+﻿<i id="@_id" class="@BootstrapIconClass @Class @(IsSuffix? "position-absolute" : "") pointer"  data-ui-toggle="@_id" style="@(IsSuffix? "right: 5px; top: 50%; transform: translateY(-50%);" : "")"></i>
+
+@if (InfoText is not null && InfoTitle is not null)
+{
+    <PopOver Size="PopOverSize.Default" Direction="Direction.Bottom" Id="@_id" Title="@InfoTitle">
+        <Body>
+            @InfoText
+        </Body>
+    </PopOver>
+}
+
+@code {
+    
+    [Parameter, EditorRequired] 
+    public required string BootstrapIconClass { get; set; }
+    [Parameter] 
+    public string? Class { get; set; }
+    
+    [Parameter]
+    public string? InfoText { get; set; }
+    [Parameter] 
+    public string? InfoTitle { get; set; }
+    [Parameter]
+    public bool IsSuffix { get; set; }
+    
+    private readonly string _id = Guid.NewGuid().ToString();
+}
