@@ -1,9 +1,10 @@
 ﻿using LocalVenue.Core.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Core;
 
-public class VenueContext : DbContext
+public class VenueContext : IdentityDbContext<Customer>
 {
     public VenueContext(DbContextOptions<VenueContext> options) : base(options)
     {
