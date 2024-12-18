@@ -1,4 +1,4 @@
-﻿@using DineTime.Shared.Enums
+﻿@using LocalVenue.Shared.Enums
 @inject IJSRuntime jsRuntime
 
 <div id="@(!string.IsNullOrWhiteSpace(Id) ? Id : $"id-{Guid.NewGuid()}")" class="modal fade @_modalClass @(Centered ? "modal-dialog-centered" : "")" tabindex="-1" role="dialog" style="display:@_modalDisplay; overflow-y: auto;">
@@ -69,19 +69,19 @@
     {
         if (firstRender)
         {
-            await jsRuntime.InvokeVoidAsync("DineTime.Bootstrap.ModalBindOnClose", Id, DotNetObjectReference.Create(this));
+            await jsRuntime.InvokeVoidAsync("LocalVenue.Bootstrap.ModalBindOnClose", Id, DotNetObjectReference.Create(this));
         }
         await base.OnAfterRenderAsync(firstRender);
     }
     
     public void Open()
     {
-        jsRuntime.InvokeVoidAsync("DineTime.Bootstrap.ModalShow", Id);
+        jsRuntime.InvokeVoidAsync("LocalVenue.Bootstrap.ModalShow", Id);
     }
 
     public void Close()
     {
-        jsRuntime.InvokeVoidAsync("DineTime.Bootstrap.ModalClose", Id);
+        jsRuntime.InvokeVoidAsync("LocalVenue.Bootstrap.ModalClose", Id);
     }
 
 }

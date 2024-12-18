@@ -1,4 +1,4 @@
-﻿namespace DineTime.Shared.Enums;
+﻿namespace LocalVenue.Shared.Enums;
 
 public enum ComparisonTypes
 {

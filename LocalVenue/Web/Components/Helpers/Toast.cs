@@ -1,7 +1,7 @@
-﻿using DineTime.Shared.Enums;
+﻿using LocalVenue.Shared.Enums;
 using Microsoft.JSInterop;
 
-namespace DineTime.Helpers;
+namespace LocalVenue.Helpers;
 
 public class Toast
 {

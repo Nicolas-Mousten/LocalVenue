@@ -30,7 +30,7 @@
     
     private async Task ToggleCollapse()
     {
-        await Js.InvokeVoidAsync("DineTime.Collapse.toggle", Id, ArrowId);
+        await Js.InvokeVoidAsync("LocalVenue.Collapse.toggle", Id, ArrowId);
         await OnCollapseStateChange();
     }
     
