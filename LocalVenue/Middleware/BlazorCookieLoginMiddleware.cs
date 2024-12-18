@@ -52,13 +52,11 @@ public class BlazorCookieLoginMiddleware
             }
             else if (result.RequiresTwoFactor)
             {
-                //TODO: redirect to 2FA razor component
                 context.Response.Redirect("/loginwith2fa/" + key);
                 return;
             }
             else
             {
-                //TODO: Proper error handling
                 context.Response.Redirect("/loginfailed");
                 return;
             }
