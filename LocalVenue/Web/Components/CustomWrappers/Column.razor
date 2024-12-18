@@ -14,8 +14,6 @@
     [Parameter] public int? WidthPercent { get; set; }
     [Parameter] public TextAlign TextAlign { get; set; } = TextAlign.Left;
     [Parameter] public RenderFragment<T>? CustomDisplay { get; set; }
-    //TODO: Implement percentage width
-    // [Parameter] public int? PercentageWidth { get; set; }
     [CascadingParameter] public required Grid<T> Parent { get; set; }
     
     public OrderDirection OrderDirection { get; set; } = OrderDirection.None;
