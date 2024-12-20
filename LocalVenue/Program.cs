@@ -12,6 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
     options.UseMySql(builder.Configuration.GetConnectionString("VenueContext")!,
@@ -37,7 +40,7 @@ builder.Services.AddIdentity<Customer, IdentityRole>(options =>
         options.SignIn.RequireConfirmedAccount = false;
         options.SignIn.RequireConfirmedPhoneNumber = false;
         options.SignIn.RequireConfirmedAccount = false;
-        
+
         options.Password.RequiredLength = 3;
         options.Password.RequireUppercase = false;
         options.Password.RequireDigit = false;
@@ -62,6 +65,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "LocalVenue API V1");
+    c.RoutePrefix = "swagger";
+    c.DocumentTitle = "LocalVenue API";
+});
 
 app.UseAntiforgery();
 app.UseStaticFiles();
