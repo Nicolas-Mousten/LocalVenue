@@ -7,12 +7,19 @@ public class Show
 {
     [Key]
     public long ShowId { get; set; }
-    public required string Title { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    public string Title { get; set; } = string.Empty;
+
     public string? Description { get; set; }
+
     public DateTime StartTime { get; set; }
+
     public DateTime EndTime { get; set; }
+
     public Genre Genre { get; set; }
-    
-    public ICollection<Ticket> Tickets { get; set; }
-    
+
+    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+
 }

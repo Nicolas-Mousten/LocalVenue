@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.WebComponents;
+using LocalVenue.Core.Interfaces;
+using LocalVenue.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,14 +14,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program)); //AutoMapper configuration
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); //TODO: Add authentication for the API (JWT maybe?)
 
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
     options.UseMySql(builder.Configuration.GetConnectionString("VenueContext")!,
     ServerVersion.Parse("8.0-mysql"));
 });
+
+builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<IShowService, ShowService>();
+builder.Services.AddScoped<ISeatService, SeatService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -65,6 +73,28 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<VenueContext>();
+    var retryCount = 5;
+    var delay = TimeSpan.FromSeconds(10);
+
+    for (int i = 0; i < retryCount; i++)
+    {
+        try
+        {
+            dbContext.Database.Migrate(); //Auto perform migrations
+            DbSeeder.UpsertSeed(dbContext); //Auto seed database
+            break;
+        }
+        catch (Microsoft.Data.SqlClient.SqlException)
+        {
+            if (i == retryCount - 1) throw;
+            Thread.Sleep(delay);
+        }
+    }
+}
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -82,5 +112,7 @@ app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapControllers();
 
 app.Run();
