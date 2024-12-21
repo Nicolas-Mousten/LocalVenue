@@ -17,7 +17,11 @@ builder.Services.AddRazorComponents()
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program)); //AutoMapper configuration
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); //TODO: Add authentication for the API (JWT maybe?)
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "LocalVenue API", Version = "v1" });
+    c.EnableAnnotations();
+}); //TODO: Add authentication for the API (JWT maybe?)
 
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {

@@ -17,9 +17,9 @@ public class ShowService : GenericCRUDService<Show>, IShowService
         _mapper = mapper;
     }
 
-    public async Task<PagedList<ShowDTO_Nested>> GetShows(int page, int pageSize, string? searchParameter, string searchProperty = "Title")
+    public async Task<PagedList<ShowDTO_Nested>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title")
     {
-        var shows = await base.GetItems(page, pageSize, searchParameter, searchProperty, show => show.Tickets!); ;
+        var shows = await base.GetItems(page, pageSize, searchParameter, searchProperty ?? "Title", show => show.Tickets!); ;
 
         var mappedShows = shows.Results!.Select(_mapper.Map<ShowDTO_Nested>).ToList();
 
@@ -46,9 +46,20 @@ public class ShowService : GenericCRUDService<Show>, IShowService
     public async Task<List<TicketDTO_Nested>> GetAvailableTicketsForShow(long showId)
     {
         var ticket = await _context.Shows.Include(show => show.Tickets).FirstOrDefaultAsync(show => show.ShowId == showId);
+
+        if (ticket == null)
+        {
+            throw new KeyNotFoundException($"Show with id {showId} not found");
+        }
+
         var tickets = ticket!.Tickets!.Where(ticket => ticket.Status == Enums.Status.Available).ToList();
 
         var mappedTickets = tickets.Select(_mapper.Map<TicketDTO_Nested>).ToList();
+
+        if (mappedTickets.Count == 0)
+        {
+            throw new ArgumentNullException($"No available tickets found for show with id {showId}");
+        }
 
         return mappedTickets;
     }

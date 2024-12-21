@@ -16,6 +16,10 @@ public class SeatService : GenericCRUDService<Seat>, ISeatService
     public async Task<List<Seat>> GetSeatsInRow(int row)
     {
         var seats = await _context.Seats.Where(seat => seat.Row == row).ToListAsync();
+        if (seats.Count == 0)
+        {
+            throw new ArgumentNullException($"No seats found in row {row}");
+        }
         return seats;
     }
 

@@ -3,6 +3,7 @@ using LocalVenue.Core.Entities;
 using LocalVenue.Core.Interfaces;
 using LocalVenue.Core.Models;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace LocalVenue.Core.Controllers;
 
@@ -20,6 +21,10 @@ public class TicketController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Gets a ticket by ID", Description = "Retrieves a specific ticket by its ID.")]
+    [SwaggerResponse(200, "Returns the ticket", typeof(TicketDTO_Nested))]
+    [SwaggerResponse(404, "If the ticket is not found", typeof(string))]
+    [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<TicketDTO_Nested>> GetTicket(long id)
     {
         try
@@ -29,7 +34,7 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
-            if (e is ArgumentNullException)
+            if (e is KeyNotFoundException)
             {
                 return NotFound($"Ticket with id {id} not found");
             }
@@ -38,6 +43,10 @@ public class TicketController : ControllerBase
     }
 
     [HttpPost]
+    [SwaggerOperation(Summary = "Creates a new ticket", Description = "Creates a new ticket with the provided details.")]
+    [SwaggerResponse(201, "Returns the created ticket", typeof(Ticket))]
+    [SwaggerResponse(400, "If there is an error", typeof(string))]
+    [SwaggerResponse(409, "If a ticket for assigned show with assigned seat exists", typeof(string))]
     public async Task<ActionResult<TicketDTO_Nested>> AddTicket(TicketDTO ticketDTO)
     {
         var ticket = _mapper.Map<Ticket>(ticketDTO);
@@ -59,6 +68,10 @@ public class TicketController : ControllerBase
     }
 
     [HttpPut]
+    [SwaggerOperation(Summary = "Updates an existing ticket", Description = "Updates the details of an existing ticket.")]
+    [SwaggerResponse(200, "Returns the updated ticket", typeof(TicketDTO_Nested))]
+    [SwaggerResponse(400, "If there is an error", typeof(string))]
+    [SwaggerResponse(404, "If the ticket is not found", typeof(string))]
     public async Task<ActionResult<TicketDTO_Nested>> UpdateTicket([FromBody] TicketDTO ticketDTO)
     {
         var ticket = _mapper.Map<Ticket>(ticketDTO);
@@ -69,11 +82,18 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
+            if (e is KeyNotFoundException)
+            {
+                return NotFound($"No ticket found with id {ticket.TicketId}");
+            }
             return BadRequest(e.Message);
         }
     }
 
     [HttpDelete("{id}")]
+    [SwaggerOperation(Summary = "Deletes a ticket", Description = "Deletes a specific ticket by its ID.")]
+    [SwaggerResponse(200, "Returns the deleted ticket", typeof(TicketDTO_Nested))]
+    [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<TicketDTO_Nested>> DeleteTicket(int id)
     {
         try
