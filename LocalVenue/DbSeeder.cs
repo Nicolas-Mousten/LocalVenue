@@ -1,6 +1,7 @@
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Enums;
+using Microsoft.AspNetCore.Identity;
 
 public static class DbSeeder
 {
@@ -45,7 +46,50 @@ public static class DbSeeder
                 UpsertTicket(context, new Ticket { TicketId = ticketId++, Price = (decimal)(random.NextDouble() * 100), SeatId = seat.SeatId, ShowId = show.ShowId });
             }
         }
-        context.SaveChanges();
+        
+        //Seed Admin user
+        var admin = new Customer
+        {
+            Id = "1",
+            FirstName = "Admin",
+            LastName = "Admin",
+            Email = "admin@hotmail.com",
+            NormalizedUserName = "ADMIN",
+            NormalizedEmail = "ADMIN@HOTMAIL.COM",
+            UserName = "admin"
+        };
+        
+        if (context.Users.Find("1") == null)
+        {
+        
+            var passwordHasher = new PasswordHasher<Customer>();
+        
+            admin.PasswordHash = passwordHasher.HashPassword(admin, "123");
+        
+            context.Users.Add(admin);
+        
+            var role = new IdentityRole
+            {
+                Name = "Admin"
+            };
+        
+            context.SaveChanges();
+        
+            context.Roles.Add(role);
+        
+            context.Roles.Add(role);
+        
+            var roleMapping = new IdentityUserRole<string>
+            {
+                RoleId = role.Id,
+                UserId = admin.Id
+            };
+        
+            context.UserRoles.Add(roleMapping);
+        
+            context.SaveChanges();
+        
+        }
     }
 
     private static void UpsertSeat(VenueContext context, Seat seat)
