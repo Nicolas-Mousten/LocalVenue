@@ -1,6 +1,7 @@
 using AutoMapper;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -61,6 +62,7 @@ public class SeatController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPost]
     [SwaggerOperation(Summary = "Creates a new seat", Description = "Creates a new seat with the provided details.")]
     [SwaggerResponse(201, "Returns the created seat", typeof(Seat))]

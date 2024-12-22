@@ -5,10 +5,12 @@ namespace LocalVenue.Core.Entities;
 
 public class Customer : IdentityUser
 {
+    [Required]
     [MaxLength(255)]
-    public required string FirstName { get; set; }
+    public string FirstName { get; set; }
+    [Required]
     [MaxLength(255)]
-    public required string LastName { get; set; }
+    public string LastName { get; set; }
     
     public bool IsGoldenMember { get; set; }
 

@@ -62,7 +62,8 @@ builder.Services.AddIdentity<Customer, IdentityRole>(options =>
         options.Password.RequiredUniqueChars = 0;
         options.Password.RequireNonAlphanumeric = false;
     })
-    .AddEntityFrameworkStores<VenueContext>();
+    .AddEntityFrameworkStores<VenueContext>()
+    .AddApiEndpoints();
 
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
@@ -119,6 +120,8 @@ app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+
 
 app.MapControllers();
 
