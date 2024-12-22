@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Shared.WebComponents;
 using LocalVenue.Core.Interfaces;
 using LocalVenue.Core.Services;
+using LocalVenue.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +33,7 @@ builder.Services.AddDbContextFactory<VenueContext>(options =>
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IShowService, ShowService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -52,6 +54,7 @@ builder.Services.AddIdentity<Customer, IdentityRole>(options =>
         options.SignIn.RequireConfirmedAccount = false;
         options.SignIn.RequireConfirmedPhoneNumber = false;
         options.SignIn.RequireConfirmedAccount = false;
+        options.SignIn.RequireConfirmedEmail = false;
 
         options.Password.RequiredLength = 3;
         options.Password.RequireUppercase = false;

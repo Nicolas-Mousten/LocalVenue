@@ -1,0 +1,128 @@
+﻿<!-- Login.razor -->
+@page "/login"
+@page "/Account/Login"
+@using global::Shared.WebComponents
+@using LocalVenue.Core.Entities
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Customer> SignInManager
+@inject UserManager<Customer> UserManager
+@inject NavigationManager Navigation
+@inject IJSRuntime JavaScript
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+</style>
+<div class="container mt-5 pt-5 text-center">
+    <h1 style="font-family: 'Playfair Display', serif; color: #000; font-size: 3rem;">Login</h1>
+</div>
+<!-- Regristrering -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6" style="background-color: rgba(255, 255, 255, 0.9); padding: 70px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+
+            <EditForm FormName="login" Model="@loginModel" OnValidSubmit="LoginUser">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label" style="color: #000;">Email</label>
+                    <InputText id="email" @bind-Value="loginModel!.Email" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label" style="color: #000;">Kodeord</label>
+                    <InputText id="password" @bind-Value="loginModel!.Password" type="password" class="form-control"/>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mb-3" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="visually-hidden">Loading...</span>
+                    }
+                    else
+                    {
+                        <span>Login</span>
+                    }
+                </button>
+                <!-- Fejlmeddelelse ved login -->
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger" role="alert">@error</div>
+                }
+            </EditForm>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private bool isSubmitting;
+    LoginModel? loginModel;
+    private string? error;
+
+    [Parameter] public string? ReturnUrl { get; set; }
+
+    public class LoginModel
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        loginModel ??= new LoginModel();
+        return base.OnInitializedAsync();
+    }
+
+    private async Task LoginUser()
+    {
+        isSubmitting = true;
+        StateHasChanged();
+
+        var currentUri = await JavaScript.InvokeAsync<string>("eval", "window.location.href");
+
+        if (currentUri.Contains("ReturnUrl="))
+        {
+            ReturnUrl = Uri.UnescapeDataString((Navigation.ToAbsoluteUri(currentUri).GetComponents(UriComponents.Query, UriFormat.UriEscaped)).Substring("ReturnUrl=".Length));
+        }
+
+        error = null;
+        var user = await UserManager.FindByEmailAsync(loginModel!.Email);
+
+        if (user == null)
+        {
+            error = "Forkert brugernavn eller adgangskode. Venligst prøv igen.";
+            isSubmitting = false; // Gør knappen aktiv igen
+            StateHasChanged(); // Opdater UI
+            return;
+        }
+
+
+        if (await SignInManager.CanSignInAsync(user))
+        {
+            var result = await SignInManager.CheckPasswordSignInAsync(user, loginModel!.Password, true);
+            if (result == SignInResult.Success)
+            {
+                Guid key = Guid.NewGuid();
+                BlazorCookieLoginMiddleware.Logins[key] = new LoginInfo { Email = loginModel!.Email, Password = loginModel!.Password, ReturnUrl = ReturnUrl };
+                Navigation.NavigateTo($"/login?key={key}", true);
+            }
+            else
+            {
+                error = "Forkert e-mail eller adgangskode. Venligst prøv igen.";
+            }
+        }
+        else
+        {
+            error = "For mange forsøg, din konto er blokeret.";
+        }
+
+        isSubmitting = false;
+        StateHasChanged();
+    }
+
+}

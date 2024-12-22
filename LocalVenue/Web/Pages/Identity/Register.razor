@@ -1,0 +1,133 @@
+﻿@page "/register"
+@using LocalVenue.Core.Entities
+@using LocalVenue.Core.Interfaces
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Customer> UserManager
+@inject NavigationManager Navigation
+@inject ICustomerService CustomerService
+@rendermode InteractiveServer
+
+<style>
+    body {
+        background-color: #f0f0f0;
+    }
+</style>
+
+
+<div class="container mt-5 pt-5 text-center">
+    <h1 style="font-family: 'Playfair Display', serif; color: #000; font-size: 3rem;">Opret bruger</h1>
+</div>
+
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6" style="background-color: rgba(255, 255, 255, 0.9); padding: 70px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+
+            <EditForm FormName="register" Model="@registerModel" OnValidSubmit="RegisterUser">
+                <DataAnnotationsValidator/>
+                <ValidationSummary class="text-danger"/>
+
+
+                <div class="mb-3">
+                    <label for="firstname" class="form-label">Navn</label>
+                    <InputText id="firstname" @bind-Value="registerModel!.FirstName" type="name" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="lastname" class="form-label">Efternavn</label>
+                    <InputText id="lastname" @bind-Value="registerModel!.LastName" type="name" class="form-control"/>
+                </div>
+
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    <InputText id="Email" @bind-Value="registerModel!.Email" type="Email" class="form-control"/>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Kodeord</label>
+                    <InputText id="password" @bind-Value="registerModel!.Password" type="password" class="form-control"/>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Bekræft kodeord</label>
+                    <InputText id="confirmPassword" @bind-Value="registerModel!.ConfirmPassword" type="password" class="form-control"/>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary w-100 mb-3" disabled="@isSubmitting">
+                    @if (isSubmitting)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="visually-hidden">Loading...</span>
+                    }
+                    else
+                    {
+                        <span>Opret Bruger</span>
+                    }
+                </button>
+
+                <!-- Fejlvisning -->
+                @if (errors.Any())
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @foreach (var error in errors)
+                        {
+                            <div>@error</div>
+                        }
+                    </div>
+                }
+            </EditForm>
+
+        </div>
+    </div>
+</div>
+
+@code {
+    RegisterModel? registerModel;
+    private bool isSubmitting = false;
+    private List<string>? errors;
+
+    public class RegisterModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string ConfirmPassword { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        registerModel ??= new RegisterModel();
+        errors ??= [];
+        base.OnInitialized();
+    }
+
+    private async Task RegisterUser()
+    {
+        isSubmitting = true;
+
+        var user = new Models.Customer()
+        {
+            FirstName = registerModel!.FirstName,
+            LastName = registerModel!.LastName,
+            Email = registerModel!.Email,
+        };
+        
+        var result = await CustomerService.CreateCustomerAsync(user, registerModel!.Password);
+
+        if (result.Succeeded)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            errors = result.Errors.Select(err => err.Description).ToList();
+        }
+
+        isSubmitting = false;
+    }
+
+}
