@@ -1,13 +1,16 @@
 using LocalVenue.Core.Enums;
 
-namespace LocalVenue.Core.Models;
+namespace LocalVenue.RequestDTOs;
 
-public class ShowDTO
+public class ShowRequestDTO
 {
-    public long ShowId { get; set; }
-    public required string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
+
     public string? Description { get; set; }
+
     public DateTime StartTime { get; set; }
+
     public DateTime EndTime { get; set; }
+
     public Genre Genre { get; set; }
 }

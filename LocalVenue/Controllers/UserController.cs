@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LocalVenue.Core.Controllers;
+namespace LocalVenue.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class UserController(SignInManager<Customer> signInManager, UserManager<Customer> userManager) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult> Login (LoginRequest request)
+    public async Task<ActionResult> Login(LoginRequest request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)

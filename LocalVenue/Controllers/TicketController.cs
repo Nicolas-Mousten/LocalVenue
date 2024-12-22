@@ -1,11 +1,11 @@
 using AutoMapper;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Interfaces;
-using LocalVenue.Core.Models;
+using LocalVenue.RequestDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace LocalVenue.Core.Controllers;
+namespace LocalVenue.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -22,10 +22,10 @@ public class TicketController : ControllerBase
 
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Gets a ticket by ID", Description = "Retrieves a specific ticket by its ID.")]
-    [SwaggerResponse(200, "Returns the ticket", typeof(TicketDTO_Nested))]
+    [SwaggerResponse(200, "Returns the ticket", typeof(Ticket))]
     [SwaggerResponse(404, "If the ticket is not found", typeof(string))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
-    public async Task<ActionResult<TicketDTO_Nested>> GetTicket(long id)
+    public async Task<ActionResult<Ticket>> GetTicket(long id)
     {
         try
         {
@@ -47,9 +47,9 @@ public class TicketController : ControllerBase
     [SwaggerResponse(201, "Returns the created ticket", typeof(Ticket))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     [SwaggerResponse(409, "If a ticket for assigned show with assigned seat exists", typeof(string))]
-    public async Task<ActionResult<TicketDTO_Nested>> AddTicket(TicketDTO ticketDTO)
+    public async Task<ActionResult<Ticket>> AddTicket(TicketRequestDTO ticketRequestDTO)
     {
-        var ticket = _mapper.Map<Ticket>(ticketDTO);
+        var ticket = _mapper.Map<Ticket>(ticketRequestDTO);
         try
         {
             var createdTicket = await _ticketService.AddTicket(ticket);
@@ -69,12 +69,12 @@ public class TicketController : ControllerBase
 
     [HttpPut]
     [SwaggerOperation(Summary = "Updates an existing ticket", Description = "Updates the details of an existing ticket.")]
-    [SwaggerResponse(200, "Returns the updated ticket", typeof(TicketDTO_Nested))]
+    [SwaggerResponse(200, "Returns the updated ticket", typeof(Ticket))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     [SwaggerResponse(404, "If the ticket is not found", typeof(string))]
-    public async Task<ActionResult<TicketDTO_Nested>> UpdateTicket([FromBody] TicketDTO ticketDTO)
+    public async Task<ActionResult<Ticket>> UpdateTicket([FromBody] TicketRequestDTO ticketRequestDTO)
     {
-        var ticket = _mapper.Map<Ticket>(ticketDTO);
+        var ticket = _mapper.Map<Ticket>(ticketRequestDTO);
         try
         {
             var updatedTicket = await _ticketService.UpdateTicket(ticket);
@@ -92,9 +92,9 @@ public class TicketController : ControllerBase
 
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Deletes a ticket", Description = "Deletes a specific ticket by its ID.")]
-    [SwaggerResponse(200, "Returns the deleted ticket", typeof(TicketDTO_Nested))]
+    [SwaggerResponse(200, "Returns the deleted ticket", typeof(Ticket))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
-    public async Task<ActionResult<TicketDTO_Nested>> DeleteTicket(int id)
+    public async Task<ActionResult<Ticket>> DeleteTicket(int id)
     {
         try
         {

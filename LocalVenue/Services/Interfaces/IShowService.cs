@@ -5,12 +5,12 @@ namespace LocalVenue.Core.Interfaces
 {
     public interface IShowService
     {
-        Task<PagedList<ShowDTO_Nested>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title");
-        Task<ShowDTO_Nested> GetShow(long id);
-        Task<ShowDTO_Nested> GetShow(string searchParameter, string searchProperty = "Title");
-        Task<List<TicketDTO_Nested>> GetAvailableTicketsForShow(long showId);
-        Task<ShowDTO_Nested> AddShow(Show show);
-        Task<ShowDTO_Nested> UpdateShow(Show show);
-        Task<ShowDTO_Nested> DeleteShow(long id);
+        Task<PagedList<Show>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title");
+        Task<Show> GetShow(long id);
+        Task<Show> GetShow(string searchParameter, string searchProperty = "Title");
+        Task<List<Ticket>> GetAvailableTicketsForShow(long showId);
+        Task<Show> AddShow(Show show);
+        Task<Show> UpdateShow(Show show);
+        Task<Show> DeleteShow(long id);
     }
 }
