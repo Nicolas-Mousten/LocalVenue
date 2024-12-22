@@ -15,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
 builder.Services.AddAutoMapper(typeof(Program)); //AutoMapper configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -23,6 +27,10 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new() { Title = "LocalVenue API", Version = "v1" });
     c.EnableAnnotations();
 }); //TODO: Add authentication for the API (JWT maybe?)
+    // TODO: Fix the schemas shown for the API in Swagger
+    // TODO: Investigate if az cli can be used to deploy the app to Azure from pipeline
+    //      TODO: Try to add dotnet and postman testing in pipeline
+    // TODO: Implement the customer entity and some basic authentication for the API
 
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {

@@ -1,11 +1,10 @@
-using AutoMapper;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace LocalVenue.Core.Controllers;
+namespace LocalVenue.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

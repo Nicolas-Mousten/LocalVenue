@@ -1,29 +1,24 @@
-using LocalVenue.Core.Models;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 
 namespace LocalVenue.Core.Services;
 
 public class TicketService : GenericCRUDService<Ticket>, ITicketService
 {
     private readonly VenueContext _context;
-    private readonly IMapper _mapper;
 
-    public TicketService(VenueContext context, IMapper mapper) : base(context)
+    public TicketService(VenueContext context) : base(context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
-    public async Task<TicketDTO_Nested> GetTicket(long id)
+    public async Task<Ticket> GetTicket(long id)
     {
-        var returnTicket = await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
-        return _mapper.Map<TicketDTO_Nested>(returnTicket);
+        return await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 
-    public async Task<TicketDTO_Nested> AddTicket(Ticket ticket)
+    public async Task<Ticket> AddTicket(Ticket ticket)
     {
         //Check if the ticket's seat, customer, and show exist
         if (await _context.Seats.FindAsync(ticket.SeatId) == null)
@@ -52,11 +47,10 @@ public class TicketService : GenericCRUDService<Ticket>, ITicketService
             throw new ArgumentException($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned");
         }
 
-        var returnTicket = await base.AddItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
-        return _mapper.Map<TicketDTO_Nested>(returnTicket);
+        return await base.AddItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 
-    public async Task<TicketDTO_Nested> UpdateTicket(Ticket ticket)
+    public async Task<Ticket> UpdateTicket(Ticket ticket)
     {
         if (await _context.Seats.FindAsync(ticket.SeatId) == null)
         {
@@ -78,13 +72,11 @@ public class TicketService : GenericCRUDService<Ticket>, ITicketService
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }
 
-        var returnTicket = await base.UpdateItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
-        return _mapper.Map<TicketDTO_Nested>(returnTicket);
+        return await base.UpdateItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 
-    public async Task<TicketDTO_Nested> DeleteTicket(long id)
+    public async Task<Ticket> DeleteTicket(long id)
     {
-        var returnTicket = await base.DeleteItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
-        return _mapper.Map<TicketDTO_Nested>(returnTicket);
+        return await base.DeleteItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 }
