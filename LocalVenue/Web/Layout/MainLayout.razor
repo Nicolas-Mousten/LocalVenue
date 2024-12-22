@@ -1,4 +1,10 @@
-﻿@inherits LayoutComponentBase
+﻿@using LocalVenue.Core.Entities
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@inherits LayoutComponentBase
+@inject SignInManager<Customer> SignInManager
+@inject UserManager<Customer> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="page">
     <div class="sidebar">
@@ -7,7 +13,24 @@
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (SignInManager.IsSignedIn(AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User))
+            {
+                <div class="d-flex flex-row align-items-center justify-content-evenly">
+                @if (Customer is not null)
+                {
+                    <div class="mx-2">@Customer.FirstName</div>
+                    <div class="mx-2">@Customer.LastName</div>
+                }
+                    <a href="/Logout" class="btn btn-primary mx-2">Log ud</a>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <a href="/Login" class="btn btn-primary">Login</a>
+                    <a href="/Register" class="btn btn-primary">Register</a>
+                </div>
+            }
         </div>
 
         <article class="content px-4">
@@ -21,3 +44,24 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code
+{
+    private Models.Customer? Customer { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserManager.GetUserAsync((await AuthenticationStateProvider.GetAuthenticationStateAsync()).User);
+        
+        if (user != null)
+        {
+            Customer = new Models.Customer
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+            };
+        }
+    }
+
+}
