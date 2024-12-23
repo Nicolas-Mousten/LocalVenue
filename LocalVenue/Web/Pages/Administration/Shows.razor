@@ -43,39 +43,44 @@
 
 <Modal @ref="Modal" Title="@(CreatingNewShow ? "Opret show" : "Rediger show")" Id="show-model">
     <Body>
-    <div class="row">
-        <div class="col-md-6 mb-3">
-            <FloatingLabelHeader LabelText="Titel" InputFieldId="show-title-input">
-                <InputText class="form-control" id="show-title-input" @bind-Value="Show.Title"></InputText>
-            </FloatingLabelHeader>
+    <EditForm Model="Show">
+        <DataAnnotationsValidator/>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <FloatingLabelHeader LabelText="Titel" InputFieldId="show-title-input">
+                    <InputText class="form-control" id="show-title-input" @bind-Value="Show.Title"></InputText>
+                    <ValidationMessage For="() => Show.Title" class="text-danger"></ValidationMessage>
+                </FloatingLabelHeader>
+            </div>
+            <div class="col-md-6">
+                <FloatingLabelHeader LabelText="Genre" InputFieldId="show-genre-input">
+                    <InputSelect class="form-control" id="show-genre-input" @bind-Value="Show.Genre">
+                        @foreach (Genre genre in Enum.GetValues(typeof(Genre)))
+                        {
+                            <option value="@genre">@genre.ToNewString()</option>
+                        }
+                    </InputSelect>
+                </FloatingLabelHeader>
+            </div>
+            <div class="mb-3">
+                <FloatingLabelHeader LabelText="Beskrivelse" InputFieldId="show-description-input">
+                    <InputTextArea style="height: 100px;" class="form-control" id="show-description-input" @bind-Value="Show.Description"></InputTextArea>
+                    <ValidationMessage For="() => Show.Description" class="text-danger"></ValidationMessage>
+                </FloatingLabelHeader>
+            </div>
+
+            <div class="col-md-6">
+                <FloatingLabelHeader LabelText="Start Tid" InputFieldId="show-start-time-input">
+                    <InputDate class="form-control" id="show-start-time-input" Type="InputDateType.DateTimeLocal" @bind-Value="Show.StartTime"></InputDate>
+                </FloatingLabelHeader>
+            </div>
+            <div class="col-md-6">
+                <FloatingLabelHeader LabelText="Slut Tid" InputFieldId="show-end-time-input">
+                    <InputDate class="form-control" id="show-end-time-input" Type="InputDateType.DateTimeLocal" @bind-Value="Show.EndTime"></InputDate>
+                </FloatingLabelHeader>
+            </div>
         </div>
-        <div class="col-md-6">
-            <FloatingLabelHeader LabelText="Genre" InputFieldId="show-genre-input">
-                <InputSelect class="form-control" id="show-genre-input" @bind-Value="Show.Genre">
-                    @foreach(Genre genre in Enum.GetValues(typeof(Genre)))
-                    {
-                        <option value="@genre">@genre.ToNewString()</option>
-                    }
-                </InputSelect>
-            </FloatingLabelHeader>
-        </div>
-        <div class="mb-3">
-            <FloatingLabelHeader LabelText="Beskrivelse" InputFieldId="show-description-input">
-                <InputTextArea style="height: 100px;" class="form-control" id="show-description-input" @bind-Value="Show.Description"></InputTextArea>
-            </FloatingLabelHeader>
-        </div>
-            
-        <div class="col-md-6">
-            <FloatingLabelHeader LabelText="Start Tid" InputFieldId="show-start-time-input">
-                <InputDate class="form-control" id="show-start-time-input" Type="InputDateType.DateTimeLocal" @bind-Value="Show.StartTime"></InputDate>
-            </FloatingLabelHeader>
-        </div>
-        <div class="col-md-6">
-            <FloatingLabelHeader LabelText="Slut Tid" InputFieldId="show-end-time-input">
-                <InputDate class="form-control" id="show-end-time-input" Type="InputDateType.DateTimeLocal" @bind-Value="Show.EndTime"></InputDate>
-            </FloatingLabelHeader>
-        </div>
-    </div>
+    </EditForm>
     </Body>
     <FooterContent>
         <div class="d-flex flex-grow-1 justify-content-between">
@@ -92,7 +97,8 @@
 
     private bool CreatingNewShow { get; set; }
 
-    private Modal Modal { get; set; }
+    private Modal? Modal { get; set; }
+    private EditForm? EditForm { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,21 +119,26 @@
             EndTime = show.EndTime,
             Genre = show.Genre
         };
-        Modal.Open();
+        Modal?.Open();
     }
 
     private void CreateShowModal()
     {
         CreatingNewShow = true;
         Show = new Show();
-        Modal.Open();
+        Modal?.Open();
     }
 
     private async Task CreateShow()
     {
+        if (EditForm?.EditContext?.Validate() == false)
+        {
+            return;
+        }
+        
         var success = await ShowService.CreateShowAsync(Show);
 
-        Modal.Close();
+        Modal?.Close();
         
         if (success)
         {
@@ -141,9 +152,14 @@
     
     private async Task UpdateShow()
     {
+        if (EditForm?.EditContext?.Validate() == false)
+        {
+            return;
+        }
+        
         var success = await ShowService.UpdateShowAsync(Show);
         
-        Modal.Close();
+        Modal?.Close();
         
         if (success)
         {
