@@ -15,7 +15,7 @@ on:
       - ".github/workflows/pr-workflow.yml"
 
 jobs:
-  build:
+  xunit-test:
     runs-on: ubuntu-24.04
 
     steps:

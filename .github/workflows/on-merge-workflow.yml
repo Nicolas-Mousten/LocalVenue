@@ -9,7 +9,7 @@ on:
       - ".github/workflows/on-merge-workflow.yml"
 
 jobs:
-  deploy:
+  postman-test:
     runs-on: ubuntu-24.04
 
     steps:
