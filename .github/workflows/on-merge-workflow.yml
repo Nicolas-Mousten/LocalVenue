@@ -30,7 +30,7 @@ jobs:
         run: |
           newman run "LocalVenue Tests.postman_collection.json" \
             --env-var "webUrl=https://localvenue-webapp-casp0006.azurewebsites.net/" \
-            --reporters htmlextra \
+            --reporters cli,htmlextra \
             --reporter-htmlextra-export testResults/runreport.html \
             --reporter-htmlextra-darkTheme
 
