@@ -61,4 +61,57 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
         
         return await context.Shows.ToListAsync();
     }
+
+    public async Task<bool> CreateShowAsync(Web.Models.Show show)
+    {
+        try
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+        
+            var newShow = new Show
+            {
+                Title = show.Title,
+                Description = show.Description,
+                StartTime = show.StartTime,
+                EndTime = show.EndTime,
+                Genre = show.Genre,
+            };
+        
+            context.Shows.Add(newShow);
+            await context.SaveChangesAsync();
+        } catch
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public async Task<bool> UpdateShowAsync(Web.Models.Show show)
+    {
+        try
+        {
+            await using var context = await _contextFactory.CreateDbContextAsync();
+
+            var showToUpdate = await context.Shows.FirstOrDefaultAsync(x => x.ShowId == show.Id);
+            
+            if (showToUpdate == null)
+            {
+                return false;
+            }
+            
+            showToUpdate.Title = show.Title;
+            showToUpdate.Description = show.Description;
+            showToUpdate.StartTime = show.StartTime;
+            showToUpdate.EndTime = show.EndTime;
+            showToUpdate.Genre = show.Genre;
+
+            context.Shows.Update(showToUpdate);
+            await context.SaveChangesAsync();
+        
+        } catch
+        {
+            return false;
+        }
+        return true;
+    }
 }
