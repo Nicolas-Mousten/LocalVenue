@@ -1,7 +1,7 @@
-using LocalVenue.Core.Models;
 using LocalVenue.Core.Entities;
+using LocalVenue.Core.Models;
 
-namespace LocalVenue.Core.Interfaces
+namespace LocalVenue.Services.Interfaces
 {
     public interface IShowService
     {
@@ -12,5 +12,6 @@ namespace LocalVenue.Core.Interfaces
         Task<Show> AddShow(Show show);
         Task<Show> UpdateShow(Show show);
         Task<Show> DeleteShow(long id);
+        public Task<List<Show>> GetAllShows();
     }
 }

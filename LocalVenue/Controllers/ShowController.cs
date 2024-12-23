@@ -1,7 +1,7 @@
 using AutoMapper;
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Interfaces;
 using LocalVenue.RequestModels;
+using LocalVenue.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -30,6 +30,7 @@ public class ShowController : ControllerBase
         [FromQuery] int pageSize = 10,
         [FromQuery] string? searchParameter = null,
         [FromQuery, SwaggerParameter("The property to search by. Defaults to 'Title' if left empty.")] string? searchProperty = null)
+    //TODO: can searchProperty be an enum instead of string?
     {
         try
         {

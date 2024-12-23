@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.WebComponents;
-using LocalVenue.Core.Interfaces;
 using LocalVenue.Core.Services;
 using LocalVenue.Services;
+using LocalVenue.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,46 +32,7 @@ builder.Services.AddSwaggerGen(c =>
 
 
 // Database context setup starts
-var connectionStrings = new List<string>();
-if (builder.Environment.IsDevelopment()) //pull secrets from local storage or Azure configuration
-{
-    var venueContextLocal = builder.Configuration.GetConnectionString("VenueContextLocal") ?? throw new ArgumentNullException("VenueContextLocal");
-    connectionStrings.Add(venueContextLocal);
-}
-var venueContext = builder.Configuration.GetConnectionString("VenueContext") ?? throw new ArgumentNullException("VenueContext");
-connectionStrings.Add(venueContext);
-
-string? connectionString = null;
-bool connected = false;
-
-foreach (var connStr in connectionStrings)
-{
-    try
-    {
-        var optionsBuilder = new DbContextOptionsBuilder<VenueContext>();
-        optionsBuilder.UseMySql(connStr, ServerVersion.AutoDetect(connStr));
-
-        using (var context = new VenueContext(optionsBuilder.Options))
-        {
-            if (context.Database.CanConnect())
-            {
-                connectionString = connStr;
-                connected = true;
-                break;
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Failed to connect using connection string: {connStr}. Error: {ex.Message}");
-    }
-}
-
-if (!connected)
-{
-    throw new Exception("Failed to connect to any database.");
-}
-
+var connectionString = builder.Configuration.GetConnectionString("VenueContext") ?? throw new ArgumentNullException("VenueContext");
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.Parse("8.0-mysql"));
@@ -168,8 +129,6 @@ app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-
 
 app.MapControllers();
 

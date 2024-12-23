@@ -70,7 +70,8 @@ public static class DbSeeder
         
             var role = new IdentityRole
             {
-                Name = "Admin"
+                Name = "Admin",
+                NormalizedName = "ADMIN",
             };
         
             context.SaveChanges();

@@ -1,0 +1,17 @@
+@page "/Logout"
+@using LocalVenue.Core.Entities
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Customer> SignInManager
+@inject NavigationManager NavigationManager
+<h1 class="primary-color">Du er igang med blive logged ud...</h1>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await SignInManager.SignOutAsync();
+        
+        Thread.Sleep(1500); 
+        
+        NavigationManager.NavigateTo("/");
+    }
+}

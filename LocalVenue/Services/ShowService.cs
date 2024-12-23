@@ -1,18 +1,15 @@
+using LocalVenue.Core;
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Interfaces;
 using LocalVenue.Core.Models;
+using LocalVenue.Core.Services;
+using LocalVenue.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace LocalVenue.Core.Services;
+namespace LocalVenue.Services;
 
-public class ShowService : GenericCRUDService<Show>, IShowService
+public class ShowService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Show>(contextFactory), IShowService
 {
-    private readonly VenueContext _context;
-
-    public ShowService(VenueContext context) : base(context)
-    {
-        _context = context;
-    }
+    private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
     public async Task<PagedList<Show>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title")
     {
@@ -31,14 +28,16 @@ public class ShowService : GenericCRUDService<Show>, IShowService
 
     public async Task<List<Ticket>> GetAvailableTicketsForShow(long showId)
     {
-        var ticket = await _context.Shows.Include(show => show.Tickets).FirstOrDefaultAsync(show => show.ShowId == showId);
+        await using var context = await _contextFactory.CreateDbContextAsync();
+        
+        var ticket = await context.Shows.Include(show => show.Tickets).FirstOrDefaultAsync(show => show.ShowId == showId);
 
         if (ticket == null)
         {
             throw new KeyNotFoundException($"Show with id {showId} not found");
         }
 
-        return ticket!.Tickets!.Where(ticket => ticket.Status == Enums.Status.Available).ToList();
+        return ticket!.Tickets!.Where(ticket => ticket.Status == Core.Enums.Status.Available).ToList();
     }
 
     public async Task<Show> AddShow(Show show)
@@ -54,5 +53,12 @@ public class ShowService : GenericCRUDService<Show>, IShowService
     public async Task<Show> DeleteShow(long id)
     {
         return await base.DeleteItem(id);
+    }
+
+    public async Task<List<Show>> GetAllShows()
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync();
+        
+        return await context.Shows.ToListAsync();
     }
 }

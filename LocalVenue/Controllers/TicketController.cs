@@ -1,7 +1,7 @@
 using AutoMapper;
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Interfaces;
 using LocalVenue.RequestModels;
+using LocalVenue.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 

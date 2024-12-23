@@ -1,4 +1,4 @@
-﻿using LocalVenue.Core.Interfaces;
+﻿using LocalVenue.Services.Interfaces;
 using LocalVenue.Web.Models;
 using Microsoft.AspNetCore.Identity;
 

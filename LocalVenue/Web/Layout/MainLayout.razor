@@ -1,13 +1,42 @@
-﻿@inherits LayoutComponentBase
+﻿@using LocalVenue.Web.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Customer = LocalVenue.Core.Entities.Customer
+@inherits LayoutComponentBase
+@inject SignInManager<Customer> SignInManager
+@inject UserManager<Customer> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+   
+        @if (IsSignedIn)
+        {
+            <div class="sidebar">
+                <NavMenu MenuItems="_menuItems"/>
+            </div>
+        }
+  
 
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+            @if (IsSignedIn)
+            {
+                <div class="d-flex flex-row align-items-center justify-content-evenly">
+                @if (Customer is not null)
+                {
+                    <div class="mx-2">@Customer.FirstName</div>
+                    <div class="mx-2">@Customer.LastName</div>
+                }
+                    <a href="/Logout" class="btn btn-primary mx-2">Log ud</a>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <a href="/Login" class="btn btn-primary">Login</a>
+                    <a href="/Register" class="btn btn-primary">Register</a>
+                </div>
+            }
         </div>
 
         <article class="content px-4">
@@ -21,3 +50,67 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code
+{
+    private Models.Customer? Customer { get; set; }
+    private static bool IsAdmin { get; set; }
+    private static bool IsSignedIn { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsSignedIn = false;
+        
+        var user = await UserManager.GetUserAsync((await AuthenticationStateProvider.GetAuthenticationStateAsync()).User);
+
+        if (user != null)
+        {
+            IsSignedIn = true;
+            
+            var userRoles = await UserManager.GetRolesAsync(user);
+
+            IsAdmin = userRoles.Contains("Admin");
+
+            Customer = new Models.Customer
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+            };
+            
+            _menuItems =
+            [
+                new MenuItem
+                {
+                    Name = "Home",
+                    Link = "",
+                    Icon = "bi-house-door-fill-nav-menu",
+                },
+                new MenuItem
+                {
+                    Name = "Counter",
+                    Link = "counter",
+                    Icon = "bi-plus-square-fill-nav-menu"
+                },
+                new MenuItem
+                {
+                    Name = "Weather",
+                    Link = "weather",
+                    Icon = "bi-list-nested-nav-menu"
+                },
+                new MenuItem
+                {
+                    Name = "Shows",
+                    Link = "Administration/Shows",
+                    Icon = "bi-calendar-check",
+                    Visible = IsAdmin,
+                }
+            ];
+            StateHasChanged();
+        }
+        
+    }
+
+    private List<MenuItem>? _menuItems;
+
+}

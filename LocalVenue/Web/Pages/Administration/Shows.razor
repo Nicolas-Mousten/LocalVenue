@@ -1,10 +1,50 @@
 ﻿@page "/Administration/Shows"
+@using LocalVenue.Services.Interfaces
+@using LocalVenue.Shared.Enums
+@using LocalVenue.Translators
 @using Microsoft.AspNetCore.Authorization
+@using LocalVenue.Web.Components.CustomWrappers
+@using LocalVenue.Web.Models
+@inject IShowService ShowService
+@rendermode InteractiveServer
 
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>Shows</h3>
+<PageTitle>Shows</PageTitle>
+
+<div class="config-card">
+    <div class="config-card-title">Shows</div>
+
+    <div class="">
+        <Grid T="Show" Items="AllShows">
+            <Column Title="Title" Value="@nameof(Show.Title)"></Column>
+            <Column Title="Beskrivelse" Value="@nameof(Show.Description)"></Column>
+            <Column Title="Start Tid" Value="@nameof(Show.StartTime)" Sortable="true" TextAlign="TextAlign.Right" Format="d"></Column>
+            <Column Title="Slut Tid" Value="@nameof(Show.EndTime)" Sortable="true" TextAlign="TextAlign.Right" Format="d"></Column>
+            <Column Title="Genre" TextAlign="TextAlign.Center" Value="@nameof(Show.Genre)"></Column>
+            <Column Title="Rediger" WidthPercent="5" TextAlign="TextAlign.Right" Value="@string.Empty">
+                <CustomDisplay
+                    Context="item">
+                    <button class="btn btn-success" @onclick="() => EditShow(item)"><i class="bi bi-pencil-square"></i></button>
+                </CustomDisplay>
+            </Column>
+        </Grid>
+    </div>
+</div>
 
 @code {
-    
+    public List<Show>? AllShows { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var shows = await ShowService.GetAllShows();
+
+        AllShows = shows.Select(ShowTranslator.Translate).ToList();
+    }
+
+    public async Task EditShow(Show show)
+    {
+        throw new NotImplementedException();
+    }
+
 }
