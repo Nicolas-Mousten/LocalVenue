@@ -8,14 +8,23 @@
 # Step 3b: Probably restart your terminal again
 # Step 4: Run this script
 
-#Bash
-dotnet publish -c Release -r win-x64
+dotnet publish -c Release
 
-#Powershell
-powershell Compress-Archive -Path ./LocalVenue/bin/Release/net8.0/publish/* -DestinationPath ./LocalVenue/bin/Release/publish.zip -Force
+OS=$(uname -s)
 
-#Bash
+if [ "$OS" = "Linux" ] || [ $OS = "Darwin" ]; then # Linux or MacOS
+    zip -r ./LocalVenue/bin/Release/publish.zip ./LocalVenue/bin/Release/net8.0/publish/* 
+else # Windows
+    powershell 'Compress-Archive -Path ./LocalVenue/bin/Release/net8.0/publish/* -DestinationPath ./LocalVenue/bin/Release/publish.zip -Force'
+fi
+
 terraform init --upgrade
 terraform apply --parallelism=25 -auto-approve
 
-#az webapp deploy --resource-group <name> --name <name> --src-path "path"
+# Step 5 (optional): Deploy the app, if Terraform failed or is slow to redeploy once the resources are created
+#> az webapp deploy --resource-group localvenue-<suffix> --name localvenue-webapp-<suffix> --src-path "./LocalVenue/bin/Release/publish.zip"
+
+rm ./LocalVenue/bin/Release/publish.zip # Clean up the zip file
+
+# Step 6: Cleanup can be done with 
+#> terraform destroy -auto-approve
