@@ -1,4 +1,4 @@
-name: Azure CLI Example
+name: Postman Tests
 
 on:
   push:
@@ -10,14 +10,32 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - name: Run Postman tests
-        uses: postmanlabs/newman-action@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v2
         with:
-          collection: tests.postman_collection.json
-          environment: |
-            {
-              "key": "webUrl",
-              "value": "https://localvenue-webapp-casp0006.azurewebsites.net/"
-            }
-          reporters: html
-          reporter-html-export: newman/results.html
+          node-version: "14"
+
+      - name: Install newman
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+
+      - name: Make directory for newman results
+        run: mkdir newman
+
+      - name: Run Postman tests
+        run: |
+          newman run "LocalVenue Tests.postman_collection.json" \
+            --env-var "webUrl=https://localvenue-webapp-casp0006.azurewebsites.net/" \
+            --reporters htmlextra \
+            --reporter-htmlextra-export testResults/runreport.html \
+            --reporter-htmlextra-darkTheme
+
+      - name: Publish Postman results
+        uses: actions/upload-artifact@v2
+        with:
+          name: RunReports
+          path: testResults
