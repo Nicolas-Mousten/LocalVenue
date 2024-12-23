@@ -43,7 +43,7 @@
 
 <Modal @ref="Modal" Title="@(CreatingNewShow ? "Opret show" : "Rediger show")" Id="show-model">
     <Body>
-    <EditForm Model="Show">
+    <EditForm @ref="EditForm" Model="Show">
         <DataAnnotationsValidator/>
         <div class="row">
             <div class="col-md-6 mb-3">
