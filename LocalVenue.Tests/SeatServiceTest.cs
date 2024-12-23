@@ -3,37 +3,46 @@ using LocalVenue.Core.Entities;
 using LocalVenue.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Xunit;
 
 namespace LocalVenue.Tests;
 
 public class SeatServiceTest
 {
-    private readonly DbContextOptions<VenueContext> _options;
+    private readonly ServiceProvider serviceProvider;
+
     public SeatServiceTest()
     {
-        _options = new DbContextOptionsBuilder<VenueContext>()
-            .UseInMemoryDatabase("LocalVenue")
-            .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning))
-            .Options;
+        var services = new ServiceCollection();
+        services.AddDbContextFactory<VenueContext>(options =>
+        {
+            options.UseInMemoryDatabase("InMemoryDb")
+                .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+        });
+
+        serviceProvider = services.BuildServiceProvider();
     }
-    
+
     [Fact]
     public async Task TestSeatServiceGetById()
     {
-        await using var context = new VenueContext(_options);
-        
-        var service = new SeatService(context);
-        
-        var seatId = 1;
-        
-        context.Seats.Add(new Seat { SeatId = seatId, Section = "Front", Row = 1, Number = 1 });
-
-        await context.SaveChangesAsync();
-        
         // Arrange
-  
+        var seatId = 1;
         var expectedSeat = new Seat { SeatId = seatId, Section = "Front", Row = 1, Number = 1 };
+
+        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        
+        await using (var context = await dbContextFactory.CreateDbContextAsync())
+        {
+            context.Seats.Add(expectedSeat);
+            await context.SaveChangesAsync();
+        }
+
         // Act
+        var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+    
+        var service = new SeatService(contextFactoryRetrieve);
         var result = await service.GetSeat(seatId);
 
         // Assert
@@ -42,5 +51,6 @@ public class SeatServiceTest
         Assert.Equal(expectedSeat.Section, result.Section);
         Assert.Equal(expectedSeat.Row, result.Row);
         Assert.Equal(expectedSeat.Number, result.Number);
+        
     }
 }
