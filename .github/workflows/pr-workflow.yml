@@ -6,11 +6,13 @@ on:
     paths:
       - "LocalVenue/**"
       - "LocalVenue.Tests/**"
+      - ".github/workflows/pr-workflow.yml"
   pull_request:
     branches: ["master"]
     paths:
       - "LocalVenue/**"
       - "LocalVenue.Tests/**"
+      - ".github/workflows/pr-workflow.yml"
 
 jobs:
   build:

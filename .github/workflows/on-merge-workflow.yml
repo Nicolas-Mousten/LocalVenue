@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "LocalVenue/**"
+      - ".github/workflows/on-merge-workflow.yml"
 
 jobs:
   deploy:
