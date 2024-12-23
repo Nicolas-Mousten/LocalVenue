@@ -17,16 +17,13 @@ public class GenericCRUDService<T> where T : class
 
     private IQueryable<T> IncludeProperties(params Expression<Func<T, object>>[] includes)
     {
-        using var _context = contextFactory.CreateDbContext();
+        var context = contextFactory.CreateDbContext();
         
-        IQueryable<T> query = _context.Set<T>();
-
-        if (includes != null)
+        IQueryable<T> query = context.Set<T>();
+        
+        foreach (var include in includes)
         {
-            foreach (var include in includes)
-            {
-                query = query.Include(include);
-            }
+            query = query.Include(include);
         }
 
         return query;
