@@ -13,10 +13,9 @@ public enum Genre
     Documentary = 5,
 }
 
-public class Genre1
+public static class Genre1
 {
-    public Genre Genre { get; set; }
-    public override string ToString()
+    public static string ToNewString(this Genre Genre)
     {
         return Genre switch
         {
@@ -29,6 +28,8 @@ public class Genre1
             _ => throw new ArgumentOutOfRangeException(nameof(Genre), Genre, null)
         };
     }
+    
+    
 }
 
 
