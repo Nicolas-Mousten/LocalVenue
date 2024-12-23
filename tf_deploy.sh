@@ -1,5 +1,6 @@
 ##!/bin/bash
 
+# Step 0: Make sure you have "terraform.tfvars" created and filled out as shown in "terraform.tfvars_template"
 # Step 1: Install az cli and terraform
 #> choco install terraform
 #> winget install -e --id Microsoft.AzureCLI
