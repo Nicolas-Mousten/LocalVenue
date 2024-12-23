@@ -9,6 +9,7 @@ public static class ShowTranslator
     {
         return new Show
         {
+            Id = show.ShowId,
             Title = show.Title,
             Description = show.Description,
             StartTime = show.StartTime,

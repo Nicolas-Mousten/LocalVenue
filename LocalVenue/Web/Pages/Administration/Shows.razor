@@ -1,12 +1,17 @@
 ﻿@page "/Administration/Shows"
+@using LocalVenue.Core.Enums
+@using LocalVenue.Helpers
 @using LocalVenue.Services.Interfaces
 @using LocalVenue.Shared.Enums
 @using LocalVenue.Translators
 @using Microsoft.AspNetCore.Authorization
 @using LocalVenue.Web.Components.CustomWrappers
 @using LocalVenue.Web.Models
+@using LocalVenue.Web.Components.BootstrapWrappers
 @inject IShowService ShowService
+@inject IJSRuntime Js;
 @rendermode InteractiveServer
+
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -15,9 +20,13 @@
 <div class="config-card">
     <div class="config-card-title">Shows</div>
 
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-success" @onclick="CreateShowModal" >Opret Show</button>
+    </div>
+    
     <div class="">
         <Grid T="Show" Items="AllShows">
-            <Column Title="Title" Value="@nameof(Show.Title)"></Column>
+            <Column Title="Titel" Value="@nameof(Show.Title)"></Column>
             <Column Title="Beskrivelse" Value="@nameof(Show.Description)"></Column>
             <Column Title="Start Tid" Value="@nameof(Show.StartTime)" Sortable="true" TextAlign="TextAlign.Right" Format="d"></Column>
             <Column Title="Slut Tid" Value="@nameof(Show.EndTime)" Sortable="true" TextAlign="TextAlign.Right" Format="d"></Column>
@@ -32,8 +41,58 @@
     </div>
 </div>
 
+<Modal @ref="Modal" Title="@(CreatingNewShow ? "Opret show" : "Rediger show")" Id="show-model">
+    <Body>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <FloatingLabelHeader LabelText="Titel" InputFieldId="show-title-input">
+                <InputText class="form-control" id="show-title-input" @bind-Value="Show.Title"></InputText>
+            </FloatingLabelHeader>
+        </div>
+        <div class="col-md-6">
+            <FloatingLabelHeader LabelText="Genre" InputFieldId="show-genre-input">
+                <InputSelect class="form-control" id="show-genre-input" @bind-Value="Show.Genre">
+                    @foreach(Genre genre in Enum.GetValues(typeof(Genre)))
+                    {
+                        <option value="@genre">@genre.ToNewString()</option>
+                    }
+                </InputSelect>
+            </FloatingLabelHeader>
+        </div>
+        <div class="mb-3">
+            <FloatingLabelHeader LabelText="Beskrivelse" InputFieldId="show-description-input">
+                <InputTextArea style="height: 100px;" class="form-control" id="show-description-input" @bind-Value="Show.Description"></InputTextArea>
+            </FloatingLabelHeader>
+        </div>
+            
+        <div class="col-md-6">
+            <FloatingLabelHeader LabelText="Start Tid" InputFieldId="show-start-time-input">
+                <InputDate class="form-control" id="show-start-time-input" Type="InputDateType.DateTimeLocal" @bind-Value="Show.StartTime"></InputDate>
+            </FloatingLabelHeader>
+        </div>
+        <div class="col-md-6">
+            <FloatingLabelHeader LabelText="Slut Tid" InputFieldId="show-end-time-input">
+                <InputDate class="form-control" id="show-end-time-input" Type="InputDateType.DateTimeLocal" @bind-Value="Show.EndTime"></InputDate>
+            </FloatingLabelHeader>
+        </div>
+    </div>
+    </Body>
+    <FooterContent>
+        <div class="d-flex flex-grow-1 justify-content-between">
+            <button class="btn btn-secondary" @onclick="Modal.Close">Luk</button>
+            <button class="btn btn-success" @onclick="@(CreatingNewShow ? CreateShow : UpdateShow)" >@(CreatingNewShow ? "Opret" : "Gem ændringer")</button>
+        </div>
+    </FooterContent>
+</Modal>
+
+
 @code {
     public List<Show>? AllShows { get; set; }
+    private Show Show { get; set; } = new();
+
+    private bool CreatingNewShow { get; set; }
+
+    private Modal Modal { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,9 +101,58 @@
         AllShows = shows.Select(ShowTranslator.Translate).ToList();
     }
 
-    public async Task EditShow(Show show)
+    private void EditShow(Show show)
     {
-        throw new NotImplementedException();
+        CreatingNewShow = false;
+        Show = new Show
+        {
+            Id = show.Id,
+            Title = show.Title,
+            Description = show.Description,
+            StartTime = show.StartTime,
+            EndTime = show.EndTime,
+            Genre = show.Genre
+        };
+        Modal.Open();
+    }
+
+    private void CreateShowModal()
+    {
+        CreatingNewShow = true;
+        Show = new Show();
+        Modal.Open();
+    }
+
+    private async Task CreateShow()
+    {
+        var success = await ShowService.CreateShowAsync(Show);
+
+        Modal.Close();
+        
+        if (success)
+        {
+            Toast.SimpleToast(ToastType.Success, "Show oprettet", Js);
+        }
+        else
+        {
+            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke oprette show, prøv igen", Js);
+        }
+    }
+    
+    private async Task UpdateShow()
+    {
+        var success = await ShowService.UpdateShowAsync(Show);
+        
+        Modal.Close();
+        
+        if (success)
+        {
+            Toast.SimpleToast(ToastType.Success, "Show opdateret", Js);
+        }
+        else
+        {
+            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke opdatere show, prøv igen", Js);
+        }
     }
 
 }

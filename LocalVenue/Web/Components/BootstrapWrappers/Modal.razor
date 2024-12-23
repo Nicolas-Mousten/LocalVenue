@@ -1,4 +1,4 @@
-﻿@using LocalVenue.Shared.Enums
+﻿@using global::LocalVenue.Shared.Enums
 @inject IJSRuntime JsRuntime
 
 <div id="@(!string.IsNullOrWhiteSpace(Id) ? Id : $"id-{Guid.NewGuid()}")" class="modal fade @_modalClass @(Centered ? "modal-dialog-centered" : "")" tabindex="-1" role="dialog" style="display:@_modalDisplay; overflow-y: auto;">

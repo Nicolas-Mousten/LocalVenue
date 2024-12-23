@@ -13,5 +13,7 @@ namespace LocalVenue.Services.Interfaces
         Task<Show> UpdateShow(Show show);
         Task<Show> DeleteShow(long id);
         public Task<List<Show>> GetAllShows();
+        public Task<bool> CreateShowAsync(Web.Models.Show show);
+        public Task<bool> UpdateShowAsync(Web.Models.Show show);
     }
 }
