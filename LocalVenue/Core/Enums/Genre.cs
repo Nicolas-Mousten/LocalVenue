@@ -5,7 +5,6 @@ namespace LocalVenue.Core.Enums;
 
 public enum Genre
 {
-    [Description("Musical")]
     Musical = 0,
     Comedy = 1,
     Drama = 2,
