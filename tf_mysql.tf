@@ -18,14 +18,24 @@ resource "azurerm_mysql_flexible_database" "main" {
   collation           = "utf8_unicode_ci"
 }
 
-resource "azurerm_mysql_flexible_server_firewall_rule" "allow_webapp" {
-  for_each            = toset(azurerm_windows_web_app.main.outbound_ip_address_list)
-  name                = "allow-webapp-${replace(each.key, ".", "-")}"
+#Allow all IPs
+resource "azurerm_mysql_flexible_server_firewall_rule" "allow_all_ips" {
+  name                = "allow_all_ips"
   resource_group_name = azurerm_resource_group.main.name
   server_name         = azurerm_mysql_flexible_server.main.name
-  start_ip_address    = each.value
-  end_ip_address      = each.value
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "255.255.255.255"
 }
+
+# Deprecated method for adding individual firewall rules
+# resource "azurerm_mysql_flexible_server_firewall_rule" "allow_webapp" {
+#   for_each            = toset(azurerm_windows_web_app.main.outbound_ip_address_list)
+#   name                = "allow-webapp-${replace(each.key, ".", "-")}"
+#   resource_group_name = azurerm_resource_group.main.name
+#   server_name         = azurerm_mysql_flexible_server.main.name
+#   start_ip_address    = each.value
+#   end_ip_address      = each.value
+# }
 
 locals {
   mysql_connection_string = "server=${azurerm_mysql_flexible_server.main.fqdn};port=3306;database=${var.database_name};uid=${var.sql_user};pwd=${var.sql_password}"
