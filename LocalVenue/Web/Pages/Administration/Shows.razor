@@ -1,10 +1,39 @@
 ﻿@page "/Administration/Shows"
+@using LocalVenue.Core.Enums
+@using LocalVenue.Services.Interfaces
+@using LocalVenue.Translators
 @using Microsoft.AspNetCore.Authorization
+@using LocalVenue.Web.Components.CustomWrappers
+@using LocalVenue.Web.Models
+@inject IShowService ShowService
 
 @attribute [Authorize(Roles = "Admin")]
 
-<h3>Shows</h3>
+<PageTitle>Show</PageTitle>
+
+<div class="config-card">
+    <div class="config-card-title">Shows</div>
+
+    <div class="">
+        <Grid T="Show" Items="AllShows">
+            <Column Title="Title" Value="@nameof(Show.Title)"></Column>
+            <Column Title="Beskrivelse" Value="@nameof(Show.Description)"></Column>
+            <Column Title="Start Tid" Value="@nameof(Show.StartTime)" Format="d"></Column>
+            <Column Title="Slut Tid" Value="@nameof(Show.EndTime)" Format="d"></Column>
+            <Column Title="Genre" Value="@nameof(Show.Genre)"></Column>
+        </Grid>
+    </div>
+    
+</div>
 
 @code {
-    
+    public List<Show>? AllShows { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var shows = await ShowService.GetAllShows();
+
+        AllShows = shows.Select(ShowTranslator.Translate).ToList();
+    }
+
 }

@@ -1,5 +1,5 @@
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Interfaces;
+using LocalVenue.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

@@ -1,6 +1,6 @@
 using LocalVenue.Core.Entities;
 
-namespace LocalVenue.Core.Interfaces
+namespace LocalVenue.Services.Interfaces
 {
     public interface ISeatService
     {

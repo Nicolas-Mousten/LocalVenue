@@ -1,21 +1,20 @@
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Interfaces;
+using LocalVenue.Services;
+using LocalVenue.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Core.Services;
 
-public class SeatService : GenericCRUDService<Seat>, ISeatService
+public class SeatService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Seat>(contextFactory), ISeatService
 {
-    private readonly VenueContext _context;
+    private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
-    public SeatService(VenueContext context) : base(context)
-    {
-        _context = context;
-    }
 
     public async Task<List<Seat>> GetSeatsInRow(int row)
     {
-        var seats = await _context.Seats.Where(seat => seat.Row == row).ToListAsync();
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        var seats = await context.Seats.Where(seat => seat.Row == row).ToListAsync();
         if (seats.Count == 0)
         {
             throw new ArgumentNullException($"No seats found in row {row}");

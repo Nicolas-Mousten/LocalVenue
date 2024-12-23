@@ -1,21 +1,24 @@
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using LocalVenue.Core;
 using LocalVenue.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.ComponentModel.DataAnnotations;
 
-namespace LocalVenue.Core.Services;
+namespace LocalVenue.Services;
 
 public class GenericCRUDService<T> where T : class
 {
-    private readonly VenueContext _context;
+    private readonly IDbContextFactory<VenueContext> contextFactory;
 
-    public GenericCRUDService(VenueContext context)
+    public GenericCRUDService(IDbContextFactory<VenueContext> contextFactory )
     {
-        _context = context;
+        this.contextFactory = contextFactory;
     }
 
     private IQueryable<T> IncludeProperties(params Expression<Func<T, object>>[] includes)
     {
+        using var _context = contextFactory.CreateDbContext();
+        
         IQueryable<T> query = _context.Set<T>();
 
         if (includes != null)
@@ -90,6 +93,8 @@ public class GenericCRUDService<T> where T : class
 
     public async Task<T> AddItem(T item, params Expression<Func<T, object>>[]? includes)
     {
+        await using var _context = await contextFactory.CreateDbContextAsync();
+        
         IQueryable<T> query = IncludeProperties(includes!);
 
         _context.Set<T>().Add(item);
@@ -100,6 +105,8 @@ public class GenericCRUDService<T> where T : class
 
     public async Task<T> UpdateItem(T item, params Expression<Func<T, object>>[]? includes)
     {
+        await using var _context = await contextFactory.CreateDbContextAsync();
+        
         IQueryable<T> query = IncludeProperties(includes!);
 
         var keyProperty = typeof(T).GetProperties()
@@ -122,6 +129,8 @@ public class GenericCRUDService<T> where T : class
 
     public async Task<T> DeleteItem(long id, params Expression<Func<T, object>>[]? includes)
     {
+        await using var _context = await contextFactory.CreateDbContextAsync();
+        
         var item = await GetItem(id, includes);
         if (item == null)
         {

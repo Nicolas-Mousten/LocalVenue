@@ -1,18 +1,14 @@
+using LocalVenue.Core;
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Interfaces;
+using LocalVenue.Core.Services;
+using LocalVenue.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace LocalVenue.Core.Services;
+namespace LocalVenue.Services;
 
-public class TicketService : GenericCRUDService<Ticket>, ITicketService
+public class TicketService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Ticket>(contextFactory), ITicketService
 {
-    private readonly VenueContext _context;
-
-    public TicketService(VenueContext context) : base(context)
-    {
-        _context = context;
-    }
-
+    
     public async Task<Ticket> GetTicket(long id)
     {
         return await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
@@ -20,14 +16,16 @@ public class TicketService : GenericCRUDService<Ticket>, ITicketService
 
     public async Task<Ticket> AddTicket(Ticket ticket)
     {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
         //Check if the ticket's seat, customer, and show exist
-        if (await _context.Seats.FindAsync(ticket.SeatId) == null)
+        if (await context.Seats.FindAsync(ticket.SeatId) == null)
         {
             throw new ArgumentException($"Seat with id '{ticket.SeatId}' does not exist");
         }
         if (!string.IsNullOrWhiteSpace(ticket.CustomerId))
         {
-            if (await _context.Users.FindAsync(ticket.CustomerId) == null)
+            if (await context.Users.FindAsync(ticket.CustomerId) == null)
             {
                 throw new ArgumentException($"Customer with id '{ticket.CustomerId}' does not exist");
             }
@@ -36,13 +34,13 @@ public class TicketService : GenericCRUDService<Ticket>, ITicketService
         {
             ticket.CustomerId = null;
         }
-        if (await _context.Shows.FindAsync(ticket.ShowId) == null)
+        if (await context.Shows.FindAsync(ticket.ShowId) == null)
         {
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }
 
         //Check if the ticket for show and seat already exists
-        if (await _context.Tickets.AnyAsync(t => t.ShowId == ticket.ShowId && t.SeatId == ticket.SeatId))
+        if (await context.Tickets.AnyAsync(t => t.ShowId == ticket.ShowId && t.SeatId == ticket.SeatId))
         {
             throw new ArgumentException($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned");
         }
@@ -52,13 +50,15 @@ public class TicketService : GenericCRUDService<Ticket>, ITicketService
 
     public async Task<Ticket> UpdateTicket(Ticket ticket)
     {
-        if (await _context.Seats.FindAsync(ticket.SeatId) == null)
+        await using var context = await contextFactory.CreateDbContextAsync();
+        
+        if (await context.Seats.FindAsync(ticket.SeatId) == null)
         {
             throw new ArgumentException($"Seat with id '{ticket.SeatId}' does not exist");
         }
         if (!string.IsNullOrWhiteSpace(ticket.CustomerId))
         {
-            if (await _context.Users.FindAsync(ticket.CustomerId) == null)
+            if (await context.Users.FindAsync(ticket.CustomerId) == null)
             {
                 throw new ArgumentException($"Customer with id '{ticket.CustomerId}' does not exist");
             }
@@ -67,7 +67,7 @@ public class TicketService : GenericCRUDService<Ticket>, ITicketService
         {
             ticket.CustomerId = null;
         }
-        if (await _context.Shows.FindAsync(ticket.ShowId) == null)
+        if (await context.Shows.FindAsync(ticket.ShowId) == null)
         {
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }

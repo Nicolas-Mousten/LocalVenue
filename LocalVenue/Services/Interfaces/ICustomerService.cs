@@ -1,7 +1,7 @@
 ﻿using LocalVenue.Web.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace LocalVenue.Core.Interfaces;
+namespace LocalVenue.Services.Interfaces;
 
 public interface ICustomerService
 {
