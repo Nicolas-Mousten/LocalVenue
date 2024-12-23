@@ -3,8 +3,14 @@ name: .NET Tests
 on:
   push:
     branches: ["master"]
+    paths:
+      - "LocalVenue/**"
+      - "LocalVenue.Tests/**"
   pull_request:
     branches: ["master"]
+    paths:
+      - "LocalVenue/**"
+      - "LocalVenue.Tests/**"
 
 jobs:
   build:
