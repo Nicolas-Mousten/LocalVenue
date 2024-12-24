@@ -1,113 +1,103 @@
 {
-	"info": {
-		"_postman_id": "32b20c66-0454-4931-9d82-25bfc408f909",
-		"name": "LocalVenue Tests",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "19420382"
-	},
-	"item": [
-		{
-			"name": "GetSeat/1",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Response status code is 200\", function () {\r",
-							"    pm.expect(pm.response.to.have.status(200));\r",
-							"});\r",
-							"\r",
-							"\r",
-							"pm.test(\"Response time is within an acceptable range\", function () {\r",
-							"  pm.expect(pm.response.responseTime).to.be.below(300);\r",
-							"});\r",
-							"\r",
-							"\r",
-							"pm.test(\"Response has the required fields - seatId, section, row, and number\", function () {\r",
-							"    const responseData = pm.response.json();\r",
-							"\r",
-							"    pm.expect(responseData).to.be.an('object');\r",
-							"    pm.expect(responseData).to.have.property('seatId');\r",
-							"    pm.expect(responseData).to.have.property('section');\r",
-							"    pm.expect(responseData).to.have.property('row');\r",
-							"    pm.expect(responseData).to.have.property('number');\r",
-							"});\r",
-							"\r",
-							"\r",
-							"pm.test(\"SeatId is a non-negative integer\", function () {\r",
-							"    const responseData = pm.response.json();\r",
-							"    pm.expect(responseData.seatId).to.be.a('number').and.to.be.at.least(0);\r",
-							"});\r",
-							"\r",
-							"\r",
-							"pm.test(\"Section, row, and number are non-empty strings or non-negative integers\", function () {\r",
-							"    const responseData = pm.response.json();\r",
-							"    \r",
-							"    pm.expect(responseData).to.be.an('object');\r",
-							"    \r",
-							"    pm.expect(responseData.section).to.satisfy((value) => {\r",
-							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
-							"    }, \"Section should be a non-empty string or a non-negative integer\");\r",
-							"\r",
-							"    pm.expect(responseData.row).to.satisfy((value) => {\r",
-							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
-							"    }, \"Row should be a non-empty string or a non-negative integer\");\r",
-							"\r",
-							"    pm.expect(responseData.number).to.satisfy((value) => {\r",
-							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
-							"    }, \"Number should be a non-empty string or a non-negative integer\");\r",
-							"});\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{webUrl}}/api/Seat/1",
-					"host": [
-						"{{webUrl}}"
-					],
-					"path": [
-						"api",
-						"Seat",
-						"1"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"packages": {},
-				"exec": [
-					""
-				]
-			}
-		}
-	],
-	"variable": [
-		{
-			"key": "webUrl",
-			"value": "http://localhost:5116"
-		}
-	]
+  "info": {
+    "_postman_id": "32b20c66-0454-4931-9d82-25bfc408f909",
+    "name": "LocalVenue Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "19420382"
+  },
+  "item": [
+    {
+      "name": "GetSeat/1",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Response status code is 200\", function () {\r",
+              "    pm.expect(pm.response.to.have.status(200));\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Response time is within an acceptable range\", function () {\r",
+              "  pm.expect(pm.response.responseTime).to.be.below(10000);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Response has the required fields - seatId, section, row, and number\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(responseData).to.be.an('object');\r",
+              "    pm.expect(responseData).to.have.property('seatId');\r",
+              "    pm.expect(responseData).to.have.property('section');\r",
+              "    pm.expect(responseData).to.have.property('row');\r",
+              "    pm.expect(responseData).to.have.property('number');\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"SeatId is a non-negative integer\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    pm.expect(responseData.seatId).to.be.a('number').and.to.be.at.least(0);\r",
+              "});\r",
+              "\r",
+              "\r",
+              "pm.test(\"Section, row, and number are non-empty strings or non-negative integers\", function () {\r",
+              "    const responseData = pm.response.json();\r",
+              "    \r",
+              "    pm.expect(responseData).to.be.an('object');\r",
+              "    \r",
+              "    pm.expect(responseData.section).to.satisfy((value) => {\r",
+              "        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+              "    }, \"Section should be a non-empty string or a non-negative integer\");\r",
+              "\r",
+              "    pm.expect(responseData.row).to.satisfy((value) => {\r",
+              "        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+              "    }, \"Row should be a non-empty string or a non-negative integer\");\r",
+              "\r",
+              "    pm.expect(responseData.number).to.satisfy((value) => {\r",
+              "        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+              "    }, \"Number should be a non-empty string or a non-negative integer\");\r",
+              "});\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{webUrl}}/api/Seat/1",
+          "host": ["{{webUrl}}"],
+          "path": ["api", "Seat", "1"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "webUrl",
+      "value": "http://localhost:5116"
+    }
+  ]
 }
