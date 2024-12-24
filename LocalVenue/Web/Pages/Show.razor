@@ -1,0 +1,51 @@
+﻿@page "/Show/{ShowId}"
+@using LocalVenue.Services.Interfaces
+@using LocalVenue.Web.Components.VenueComponents
+@inject IShowService ShowService
+
+@if (ErrorMessage is not null)
+{
+    <h3 class="text-center text-danger">@ErrorMessage</h3>
+    return;
+}
+
+@if (ModelShow is not null)
+{
+<div class="show-info">
+    <h1>@ModelShow.Title</h1>
+    <p>@ModelShow.Description</p>
+    <p><strong>Start Time:</strong> @ModelShow.StartTime</p>
+    <p><strong>End Time:</strong> @ModelShow.EndTime</p>
+    <p><strong>Genre:</strong> @ModelShow.Genre</p>
+</div>
+
+<SeatDisplay Tickets="ModelShow.Tickets" />
+}
+
+
+
+@code {
+    [Parameter]
+    public string ShowId { get; set; }
+    private string? ErrorMessage { get; set; }
+    
+    private Models.Show? ModelShow { get; set; }
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (!long.TryParse(ShowId, out var validatedShowId))
+        {
+            ErrorMessage = "Ikke et gyldigt show Id";
+        }
+
+        ModelShow = await ShowService.GetShowWithTicketsAsync(validatedShowId);
+        
+        if (ModelShow is null)
+        {
+            ErrorMessage = "Showet findes ikke";
+        }
+     
+    }
+
+}

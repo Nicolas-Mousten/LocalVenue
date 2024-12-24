@@ -1,0 +1,57 @@
+﻿@using LocalVenue.Core.Enums
+@using LocalVenue.Web.Models
+@code {
+    [Parameter] public List<Ticket>? Tickets { get; set; }
+}
+
+@if (Tickets is null)
+{
+    return;
+}
+<div class="seat-display">
+    @foreach (var row in Tickets.GroupBy(s => s.Seat.Row).OrderBy(g => g.Key))
+    {
+        <div class="seat-row">
+            @foreach (var seat in row.OrderBy(s => s.Seat.Number))
+            {
+                <div class="seat" style="background-color: @(GetSeatColor(seat.Status))"></div>
+            }
+        </div>
+    }
+</div>
+
+
+
+<style>
+    .seat-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .seat-row {
+        display: flex;
+        margin-bottom: 10px;
+    }
+    .seat {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 5px;
+    }
+</style>
+
+@code {
+    private string GetSeatColor(Status status)
+    {
+        return status switch
+        {
+            Status.Available => "lightgreen",
+            Status.Sold => "red",
+            Status.Reserved => "yellow",
+            _ => "gray"
+        };
+    }
+}

@@ -15,6 +15,12 @@ public static class ShowTranslator
             StartTime = show.StartTime,
             EndTime = show.EndTime,
             Genre = show.Genre,
+            Tickets = show.Tickets?
+                .Where(x => x is not null)
+                .Select(TicketTranslator.Translate)
+                .Where(x => x != null)
+                .ToList(),
+            
         };
     }
 }

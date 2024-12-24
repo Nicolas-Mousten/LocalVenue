@@ -20,6 +20,6 @@ public class Show
 
     public Genre Genre { get; set; }
 
-    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public ICollection<Ticket>? Tickets { get; set; }
 
 }

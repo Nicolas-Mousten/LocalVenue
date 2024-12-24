@@ -3,6 +3,7 @@ using LocalVenue.Core.Entities;
 using LocalVenue.Core.Models;
 using LocalVenue.Core.Services;
 using LocalVenue.Services.Interfaces;
+using LocalVenue.Translators;
 using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
@@ -113,5 +114,22 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
             return false;
         }
         return true;
+    }
+
+    public async Task<Web.Models.Show?> GetShowWithTicketsAsync(long id)
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
+        var showWithTickets = await context.Shows
+            .Include(show => show.Tickets!)
+            .ThenInclude(ticket => ticket.Seat)
+            .FirstOrDefaultAsync(show => show.ShowId == id);
+
+        if (showWithTickets == null)
+        {
+            return null;
+        }
+        
+        return ShowTranslator.Translate(showWithTickets); 
     }
 }
