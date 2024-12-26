@@ -10,20 +10,20 @@ public static class DbSeeder
         // Seed Seats
         UpsertSeat(context, new Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 });
         UpsertSeat(context, new Seat { SeatId = 2, Section = "Front", Row = 1, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 3, Section = "Front", Row = 2, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 4, Section = "Front", Row = 2, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 5, Section = "Left", Row = 1, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 6, Section = "Left", Row = 1, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 7, Section = "Left", Row = 2, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 8, Section = "Left", Row = 2, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 9, Section = "Right", Row = 1, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 10, Section = "Right", Row = 1, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 11, Section = "Right", Row = 2, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 12, Section = "Right", Row = 2, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 13, Section = "Standing", Row = 1, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 14, Section = "Standing", Row = 1, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 15, Section = "Standing", Row = 2, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 16, Section = "Standing", Row = 2, Number = 2 });
+        UpsertSeat(context, new Seat { SeatId = 3, Section = "Front", Row = 1, Number = 3 });
+        UpsertSeat(context, new Seat { SeatId = 4, Section = "Front", Row = 1, Number = 4 });
+        UpsertSeat(context, new Seat { SeatId = 5, Section = "Left", Row = 2, Number = 1 });
+        UpsertSeat(context, new Seat { SeatId = 6, Section = "Left", Row = 2, Number = 2 });
+        UpsertSeat(context, new Seat { SeatId = 7, Section = "Left", Row = 2, Number = 3 });
+        UpsertSeat(context, new Seat { SeatId = 8, Section = "Left", Row = 2, Number = 4 });
+        UpsertSeat(context, new Seat { SeatId = 9, Section = "Right", Row = 3, Number = 1 });
+        UpsertSeat(context, new Seat { SeatId = 10, Section = "Right", Row = 3, Number = 2 });
+        UpsertSeat(context, new Seat { SeatId = 11, Section = "Right", Row = 3, Number = 3 });
+        UpsertSeat(context, new Seat { SeatId = 12, Section = "Right", Row = 3, Number = 4 });
+        UpsertSeat(context, new Seat { SeatId = 13, Section = "Standing", Row = 4, Number = 1 });
+        UpsertSeat(context, new Seat { SeatId = 14, Section = "Standing", Row = 4, Number = 2 });
+        UpsertSeat(context, new Seat { SeatId = 15, Section = "Standing", Row = 4, Number = 3 });
+        UpsertSeat(context, new Seat { SeatId = 16, Section = "Standing", Row = 4, Number = 4 });
         context.SaveChanges();
 
         // Seed Shows
@@ -46,7 +46,7 @@ public static class DbSeeder
                 UpsertTicket(context, new Ticket { TicketId = ticketId++, Price = (decimal)(random.NextDouble() * 100), SeatId = seat.SeatId, ShowId = show.ShowId });
             }
         }
-        
+
         //Seed Admin user
         var admin = new Customer
         {
@@ -58,38 +58,38 @@ public static class DbSeeder
             NormalizedEmail = "ADMIN@HOTMAIL.COM",
             UserName = "admin"
         };
-        
+
         if (context.Users.Find("1") == null)
         {
-        
+
             var passwordHasher = new PasswordHasher<Customer>();
-        
+
             admin.PasswordHash = passwordHasher.HashPassword(admin, "123");
-        
+
             context.Users.Add(admin);
-        
+
             var role = new IdentityRole
             {
                 Name = "Admin",
                 NormalizedName = "ADMIN",
             };
-        
+
             context.SaveChanges();
-        
+
             context.Roles.Add(role);
-        
+
             context.Roles.Add(role);
-        
+
             var roleMapping = new IdentityUserRole<string>
             {
                 RoleId = role.Id,
                 UserId = admin.Id
             };
-        
+
             context.UserRoles.Add(roleMapping);
-        
+
             context.SaveChanges();
-        
+
         }
     }
 
