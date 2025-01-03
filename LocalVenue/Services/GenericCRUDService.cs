@@ -10,7 +10,7 @@ public class GenericCRUDService<T> where T : class
 {
     private readonly IDbContextFactory<VenueContext> contextFactory;
 
-    public GenericCRUDService(IDbContextFactory<VenueContext> contextFactory )
+    public GenericCRUDService(IDbContextFactory<VenueContext> contextFactory)
     {
         this.contextFactory = contextFactory;
     }
@@ -18,9 +18,9 @@ public class GenericCRUDService<T> where T : class
     private IQueryable<T> IncludeProperties(params Expression<Func<T, object>>[] includes)
     {
         var context = contextFactory.CreateDbContext();
-        
+
         IQueryable<T> query = context.Set<T>();
-        
+
         foreach (var include in includes)
         {
             query = query.Include(include);
@@ -91,7 +91,7 @@ public class GenericCRUDService<T> where T : class
     public async Task<T> AddItem(T item, params Expression<Func<T, object>>[]? includes)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        
+
         IQueryable<T> query = IncludeProperties(includes!);
 
         _context.Set<T>().Add(item);
@@ -103,7 +103,7 @@ public class GenericCRUDService<T> where T : class
     public async Task<T> UpdateItem(T item, params Expression<Func<T, object>>[]? includes)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        
+
         IQueryable<T> query = IncludeProperties(includes!);
 
         var keyProperty = typeof(T).GetProperties()
@@ -120,6 +120,8 @@ public class GenericCRUDService<T> where T : class
         }
 
         _context.Entry(dbItem).CurrentValues.SetValues(item);
+        _context.Entry(dbItem).State = EntityState.Modified;
+
         await _context.SaveChangesAsync();
         return dbItem;
     }
@@ -127,7 +129,7 @@ public class GenericCRUDService<T> where T : class
     public async Task<T> DeleteItem(long id, params Expression<Func<T, object>>[]? includes)
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
-        
+
         var item = await GetItem(id, includes);
         if (item == null)
         {
