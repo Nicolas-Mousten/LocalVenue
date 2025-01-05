@@ -9,6 +9,7 @@ public class Ticket
     public decimal Price { get; set; }
     public Status Status { get; set; }
     public string? SoldToCustomerId { get; set; }
-    
-    
+    public readonly string PopOverId = Guid.NewGuid().ToString();
+
+
 }

@@ -5117,6 +5117,8 @@ class Popover extends ToggleMixin(Base, POPOVER) {
     init() {
         if (this.isInit) return;
 
+        debugger;
+        
         const { base, opts } = this;
 
         base.id = this.id;

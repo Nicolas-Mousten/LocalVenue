@@ -1,5 +1,7 @@
 ﻿@using LocalVenue.Core.Enums
+@using LocalVenue.Shared.Enums
 @using LocalVenue.Web.Models
+@using LocalVenue.Web.Components.JoltyUI
 @code {
     [Parameter] public List<Ticket>? Tickets { get; set; }
 }
@@ -14,7 +16,23 @@
         <div class="seat-row">
             @foreach (var seat in row.OrderBy(s => s.Seat.Number))
             {
-                <div class="seat" style="background-color: @(GetSeatColor(seat.Status))"></div>
+                <div class="seat pointer" data-ui-toggle="@seat.PopOverId" style="background-color: @(GetSeatColor(seat.Status))"></div>
+                <PopOver ShowCloseX="false" Title="@string.Empty" Direction="Direction.Top" Size="PopOverSize.Small"  Id="@seat.PopOverId">
+                    <Body>
+                    <div class="p4">
+                        @if (seat.Status == Status.Available)
+                        {
+                            <p class="mb-2">Seat: @seat.Seat.Row - Row: @seat.Seat.Number</p>
+                            <p>Pris: @seat.Price.ToString("C2")</p>
+                        } else if (seat.Status == Status.Reserved)
+                        {
+                            
+                        }
+                        </div>
+                    </Body>
+                    <FooterContent/>
+                </PopOver>
+                
             }
         </div>
     }
