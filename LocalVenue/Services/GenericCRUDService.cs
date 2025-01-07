@@ -29,8 +29,18 @@ public class GenericCRUDService<T> where T : class
         return query;
     }
 
+    private string FirstCharToUpper(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+        {
+            return string.Empty;
+        }
+        return $"{char.ToUpper(input[0])}{input[1..]}";
+    }
+
     public async Task<PagedList<T>> GetItems(int page, int pageSize, string? searchParameter, string searchProperty, params Expression<Func<T, object>>[]? includes)
     {
+        searchProperty = FirstCharToUpper(searchProperty);
         IQueryable<T> query = IncludeProperties(includes!);
 
         var property = typeof(T).GetProperty(searchProperty)
@@ -78,6 +88,7 @@ public class GenericCRUDService<T> where T : class
 
     public async Task<T> GetItem(string searchParameter, string searchProperty, params Expression<Func<T, object>>[]? includes)
     {
+        searchProperty = FirstCharToUpper(searchProperty);
         IQueryable<T> query = IncludeProperties(includes!);
 
         var property = typeof(T).GetProperty(searchProperty)
