@@ -14,7 +14,7 @@ public class Show
     public DateTime StartTime { get; set; }
 
     public DateTime EndTime { get; set; }
-
     public Genre Genre { get; set; }
+    public bool OpeningNight { get; set; }
     public List<Ticket>? Tickets { get; set; }
 }
