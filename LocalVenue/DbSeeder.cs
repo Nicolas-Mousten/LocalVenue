@@ -7,6 +7,11 @@ public static class DbSeeder
 {
     public static void UpsertSeed(VenueContext context)
     {
+        if (context.Users.Any())
+        {
+            return;
+        }
+
         // Seed Seats
         UpsertSeat(context, new Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 });
         UpsertSeat(context, new Seat { SeatId = 2, Section = "Front", Row = 1, Number = 2 });

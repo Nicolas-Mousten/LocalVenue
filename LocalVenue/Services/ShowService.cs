@@ -30,7 +30,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
     public async Task<List<Ticket>> GetAvailableTicketsForShow(long showId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-        
+
         var ticket = await context.Shows.Include(show => show.Tickets).FirstOrDefaultAsync(show => show.ShowId == showId);
 
         if (ticket == null)
@@ -43,6 +43,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
 
     public async Task<Show> AddShow(Show show)
     {
+        // make it add tickets for each seat
         return await base.AddItem(show, show => show.Tickets!);
     }
 
@@ -59,7 +60,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
     public async Task<List<Show>> GetAllShows()
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-        
+
         return await context.Shows.ToListAsync();
     }
 
@@ -68,7 +69,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
         try
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
-        
+
             var newShow = new Show
             {
                 Title = show.Title,
@@ -77,10 +78,11 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
                 EndTime = show.EndTime,
                 Genre = show.Genre,
             };
-        
+
             context.Shows.Add(newShow);
             await context.SaveChangesAsync();
-        } catch
+        }
+        catch
         {
             return false;
         }
@@ -94,12 +96,12 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
             await using var context = await _contextFactory.CreateDbContextAsync();
 
             var showToUpdate = await context.Shows.FirstOrDefaultAsync(x => x.ShowId == show.Id);
-            
+
             if (showToUpdate == null)
             {
                 return false;
             }
-            
+
             showToUpdate.Title = show.Title;
             showToUpdate.Description = show.Description;
             showToUpdate.StartTime = show.StartTime;
@@ -108,8 +110,9 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
 
             context.Shows.Update(showToUpdate);
             await context.SaveChangesAsync();
-        
-        } catch
+
+        }
+        catch
         {
             return false;
         }
@@ -129,7 +132,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
         {
             return null;
         }
-        
-        return ShowTranslator.Translate(showWithTickets); 
+
+        return ShowTranslator.Translate(showWithTickets);
     }
 }
