@@ -19,6 +19,7 @@ public class Show
     public DateTime EndTime { get; set; }
 
     public Genre Genre { get; set; }
+    public bool OpeningNight { get; set; }
 
     public ICollection<Ticket>? Tickets { get; set; }
 

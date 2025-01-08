@@ -21,11 +21,13 @@ public class GenericCRUDService<T> where T : class
 
         IQueryable<T> query = context.Set<T>();
 
-        foreach (var include in includes)
+        if (includes != null)
         {
-            query = query.Include(include);
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
         }
-
         return query;
     }
 
@@ -76,7 +78,7 @@ public class GenericCRUDService<T> where T : class
                                                .FirstOrDefault(p => p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
                                    ?? throw new ArgumentNullException($"No key property found on type '{typeof(T).Name}'");
 
-        var item = await query.SingleOrDefaultAsync(e => EF.Property<int>(e, keyProperty.Name) == id);
+        var item = await query.SingleOrDefaultAsync(e => EF.Property<long>(e, keyProperty.Name) == id);
 
         if (item == null)
         {
