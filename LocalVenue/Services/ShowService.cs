@@ -5,6 +5,7 @@ using LocalVenue.Core.Services;
 using LocalVenue.Services.Interfaces;
 using LocalVenue.Translators;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace LocalVenue.Services;
 
@@ -134,5 +135,21 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
         }
 
         return ShowTranslator.Translate(showWithTickets);
+    }
+    
+    public async Task<List<Web.Models.Show?>> GetCurrentAndFutureShowsAsync()
+    {
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
+        var shows = await context.Shows
+            .Where(show => show.StartTime >= DateTime.Now)
+            .ToListAsync();
+        
+        if (shows.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        return ShowTranslator.TranslateMultiple(shows);
     }
 }
