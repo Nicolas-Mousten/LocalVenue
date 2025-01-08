@@ -1,7 +1,57 @@
 ﻿@page "/"
+@using LocalVenue.Services.Interfaces
+@using Microsoft.IdentityModel.Tokens
+@inject IShowService ShowService
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container">
+    @if (ErrorMessage is not null)
+    {
+        <h3 class="text-center text-danger mt-md-3">@ErrorMessage</h3>
+        return;
+    }
+    
+    <h1 class="mb-md-5 mt-md-3">Aktuelle og kommende forestillinger</h1>
 
-Welcome to your new app.
+    <div class="row row-cols-md-3 gy-4 gx-4">
+        @if (!Shows.IsNullOrEmpty())
+        {
+            @foreach (var show in Shows)
+            {
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            @show.Title
+                        </div>
+                        <div class="card-body">
+                            @show.Description
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <div>@show.StartTime.Day.@show.StartTime.Month.@show.StartTime.Year</div>
+                            <div>@show.StartTime.ToShortTimeString()</div>
+                        </div>
+                        <a href="/show/@show.Id" class="stretched-link" style="height: 0; width: 0"></a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private List<Models.Show>? Shows { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Shows = await ShowService.GetCurrentAndFutureShowsAsync();
+        
+        Console.WriteLine(Shows.Count);
+        
+        if (Shows.IsNullOrEmpty())
+        {
+            ErrorMessage = "Der spilles ikke nogle shows i øjeblikket.";
+        }
+    }
+}
