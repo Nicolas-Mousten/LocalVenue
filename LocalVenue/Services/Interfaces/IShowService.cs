@@ -16,6 +16,6 @@ namespace LocalVenue.Services.Interfaces
         public Task<bool> CreateShowAsync(Web.Models.Show show);
         public Task<bool> UpdateShowAsync(Web.Models.Show show);
         public Task<Web.Models.Show?> GetShowWithTicketsAsync(long id);
-        public Task<List<Web.Models.Show?>> GetCurrentAndFutureShowsAsync();
+        public Task<List<Web.Models.Show>> GetCurrentAndFutureShowsAsync();
     }
 }

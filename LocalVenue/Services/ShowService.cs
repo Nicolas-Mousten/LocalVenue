@@ -130,7 +130,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
         return webModelsShow;
     }
     
-    public async Task<List<Web.Models.Show?>> GetCurrentAndFutureShowsAsync()
+    public async Task<List<Web.Models.Show>> GetCurrentAndFutureShowsAsync()
     {
         var shows = await GetAllShows();
         shows = shows.Where(show => show.StartTime >= DateTime.Now).ToList();
@@ -140,6 +140,6 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
             return null;
         }
 
-        return shows.Select(show => ShowTranslator.Translate(show)).ToList();
+        return shows.Select(ShowTranslator.Translate).ToList();
     }
 }
