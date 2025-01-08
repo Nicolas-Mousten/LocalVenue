@@ -27,7 +27,6 @@ resource "azurerm_windows_web_app" "main" {
   app_settings = {
     "WEBSITE_RUN_FROM_PACKAGE" = "1",
     "ASPNETCORE_ENVIRONMENT"   = "Production"
-    "JWT_TOKEN_SECRET"         = var.jwt_token_secret
   }
   connection_string {
     name  = "VenueContext"
