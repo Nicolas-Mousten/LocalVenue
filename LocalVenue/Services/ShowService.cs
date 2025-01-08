@@ -132,11 +132,8 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
     
     public async Task<List<Web.Models.Show?>> GetCurrentAndFutureShowsAsync()
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
-
-        var shows = await context.Shows
-            .Where(show => show.StartTime >= DateTime.Now)
-            .ToListAsync();
+        var shows = await GetAllShows();
+        shows = shows.Where(show => show.StartTime >= DateTime.Now).ToList();
         
         if (shows.IsNullOrEmpty())
         {
