@@ -1,4 +1,4 @@
-name: Postman Tests
+name: Deploy and run Postman tests on merge
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   xunit-test:
-    uses: ./.github/workflows/dotnet-build-test-publish.yml
+    uses: ./.github/workflows/templates/dotnet-build-test-publish.yml
     with:
       publish: true
 

@@ -1,4 +1,4 @@
-name: .NET Tests
+name: .NET Tests on PR
 
 on:
   # push:
@@ -16,6 +16,6 @@ on:
 
 jobs:
   xunit-test:
-    uses: ./.github/workflows/dotnet-build-test-publish.yml
+    uses: ./.github/workflows/templates/dotnet-build-test-publish.yml
     with:
       publish: false
