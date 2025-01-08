@@ -4,6 +4,7 @@ namespace LocalVenue.RequestModels;
 
 public class ShowRequest
 {
+    public int? ShowId { get; set; }
     public string Title { get; set; } = string.Empty;
 
     public string? Description { get; set; }

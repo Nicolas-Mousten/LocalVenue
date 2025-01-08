@@ -4,6 +4,7 @@ namespace LocalVenue.RequestModels;
 
 public class TicketRequest
 {
+    public int? TicketId { get; set; }
     public long ShowId { get; set; }
 
     public long SeatId { get; set; }
