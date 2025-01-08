@@ -16,6 +16,6 @@ on:
 
 jobs:
   xunit-test:
-    uses: ./.github/workflows/templates/dotnet-build-test-publish.yml
+    uses: ./.github/workflows/dotnet-build-test-publish.yml
     with:
       publish: false
