@@ -24,29 +24,29 @@ public static class ShowPriceCalculator
     
     public static decimal CalculatePrice(Show show, Ticket ticket, bool openingNight)
     {
-        var price = BasePrice;
+        decimal additionalPrice = 0;
 
         if (openingNight)
         {
-            price *= 1.2m;
-        }
-
-        if (show.StartTime.Hour >= 18)
-        {
-            price += 20;
+            additionalPrice += BasePrice * 0.2m;
         }
 
         if (ShowLastForMoreThanTwoHours(show))
         {
-            price *= 1.15m;
+            additionalPrice += BasePrice *  0.15m;
         }
 
         if (ticket.Seat.Row <= 2)
         {
-            price *= 1.25m;
+            additionalPrice += BasePrice * 0.25m;
+        }
+        
+        if (show.StartTime.Hour >= 18)
+        {
+            additionalPrice += 20;
         }
 
-        return price;
+        return BasePrice + additionalPrice;
     }
     
     public static bool ShowLastForMoreThanTwoHours(Show show)
