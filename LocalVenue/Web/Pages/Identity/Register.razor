@@ -21,38 +21,41 @@
 
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-6" style="background-color: rgba(255, 255, 255, 0.9); padding: 70px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+        <div class="col-md-6"
+            style="background-color: rgba(255, 255, 255, 0.9); padding: 70px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
 
             <EditForm FormName="register" Model="@registerModel" OnValidSubmit="RegisterUser">
-                <DataAnnotationsValidator/>
-                <ValidationSummary class="text-danger"/>
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" />
 
 
                 <div class="mb-3">
                     <label for="firstname" class="form-label">Navn</label>
-                    <InputText id="firstname" @bind-Value="registerModel!.FirstName" type="name" class="form-control"/>
+                    <InputText id="firstname" @bind-Value="registerModel!.FirstName" type="name" class="form-control" />
                 </div>
 
                 <div class="mb-3">
                     <label for="lastname" class="form-label">Efternavn</label>
-                    <InputText id="lastname" @bind-Value="registerModel!.LastName" type="name" class="form-control"/>
+                    <InputText id="lastname" @bind-Value="registerModel!.LastName" type="name" class="form-control" />
                 </div>
 
                 <div class="mb-3">
                     <label for="Email" class="form-label">Email</label>
-                    <InputText id="Email" @bind-Value="registerModel!.Email" type="Email" class="form-control"/>
+                    <InputText id="Email" @bind-Value="registerModel!.Email" type="Email" class="form-control" />
                 </div>
 
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Kodeord</label>
-                    <InputText id="password" @bind-Value="registerModel!.Password" type="password" class="form-control"/>
+                    <InputText id="password" @bind-Value="registerModel!.Password" type="password"
+                        class="form-control" />
                 </div>
 
 
                 <div class="mb-3">
                     <label for="confirmPassword" class="form-label">Bekræft kodeord</label>
-                    <InputText id="confirmPassword" @bind-Value="registerModel!.ConfirmPassword" type="password" class="form-control"/>
+                    <InputText id="confirmPassword" @bind-Value="registerModel!.ConfirmPassword" type="password"
+                        class="form-control" />
                 </div>
 
 
@@ -69,7 +72,7 @@
                 </button>
 
                 <!-- Fejlvisning -->
-                @if (errors.Any())
+                @if (errors != null && errors.Any())
                 {
                     <div class="alert alert-danger" role="alert">
                         @foreach (var error in errors)
@@ -91,17 +94,17 @@
 
     public class RegisterModel
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public string ConfirmPassword { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 
     protected override void OnInitialized()
     {
         registerModel ??= new RegisterModel();
-        errors ??= [];
+        errors ??= new List<string>();
         base.OnInitialized();
     }
 
@@ -110,12 +113,12 @@
         isSubmitting = true;
 
         var user = new Models.Customer()
-        {
-            FirstName = registerModel!.FirstName,
-            LastName = registerModel!.LastName,
-            Email = registerModel!.Email,
-        };
-        
+            {
+                FirstName = registerModel!.FirstName,
+                LastName = registerModel!.LastName,
+                Email = registerModel!.Email,
+            };
+
         var result = await CustomerService.CreateCustomerAsync(user, registerModel!.Password);
 
         if (result.Succeeded)

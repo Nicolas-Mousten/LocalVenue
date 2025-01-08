@@ -21,20 +21,21 @@
 <!-- Regristrering -->
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-6" style="background-color: rgba(255, 255, 255, 0.9); padding: 70px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+        <div class="col-md-6"
+            style="background-color: rgba(255, 255, 255, 0.9); padding: 70px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
 
             <EditForm FormName="login" Model="@loginModel" OnValidSubmit="LoginUser">
-                <DataAnnotationsValidator/>
-                <ValidationSummary/>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
                 <div class="mb-3">
                     <label for="email" class="form-label" style="color: #000;">Email</label>
-                    <InputText id="email" @bind-Value="loginModel!.Email" class="form-control"/>
+                    <InputText id="email" @bind-Value="loginModel!.Email" class="form-control" />
                 </div>
 
                 <div class="mb-3">
                     <label for="password" class="form-label" style="color: #000;">Kodeord</label>
-                    <InputText id="password" @bind-Value="loginModel!.Password" type="password" class="form-control"/>
+                    <InputText id="password" @bind-Value="loginModel!.Password" type="password" class="form-control" />
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 mb-3" disabled="@isSubmitting">
@@ -68,8 +69,8 @@
 
     public class LoginModel
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 
     protected override Task OnInitializedAsync()
@@ -87,7 +88,8 @@
 
         if (currentUri.Contains("ReturnUrl="))
         {
-            ReturnUrl = Uri.UnescapeDataString((Navigation.ToAbsoluteUri(currentUri).GetComponents(UriComponents.Query, UriFormat.UriEscaped)).Substring("ReturnUrl=".Length));
+            ReturnUrl = Uri.UnescapeDataString((Navigation.ToAbsoluteUri(currentUri).GetComponents(UriComponents.Query,
+            UriFormat.UriEscaped)).Substring("ReturnUrl=".Length));
         }
 
         error = null;
@@ -108,7 +110,12 @@
             if (result == SignInResult.Success)
             {
                 Guid key = Guid.NewGuid();
-                BlazorCookieLoginMiddleware.Logins[key] = new LoginInfo { Email = loginModel!.Email, Password = loginModel!.Password, ReturnUrl = ReturnUrl };
+                BlazorCookieLoginMiddleware.Logins[key] = new LoginInfo
+                    {
+                        Email = loginModel!.Email,
+                        Password = loginModel!.Password,
+                        ReturnUrl = ReturnUrl
+                    };
                 Navigation.NavigateTo($"/login?key={key}", true);
             }
             else

@@ -19,8 +19,8 @@ public static class ShowTranslator
                 .Where(x => x is not null)
                 .Select(TicketTranslator.Translate)
                 .Where(x => x != null)
+                .Cast<Ticket>()
                 .ToList(),
-            
         };
     }
 }
