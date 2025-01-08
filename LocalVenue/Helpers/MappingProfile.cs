@@ -11,7 +11,6 @@ public class MappingProfile : Profile
         CreateMap<TicketRequest, Ticket>()
             .ForMember(dest => dest.TicketId, opt => opt.MapFrom(src => 0));
 
-        CreateMap<ShowRequest, Show>()
-            .ForMember(dest => dest.ShowId, opt => opt.MapFrom(src => 0));
+        CreateMap<ShowRequest, Show>();
     }
 }
