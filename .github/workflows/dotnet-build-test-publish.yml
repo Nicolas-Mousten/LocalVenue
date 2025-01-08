@@ -2,6 +2,11 @@ name: .NET Build, Test, and Publish
 
 on:
   workflow_call:
+    inputs:
+      publish:
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-test-publish:
@@ -31,9 +36,11 @@ jobs:
           path: "**/TestResults"
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        if: ${{ inputs.publish }}
+        run: dotnet publish LocalVenue/LocalVenue.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
+        if: ${{ inputs.publish }}
         uses: actions/upload-artifact@v4
         with:
           name: .net-app

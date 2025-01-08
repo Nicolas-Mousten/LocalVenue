@@ -12,6 +12,8 @@ on:
 jobs:
   xunit-test:
     uses: ./.github/workflows/dotnet-build-test-publish.yml
+    with:
+      publish: true
 
   deploy:
     runs-on: ubuntu-latest
