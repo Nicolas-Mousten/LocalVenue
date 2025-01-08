@@ -150,6 +150,6 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
             return null;
         }
 
-        return ShowTranslator.TranslateMultiple(shows);
+        return shows.Select(show => ShowTranslator.Translate(show)).ToList();
     }
 }

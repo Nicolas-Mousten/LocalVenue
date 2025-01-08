@@ -23,24 +23,4 @@ public static class ShowTranslator
             
         };
     }
-    
-    public static List<Show> TranslateMultiple(List<Core.Entities.Show> shows)
-    {
-        List<Show> translatedShows = new List<Show>();
-        
-        foreach (var show in shows)
-        {
-            translatedShows.Add(new Show
-            {
-                Id = show.ShowId,
-                Title = show.Title,
-                Description = show.Description,
-                StartTime = show.StartTime,
-                EndTime = show.EndTime,
-                Genre = show.Genre
-            });
-        }
-
-        return translatedShows;
-    }
 }
