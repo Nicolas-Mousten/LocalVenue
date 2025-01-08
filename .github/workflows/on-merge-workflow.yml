@@ -54,6 +54,14 @@ jobs:
       - name: Make directory for newman results
         run: mkdir newman
 
+      - name: Verify deployment
+        run: |
+          until curl -sSf https://localvenue-webapp-casp0006.azurewebsites.net/ > /dev/null; do
+            echo "Waiting for deployment..."
+            sleep 10
+          done
+        shell: bash
+
       - name: Run Postman tests
         run: |
           newman run "LocalVenue Tests.postman_collection.json" \
