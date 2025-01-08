@@ -1,3 +1,4 @@
+using AutoMapper;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Models;
@@ -8,9 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
 
-public class ShowService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Show>(contextFactory), IShowService
+public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Show>(contextFactory), IShowService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<PagedList<Show>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title")
     {
@@ -19,7 +21,13 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
 
     public async Task<Show> GetShow(long id)
     {
-        return await base.GetItem(id, show => show.Tickets!);
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
+        var show = await base.GetItem(id, show => show.Tickets!);
+        // include seats for tickets
+        show.Tickets?.ToList().ForEach(ticket => context.Entry(ticket).Reference(t => t.Seat).Load());
+
+        return show;
     }
 
     public async Task<Show> GetShow(string searchParameter, string searchProperty = "Title")
@@ -86,17 +94,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
-
-            var newShow = new Show
-            {
-                Title = show.Title,
-                Description = show.Description,
-                StartTime = show.StartTime,
-                EndTime = show.EndTime,
-                Genre = show.Genre,
-                OpeningNight = show.OpeningNight,
-            };
+            var newShow = _mapper.Map<Show>(show);
 
             await AddShow(newShow);
         }
@@ -111,25 +109,9 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
     {
         try
         {
-            await using var context = await _contextFactory.CreateDbContextAsync();
+            var newShow = _mapper.Map<Show>(show);
 
-            var showToUpdate = await context.Shows.FirstOrDefaultAsync(x => x.ShowId == show.Id);
-
-            if (showToUpdate == null)
-            {
-                return false;
-            }
-
-            showToUpdate.Title = show.Title;
-            showToUpdate.Description = show.Description;
-            showToUpdate.StartTime = show.StartTime;
-            showToUpdate.EndTime = show.EndTime;
-            showToUpdate.Genre = show.Genre;
-            showToUpdate.OpeningNight = show.OpeningNight;
-
-            context.Shows.Update(showToUpdate);
-            await context.SaveChangesAsync();
-
+            await UpdateShow(newShow);
         }
         catch
         {
@@ -140,18 +122,10 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
 
     public async Task<Web.Models.Show?> GetShowWithTicketsAsync(long id)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        var show = await GetShow(id);
 
-        var showWithTickets = await context.Shows
-            .Include(show => show.Tickets!)
-            .ThenInclude(ticket => ticket.Seat)
-            .FirstOrDefaultAsync(show => show.ShowId == id);
+        var webModelsShow = _mapper.Map<Web.Models.Show>(show);
 
-        if (showWithTickets == null)
-        {
-            return null;
-        }
-
-        return ShowTranslator.Translate(showWithTickets);
+        return webModelsShow;
     }
 }
