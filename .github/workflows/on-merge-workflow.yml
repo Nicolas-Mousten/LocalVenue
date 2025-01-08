@@ -10,8 +10,8 @@ on:
       - "LocalVenue Tests.postman_collection.json"
 
 jobs:
-xunit-test:
-    uses: ./.github/workflows/pr-workflow.yml
+  xunit-test:
+    uses: ./.github/workflows/dotnet-build-test-publish.yml
 
   deploy:
     runs-on: ubuntu-latest
