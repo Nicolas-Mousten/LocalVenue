@@ -7,11 +7,11 @@ public class Customer : IdentityUser
 {
     [Required]
     [MaxLength(255)]
-    public string FirstName { get; set; }
+    public required string FirstName { get; set; }
     [Required]
     [MaxLength(255)]
-    public string LastName { get; set; }
-    
+    public required string LastName { get; set; }
+
     public bool IsGoldenMember { get; set; }
 
     public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();

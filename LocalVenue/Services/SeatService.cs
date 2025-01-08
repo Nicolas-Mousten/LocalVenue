@@ -12,8 +12,8 @@ public class SeatService(IDbContextFactory<VenueContext> contextFactory) : Gener
 
     public async Task<List<Seat>> GetSeatsInRow(int row)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
         var seats = await context.Seats.Where(seat => seat.Row == row).ToListAsync();
         if (seats.Count == 0)
         {

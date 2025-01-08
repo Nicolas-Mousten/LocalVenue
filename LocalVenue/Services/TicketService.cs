@@ -8,7 +8,8 @@ namespace LocalVenue.Services;
 
 public class TicketService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Ticket>(contextFactory), ITicketService
 {
-    
+    private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
+
     public async Task<Ticket> GetTicket(long id)
     {
         return await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
@@ -16,8 +17,8 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
 
     public async Task<Ticket> AddTicket(Ticket ticket)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
         //Check if the ticket's seat, customer, and show exist
         if (await context.Seats.FindAsync(ticket.SeatId) == null)
         {
@@ -50,8 +51,8 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
 
     public async Task<Ticket> UpdateTicket(Ticket ticket)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
         if (await context.Seats.FindAsync(ticket.SeatId) == null)
         {
             throw new ArgumentException($"Seat with id '{ticket.SeatId}' does not exist");

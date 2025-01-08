@@ -115,7 +115,7 @@ namespace LocalVenue.Migrations
 
                     b.HasKey("SeatId");
 
-                    b.ToTable("Seats");
+                    b.ToTable("Seats", (string)null);
                 });
 
             modelBuilder.Entity("LocalVenue.Core.Entities.Show", b =>
@@ -146,7 +146,7 @@ namespace LocalVenue.Migrations
 
                     b.HasKey("ShowId");
 
-                    b.ToTable("Shows");
+                    b.ToTable("Shows", (string)null);
                 });
 
             modelBuilder.Entity("LocalVenue.Core.Entities.Ticket", b =>
@@ -178,7 +178,7 @@ namespace LocalVenue.Migrations
 
                     b.HasIndex("ShowId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
