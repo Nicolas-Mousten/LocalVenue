@@ -43,8 +43,26 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
 
     public async Task<Show> AddShow(Show show)
     {
-        // make it add tickets for each seat
-        return await base.AddItem(show, show => show.Tickets!);
+        await using var context = await _contextFactory.CreateDbContextAsync();
+
+        var returnedShow = await base.AddItem(show, show => show.Tickets!);
+        var seats = await context.Seats.ToListAsync();
+
+        foreach (var seat in seats)
+        {
+            var newTicket = new Ticket
+            {
+                ShowId = returnedShow.ShowId,
+                SeatId = seat.SeatId,
+                Status = Core.Enums.Status.Available
+            };
+
+            context.Tickets.Add(newTicket);
+        }
+        context.SaveChanges();
+
+        returnedShow = await base.GetItem(returnedShow.ShowId, show => show.Tickets!);
+        return returnedShow;
     }
 
     public async Task<Show> UpdateShow(Show show)
@@ -77,10 +95,10 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
                 StartTime = show.StartTime,
                 EndTime = show.EndTime,
                 Genre = show.Genre,
+                OpeningNight = show.OpeningNight,
             };
 
-            context.Shows.Add(newShow);
-            await context.SaveChangesAsync();
+            await AddShow(newShow);
         }
         catch
         {
@@ -107,6 +125,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory) : Gener
             showToUpdate.StartTime = show.StartTime;
             showToUpdate.EndTime = show.EndTime;
             showToUpdate.Genre = show.Genre;
+            showToUpdate.OpeningNight = show.OpeningNight;
 
             context.Shows.Update(showToUpdate);
             await context.SaveChangesAsync();
