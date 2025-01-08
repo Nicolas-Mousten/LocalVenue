@@ -6,13 +6,12 @@
 <PageTitle>Home</PageTitle>
 
 <div class="container">
+    <h1 class="mb-md-5 mt-md-3">Aktuelle og kommende forestillinger</h1>
+
     @if (ErrorMessage is not null)
     {
         <h3 class="text-center text-danger mt-md-3">@ErrorMessage</h3>
-        return;
     }
-    
-    <h1 class="mb-md-5 mt-md-3">Aktuelle og kommende forestillinger</h1>
 
     <div class="row row-cols-md-3 gy-4 gx-4">
         @if (!Shows.IsNullOrEmpty())
@@ -46,9 +45,9 @@
     protected override async Task OnInitializedAsync()
     {
         Shows = await ShowService.GetCurrentAndFutureShowsAsync();
-        
+
         Console.WriteLine(Shows.Count);
-        
+
         if (Shows.IsNullOrEmpty())
         {
             ErrorMessage = "Der spilles ikke nogle shows i øjeblikket.";

@@ -129,15 +129,15 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
 
         return webModelsShow;
     }
-    
+
     public async Task<List<Web.Models.Show>> GetCurrentAndFutureShowsAsync()
     {
         var shows = await GetAllShows();
         shows = shows.Where(show => show.StartTime >= DateTime.Now).ToList();
-        
+
         if (shows.IsNullOrEmpty())
         {
-            return null;
+            return new List<Web.Models.Show>();
         }
 
         return shows.Select(ShowTranslator.Translate).ToList();
