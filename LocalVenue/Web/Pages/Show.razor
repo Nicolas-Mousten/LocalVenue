@@ -26,7 +26,7 @@
 
 @code {
     [Parameter]
-    public string ShowId { get; set; }
+    public string ShowId { get; set; } = string.Empty;
     private string? ErrorMessage { get; set; }
 
     private Models.Show? ModelShow { get; set; }

@@ -32,7 +32,12 @@ public class BlazorCookieLoginMiddleware
     {
         if (context.Request.Path == "/login" && context.Request.Query.ContainsKey("key"))
         {
-            var key = Guid.Parse(context.Request.Query["key"]);
+            if (!context.Request.Query.TryGetValue("key", out var keyString) || string.IsNullOrEmpty(keyString))
+            {
+                context.Response.Redirect("/loginfailed");
+                return;
+            }
+            Guid.TryParse(keyString, out var key);
             var info = Logins[key];
 
             var user = await userManager.FindByEmailAsync(info.Email);
