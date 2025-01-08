@@ -1,12 +1,16 @@
+@using LocalVenue.Web.Components.BootstrapWrappers
 @typeparam T
 
 <div class="@Class" @onfocusin="OnFocus" @onfocusout="FocusOut">
     <FloatingLabelHeader InputFieldId="@InputTextId" LabelText="@Label">
-        <InputText type="string" id="@InputTextId" class="form-control" Value="@SearchString"  ValueExpression="() => SearchString" ValueChanged="OnValueChange" @oninput="OnInputChange" placeholder="#" autocomplete="off" />
+        <InputText type="string" id="@InputTextId" class="form-control" Value="@SearchString"
+            ValueExpression="() => SearchString" ValueChanged="OnValueChange" @oninput="OnInputChange" placeholder="#"
+            autocomplete="off" />
 
         @if (Focused)
         {
-            <div class="select-box-options d-flex flex-column position-absolute w-100" style="overflow: auto; @(MaxHeight.HasValue ? $"max-height: {MaxHeight}px" : string.Empty)">
+            <div class="select-box-options d-flex flex-column position-absolute w-100"
+                style="overflow: auto; @(MaxHeight.HasValue ? $"max-height: {MaxHeight}px" : string.Empty)">
                 @if (Items is null)
                 {
                     <div style="height: 75px" class="d-flex align-items-center justify-content-center card overflow-hidden">
@@ -21,7 +25,8 @@
                 }
                 else
                 {
-                    @OptionTemplate((Items, (item) => SetSelectedItem(item)));
+                    @OptionTemplate((Items, async (item) => await SetSelectedItem(item)))
+                    ;
                 }
             </div>
         }
@@ -32,41 +37,41 @@
 @code {
     [Parameter, EditorRequired]
     public required string Label { get; set; }
-    
+
     [Parameter, EditorRequired]
     public required Func<string, Task<List<T>>> GetItems { get; set; }
-    
+
     [Parameter, EditorRequired]
     public EventCallback<T> SelectedItemChanged { get; set; }
-    
+
     [Parameter, EditorRequired]
     public required T? SelectedItem { get; set; }
-    
+
     [Parameter, EditorRequired]
     public required RenderFragment<(List<T> Items, Action<T> setItem)> OptionTemplate { get; set; }
-    
+
     [Parameter, EditorRequired]
     public required Func<T, string?> DisplayValue { get; set; }
-    
+
     [Parameter]
     public EventCallback<string> SearchStringChanged { get; set; }
-    
+
     [Parameter]
     public string? NoDataMessage { get; set; }
-    
+
     [Parameter]
     public string? Class { get; set; }
-    
+
     [Parameter]
     public int? MaxHeight { get; set; }
-    
+
     private List<T>? Items { get; set; }
     private string SearchString { get; set; } = string.Empty;
 
     private bool Focused { get; set; }
     private string InputTextId { get; set; } = Guid.NewGuid().ToString();
-    
-    
+
+
     private async Task OnFocus()
     {
         Focused = true;
@@ -78,14 +83,14 @@
         await Task.Delay(150);
         Focused = false;
     }
-    
+
     private async Task OnValueChange(string value)
     {
         SearchString = value;
         Items = await GetItems(value);
         StateHasChanged();
     }
-    
+
     private async Task OnInputChange(ChangeEventArgs e)
     {
         SearchString = e.Value?.ToString() ?? string.Empty;
@@ -93,7 +98,7 @@
         await SearchStringChanged.InvokeAsync(SearchString);
         StateHasChanged();
     }
-    
+
     private async Task SetSelectedItem(T item)
     {
         SelectedItem = item;
@@ -101,7 +106,7 @@
         SearchString = DisplayValue(item) ?? string.Empty;
         Items = await GetItems(SearchString);
     }
-    
+
     public void ClearSelectedItem()
     {
         Items = null;

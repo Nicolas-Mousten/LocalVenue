@@ -8,11 +8,11 @@ namespace Shared.WebComponents;
 
 public class LoginInfo
 {
-    public string Email { get; set; }
+    public string Email { get; set; } = string.Empty;
 
-    public string Password { get; set; }
+    public string Password { get; set; } = string.Empty;
 
-    public  string? ReturnUrl { get; set; } = "/";
+    public string? ReturnUrl { get; set; } = "/";
 }
 
 public class BlazorCookieLoginMiddleware
@@ -44,7 +44,7 @@ public class BlazorCookieLoginMiddleware
             }
 
             var result = await signInMgr.PasswordSignInAsync(user, info.Password, false, lockoutOnFailure: true);
-            info.Password = null;
+            string.IsNullOrEmpty(info.Password);
             if (result.Succeeded)
             {
                 Logins.Remove(key);
