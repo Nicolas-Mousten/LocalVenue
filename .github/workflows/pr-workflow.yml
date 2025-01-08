@@ -26,13 +26,13 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore --configuration Release
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
       - name: Test
-        run: dotnet test --no-build --logger "trx;LogFileName=TestResults.xml"
+        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=TestResults.xml"
 
       - name: Publish Test Results
         if: always()
@@ -42,7 +42,7 @@ jobs:
           path: "**/TestResults"
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish --configuration Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
