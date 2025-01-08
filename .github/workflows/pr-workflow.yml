@@ -1,12 +1,12 @@
 name: .NET Tests
 
 on:
-  push:
-    # branches: ["master"]
-    # paths:
-    #   - "LocalVenue/**"
-    #   - "LocalVenue.Tests/**"
-    #   - ".github/workflows/pr-workflow.yml"
+  # push:
+  #   branches: ["master"]
+  #   paths:
+  #     - "LocalVenue/**"
+  #     - "LocalVenue.Tests/**"
+  #     - ".github/workflows/pr-workflow.yml"
   pull_request:
     branches: ["master"]
     paths:
