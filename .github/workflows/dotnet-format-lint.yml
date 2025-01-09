@@ -23,9 +23,6 @@ jobs:
           action: "fix"
           only-changed-files: true
 
-      - name: Configure Git Safe Directory
-        run: git config --global --add safe.directory /github/workspace
-
       - name: Commit files
         if: steps.format.outputs.has-changes == 'true'
         run: |
