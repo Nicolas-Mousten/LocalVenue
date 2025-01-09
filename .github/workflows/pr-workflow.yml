@@ -15,6 +15,8 @@ on:
       - ".github/workflows/pr-workflow.yml"
 
 jobs:
+  format-lint:
+    uses: ./.github/workflows/dotnet-format-lint.yml
   sonarcloud:
     uses: ./.github/workflows/sonarcloud.yml
 
