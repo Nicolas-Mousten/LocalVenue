@@ -21,6 +21,7 @@ jobs:
 
   sonarcloud:
     needs: format-lint
+    secrets: inherit
     uses: ./.github/workflows/sonarcloud.yml
 
   xunit-test:
