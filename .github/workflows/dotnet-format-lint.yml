@@ -30,6 +30,10 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -a -m 'Automated dotnet-format update
           Co-authored-by: ${{ github.event.pull_request.user.login }} <${{ github.event.pull_request.user.id }}+${{ github.event.pull_request.user.login }}@users.noreply.github.com>'
+
+      - name: Configure Git Safe Directory
+        run: git config --global --add safe.directory /github/workspace
+
       - name: Push changes
         if: steps.format.outputs.has-changes == 'true'
         uses: ad-m/github-push-action@v0.5.0
