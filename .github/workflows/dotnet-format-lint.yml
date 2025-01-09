@@ -1,4 +1,4 @@
-name: dotnet-format-lint
+name: .NET Lint
 
 on:
   workflow_call:
@@ -18,7 +18,4 @@ jobs:
         run: dotnet restore
 
       - name: Format
-        run: dotnet format --check
-
-      - name: Lint
-        run: dotnet analyze
+        run: dotnet format --verify-no-changes --verbosity diagnostic
