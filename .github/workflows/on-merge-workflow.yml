@@ -6,10 +6,14 @@ on:
       - master
     paths:
       - "LocalVenue/**"
+      - "LocalVenue.Tests/**"
       - ".github/workflows/on-merge-workflow.yml"
       - "LocalVenue Tests.postman_collection.json"
 
 jobs:
+  sonarcloud:
+    uses: ./.github/workflows/sonarcloud.yml
+
   xunit-test:
     uses: ./.github/workflows/dotnet-build-test-publish.yml
     with:

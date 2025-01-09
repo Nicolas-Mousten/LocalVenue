@@ -8,13 +8,16 @@ on:
   #     - "LocalVenue.Tests/**"
   #     - ".github/workflows/pr-workflow.yml"
   pull_request:
-    branches: ["master"]
+    types: [opened, synchronize, reopened]
     paths:
       - "LocalVenue/**"
       - "LocalVenue.Tests/**"
       - ".github/workflows/pr-workflow.yml"
 
 jobs:
+  sonarcloud:
+    uses: ./.github/workflows/sonarcloud.yml
+
   xunit-test:
     uses: ./.github/workflows/dotnet-build-test-publish.yml
     with:
