@@ -4,9 +4,8 @@ on:
   workflow_call:
     inputs:
       publish:
-        required: false
+        required: true
         type: boolean
-        default: false
 
 jobs:
   build-test-publish:

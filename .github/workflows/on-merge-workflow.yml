@@ -13,6 +13,7 @@ on:
 jobs:
   sonarcloud:
     uses: ./.github/workflows/sonarcloud.yml
+    secrets: inherit
 
   xunit-test:
     uses: ./.github/workflows/dotnet-build-test-publish.yml
