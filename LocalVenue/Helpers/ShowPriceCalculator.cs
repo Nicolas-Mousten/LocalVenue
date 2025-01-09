@@ -14,14 +14,14 @@ public static class ShowPriceCalculator
             {
                 foreach (var ticket in show.Tickets)
                 {
-                    ticket.Price = CalculatePrice(show, ticket, show.OpeningNight); 
+                    ticket.Price = CalculatePrice(show, ticket, show.OpeningNight);
                 }
             }
         }
 
         return shows;
     }
-    
+
     public static decimal CalculatePrice(Show show, Ticket ticket, bool openingNight)
     {
         decimal additionalPrice = 0;
@@ -33,14 +33,14 @@ public static class ShowPriceCalculator
 
         if (ShowLastForMoreThanTwoHours(show))
         {
-            additionalPrice += BasePrice *  0.15m;
+            additionalPrice += BasePrice * 0.15m;
         }
 
         if (ticket.Seat.Row <= 2)
         {
             additionalPrice += BasePrice * 0.25m;
         }
-        
+
         if (show.StartTime.Hour >= 18)
         {
             additionalPrice += 20;
@@ -48,7 +48,7 @@ public static class ShowPriceCalculator
 
         return BasePrice + additionalPrice;
     }
-    
+
     public static bool ShowLastForMoreThanTwoHours(Show show)
     {
         return new TimeSpan(2, 0, 0) < show.EndTime - show.StartTime;

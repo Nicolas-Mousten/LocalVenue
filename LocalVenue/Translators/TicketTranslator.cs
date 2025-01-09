@@ -11,7 +11,7 @@ public class TicketTranslator
         {
             return null;
         }
-        
+
         return new Web.Models.Ticket
         {
             Id = ticket.TicketId,

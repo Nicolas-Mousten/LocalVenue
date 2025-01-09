@@ -13,5 +13,5 @@ public static class Shake
     {
         await jsRuntime.InvokeVoidAsync("LocalVenue.Shaking.errorHorizontalShake", id);
     }
-    
+
 }

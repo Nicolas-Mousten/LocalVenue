@@ -31,7 +31,7 @@ public class SeatServiceTest
         var expectedSeat = new Seat { SeatId = seatId, Section = "Front", Row = 1, Number = 1 };
 
         var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-        
+
         await using (var context = await dbContextFactory.CreateDbContextAsync())
         {
             context.Seats.Add(expectedSeat);
@@ -40,7 +40,7 @@ public class SeatServiceTest
 
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-    
+
         var service = new SeatService(contextFactoryRetrieve);
         var result = await service.GetSeat(seatId);
 
@@ -50,6 +50,6 @@ public class SeatServiceTest
         Assert.Equal(expectedSeat.Section, result.Section);
         Assert.Equal(expectedSeat.Row, result.Row);
         Assert.Equal(expectedSeat.Number, result.Number);
-        
+
     }
 }

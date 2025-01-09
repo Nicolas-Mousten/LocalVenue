@@ -15,8 +15,8 @@ public class CustomerService(UserManager<Core.Entities.Customer> userManager) : 
             Email = customer.Email,
             UserName = customer.FirstName,
         };
-        
-        
+
+
         return await userManager.CreateAsync(businessCustomer, password);
     }
 }

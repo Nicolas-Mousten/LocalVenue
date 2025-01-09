@@ -70,7 +70,7 @@ public class ShowPriceCalculatorTest
         // Assert
         Assert.Equal(expectedPrice, result);
     }
-    
+
     [Fact]
     public void AddPrice_ShouldCalculatePriceForAllTickets()
     {
@@ -159,5 +159,5 @@ public class ShowPriceCalculatorTest
         Assert.NotNull(result);
         Assert.Empty(result[0].Tickets!);
     }
-    
+
 }
