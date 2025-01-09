@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using LocalVenue.Core.Enums;
+﻿using LocalVenue.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace LocalVenue.Core.Entities;
 

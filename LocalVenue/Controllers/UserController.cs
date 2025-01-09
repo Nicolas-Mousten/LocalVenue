@@ -32,5 +32,3 @@ public class UserController(SignInManager<Customer> signInManager, UserManager<C
         return BadRequest("Invalid login attempt.");
     }
 }
-
-
