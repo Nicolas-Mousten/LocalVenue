@@ -17,7 +17,7 @@ jobs:
 
       - name: Run dotnet format
         id: format
-        uses: jfversluis/dotnet-format@v1.0.5
+        uses: jfversluis/dotnet-format@v1.0.9
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           action: "fix"
@@ -33,7 +33,7 @@ jobs:
 
       - name: Push changes
         if: steps.format.outputs.has-changes == 'true'
-        uses: ad-m/github-push-action@v0.5.0
+        uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
