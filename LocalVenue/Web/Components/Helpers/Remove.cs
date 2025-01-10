@@ -8,7 +8,7 @@ public static class Remove
     {
         await jsRuntime.InvokeVoidAsync("LocalVenue.RemoveItem.RemoveListItem", id);
     }
-    
+
     public static async void StateChangeAfterRemoveListItem(string id, IJSRuntime jsRuntime)
     {
         await jsRuntime.InvokeVoidAsync("LocalVenue.RemoveItem.StateChangeAfterRemoveListItem", id);

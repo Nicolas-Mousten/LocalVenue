@@ -27,6 +27,7 @@ resource "azurerm_windows_web_app" "main" {
   app_settings = {
     "WEBSITE_RUN_FROM_PACKAGE" = "1",
     "ASPNETCORE_ENVIRONMENT"   = "Production"
+    "TMDB_API_KEY"             = var.tmdb_api_key
   }
   connection_string {
     name  = "VenueContext"

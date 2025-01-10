@@ -1,18 +1,34 @@
 using System.Net.Http.Headers;
+using AutoMapper;
+using LocalVenue;
 using LocalVenue.Web;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
+using LocalVenue.Core.Services;
+using LocalVenue.Services;
+using LocalVenue.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.WebComponents;
-using LocalVenue.Core.Services;
-using LocalVenue.Services;
-using LocalVenue.Services.Interfaces;
 using Polly;
 using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Let builder read appsettings.json and environment variables (azure webapp settings)
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+}
+else
+{
+    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+}
+builder.Configuration.AddEnvironmentVariables();
+
+var TMDB_API_KEY = builder.Configuration["TMDB_API_KEY"] ?? throw new ArgumentNullException("TMDB_API_KEY");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -29,13 +45,11 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "LocalVenue API", Version = "v1" });
     c.EnableAnnotations();
-}); // TODO: Investigate if az cli can be used to deploy the app to Azure from pipeline
-    //      TODO: Try to add dotnet and postman testing in pipeline
-    // TODO: Implement the customer entity and some basic authentication for the API
-
+});
 
 // Database context setup starts
 var connectionString = builder.Configuration.GetConnectionString("VenueContext") ?? throw new ArgumentNullException("VenueContext");
+
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.Parse("8.0-mysql"));
@@ -115,6 +129,7 @@ app.UseHttpsRedirection();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<VenueContext>();
+    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
     var retryCount = 5;
     var delay = TimeSpan.FromSeconds(10);
 
@@ -123,7 +138,7 @@ using (var scope = app.Services.CreateScope())
         try
         {
             dbContext.Database.Migrate(); //Auto perform migrations
-            DbSeeder.UpsertSeed(dbContext); //Auto seed database
+            DbSeeder.UpsertSeed(dbContext, mapper); //Auto seed database
             break;
         }
         catch (Microsoft.Data.SqlClient.SqlException)

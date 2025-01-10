@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using Microsoft.OpenApi.Attributes;
+﻿using Microsoft.OpenApi.Attributes;
+using System.ComponentModel;
 
 namespace LocalVenue.Core.Enums;
 
@@ -28,12 +28,6 @@ public static class Genre1
             _ => throw new ArgumentOutOfRangeException(nameof(Genre), Genre, null)
         };
     }
-    
-    
+
+
 }
-
-
-
-
-
-

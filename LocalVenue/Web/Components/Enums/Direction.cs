@@ -6,7 +6,7 @@ public enum Direction
     Bottom = 1,
     Left = 2,
     Right = 3
-    
+
 }
 
 public static class DirectionExtensions

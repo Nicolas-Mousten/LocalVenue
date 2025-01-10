@@ -21,3 +21,7 @@ variable "zip_deploy_file_path" {
 variable "azure_name_suffix" {
   type = string
 }
+
+variable "tmdb_api_key" {
+  type = string
+}

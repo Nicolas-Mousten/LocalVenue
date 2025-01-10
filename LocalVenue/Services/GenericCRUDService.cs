@@ -1,8 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using LocalVenue.Core;
 using LocalVenue.Core.Models;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 
 namespace LocalVenue.Services;
 
