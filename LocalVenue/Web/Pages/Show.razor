@@ -40,7 +40,7 @@
         }
 
         ModelShow = await ShowService.GetShowWithTicketsAsync(validatedShowId);
-
+        Console.WriteLine(ModelShow);
         if (ModelShow is null)
         {
             ErrorMessage = "Showet findes ikke";

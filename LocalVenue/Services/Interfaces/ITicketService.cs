@@ -8,5 +8,7 @@ namespace LocalVenue.Services.Interfaces
         Task<Ticket> AddTicket(Ticket ticket);
         Task<Ticket> UpdateTicket(Ticket ticket);
         Task<Ticket> DeleteTicket(long id);
+        Task JoinShow(List<Ticket> tickets, string customerId);
+        Task LeaveShow(List<Ticket> tickets, string customerId);
     }
 }

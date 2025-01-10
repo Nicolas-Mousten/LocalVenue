@@ -12,7 +12,7 @@ public static class SeatTranslator
             Number = seat.Number
         };
     }
-
+    
     public static Web.Models.Seat Translate(Core.Entities.Seat seat)
     {
         return new Web.Models.Seat

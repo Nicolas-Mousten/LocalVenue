@@ -5,6 +5,8 @@ namespace LocalVenue.Web.Models;
 public class Ticket
 {
     public long Id { get; set; }
+    public long ShowId { get; set; }
+    public long SeatId { get; set; }
     public required Seat Seat { get; set; }
     public decimal Price { get; set; }
     public Status Status { get; set; }

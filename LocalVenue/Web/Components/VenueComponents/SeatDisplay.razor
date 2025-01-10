@@ -1,9 +1,29 @@
 ﻿@using LocalVenue.Core.Enums
+@using LocalVenue.Services
+@using LocalVenue.Services.Interfaces
 @using LocalVenue.Shared.Enums
 @using LocalVenue.Web.Models
 @using LocalVenue.Web.Components.JoltyUI
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITicketService TicketService
 @code {
     [Parameter] public List<Ticket>? Tickets { get; set; }
+    private ClaimsPrincipal? _currentUser;
+    private string? _userId;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _currentUser = authState.User;
+
+        if (_currentUser.Identity?.IsAuthenticated ?? false)
+        {
+            // Retrieve specific claims (e.g., User ID, email)
+            _userId = _currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+    }
 }
 
 @if (Tickets is null)
@@ -24,9 +44,19 @@
                         {
                             <p class="mb-2">Seat: @seat.Seat.Row - Row: @seat.Seat.Number</p>
                             <p>Pris: @seat.Price.ToString("C2")</p>
+                            @if (seat.Status == Status.Available)
+                            {
+                                <button class="btn btn-primary" @onclick="() => AddSeatToTickets(seat)">Add to My Tickets</button>
+                            }
                         } else if (seat.Status == Status.Reserved)
                         {
                             
+                        } else if (seat.Status == Status.Sold)
+                        {
+                            @if (seat.SoldToCustomerId == _userId)
+                            {
+                                <p>This is your seat</p>
+                            }
                         }
                         </div>
                     </Body>
@@ -36,6 +66,8 @@
             }
         </div>
     }
+    Total Price: 
+    <button @onclick="BuyTickets">Buy Tickets</button>
 </div>
 
 
@@ -62,6 +94,9 @@
 </style>
 
 @code {
+    private List<LocalVenue.Core.Entities.Ticket> _tickets = new List<LocalVenue.Core.Entities.Ticket>();
+    
+    
     private string GetSeatColor(Status status)
     {
         return status switch
@@ -71,5 +106,28 @@
             Status.Reserved => "yellow",
             _ => "gray"
         };
+    }
+    
+    private void AddSeatToTickets(LocalVenue.Web.Models.Ticket seat)
+    {
+        // Create a new ticket for the selected seat
+        var newTicket = new Core.Entities.Ticket()
+        {
+            TicketId = seat.Id,
+            ShowId = seat.ShowId,
+            SeatId = seat.SeatId,
+            Price = seat.Price,
+            Status = seat.Status,
+            CustomerId = _userId
+        };
+
+        // Add the ticket to the tickets list
+        _tickets.Add(newTicket);
+    }
+    
+    private async Task BuyTickets()
+    {
+        await TicketService.JoinShow(_tickets, _userId);
+        StateHasChanged();
     }
 }
