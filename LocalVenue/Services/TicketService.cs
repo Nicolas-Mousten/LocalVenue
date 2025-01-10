@@ -1,12 +1,14 @@
+using AutoMapper;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Services;
+using LocalVenue.Helpers;
 using LocalVenue.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
 
-public class TicketService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Ticket>(contextFactory), ITicketService
+public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Ticket>(contextFactory), ITicketService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
@@ -15,9 +17,12 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         return await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 
-    public async Task<Ticket> AddTicket(Ticket ticket)
+    public async Task<Ticket> AddTicket(Ticket ticket, VenueContext? context = null)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        if (context == null)
+        {
+            context = await _contextFactory.CreateDbContextAsync();
+        }
 
         //Check if the ticket's seat, customer, and show exist
         if (await context.Seats.FindAsync(ticket.SeatId) == null)
@@ -35,7 +40,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         {
             ticket.CustomerId = null;
         }
-        if (await context.Shows.FindAsync(ticket.ShowId) == null)
+
+        var show = await context.Shows.FindAsync(ticket.ShowId);
+        if (show == null)
         {
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }
@@ -45,6 +52,14 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         {
             throw new ArgumentException($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned");
         }
+
+        // map some stuff for before price calculation
+        var seat = await context.Seats.FindAsync(ticket.SeatId);
+        var webSeat = mapper.Map<Web.Models.Seat>(seat);
+        var webModelsShow = mapper.Map<Web.Models.Show>(show);
+        var webModelTicket = mapper.Map<Web.Models.Ticket>(ticket);
+        webModelTicket.Seat = webSeat;
+        ticket.Price = ShowPriceCalculator.CalculatePrice(webModelsShow, webModelTicket, show.OpeningNight);
 
         return await base.AddItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }

@@ -66,7 +66,8 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
                 Status = Core.Enums.Status.Available
             };
 
-            context.Tickets.Add(newTicket);
+            TicketService ticketService = new TicketService(_contextFactory, _mapper);
+            await ticketService.AddTicket(newTicket, context);
         }
         context.SaveChanges();
 
