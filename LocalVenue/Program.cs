@@ -1,3 +1,5 @@
+using AutoMapper;
+using LocalVenue;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Services;
@@ -13,7 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Let builder read appsettings.json and environment variables (azure webapp settings)
 builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
-builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+}
+else
+{
+    builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+}
 builder.Configuration.AddEnvironmentVariables();
 
 var TMDB_API_KEY = builder.Configuration["TMDB_API_KEY"] ?? throw new ArgumentNullException("TMDB_API_KEY");
@@ -98,6 +107,7 @@ app.UseHttpsRedirection();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<VenueContext>();
+    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
     var retryCount = 5;
     var delay = TimeSpan.FromSeconds(10);
 
@@ -106,7 +116,7 @@ using (var scope = app.Services.CreateScope())
         try
         {
             dbContext.Database.Migrate(); //Auto perform migrations
-            DbSeeder.UpsertSeed(dbContext); //Auto seed database
+            DbSeeder.UpsertSeed(dbContext, mapper); //Auto seed database
             break;
         }
         catch (Microsoft.Data.SqlClient.SqlException)

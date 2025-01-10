@@ -1,12 +1,17 @@
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
+using LocalVenue.Core.Models;
 using LocalVenue.Core.Enums;
+using LocalVenue.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+
+namespace LocalVenue;
 
 public static class DbSeeder
 {
-    public static void UpsertSeed(VenueContext context)
+    public static void UpsertSeed(VenueContext context, IMapper _mapper)
     {
         if (context.Shows.Any(show => show.EndTime < DateTime.Now))
         {
@@ -61,11 +66,11 @@ public static class DbSeeder
         context.SaveChanges();
 
         // Seed Shows
-        UpsertShow(context, new Show { ShowId = 1, Title = "Comedy Night", Description = "A night full of laughs", StartTime = DateTime.Now.AddHours(1), EndTime = DateTime.Now.AddHours(3), Genre = Genre.Comedy });
-        UpsertShow(context, new Show { ShowId = 2, Title = "Magic Show", Description = "A magical evening", StartTime = DateTime.Now.AddHours(3), EndTime = DateTime.Now.AddHours(5), Genre = Genre.Romance });
-        UpsertShow(context, new Show { ShowId = 3, Title = "Rock Concert", Description = "Rock the night away", StartTime = DateTime.Now.AddHours(5), EndTime = DateTime.Now.AddHours(7), Genre = Genre.Horror });
-        UpsertShow(context, new Show { ShowId = 4, Title = "Dance Performance", Description = "An evening of dance", StartTime = DateTime.Now.AddHours(7), EndTime = DateTime.Now.AddHours(9), Genre = Genre.Documentary });
-        UpsertShow(context, new Show { ShowId = 5, Title = "Drama Play", Description = "A dramatic performance", StartTime = DateTime.Now.AddHours(9), EndTime = DateTime.Now.AddHours(11), Genre = Genre.Drama });
+        UpsertShow(context, new Show { ShowId = 1, Title = "Comedy Night", Description = "A night full of laughs", StartTime = DateTime.Now.AddHours(1), EndTime = DateTime.Now.AddHours(3), Genre = Genre.Comedy, OpeningNight = true });
+        UpsertShow(context, new Show { ShowId = 2, Title = "Magic Show", Description = "A magical evening", StartTime = DateTime.Now.AddHours(3), EndTime = DateTime.Now.AddHours(5), Genre = Genre.Romance, OpeningNight = true });
+        UpsertShow(context, new Show { ShowId = 3, Title = "Rock Concert", Description = "Rock the night away", StartTime = DateTime.Now.AddHours(5), EndTime = DateTime.Now.AddHours(7), Genre = Genre.Horror, OpeningNight = true });
+        UpsertShow(context, new Show { ShowId = 4, Title = "Dance Performance", Description = "An evening of dance", StartTime = DateTime.Now.AddHours(7), EndTime = DateTime.Now.AddHours(9), Genre = Genre.Documentary, OpeningNight = false });
+        UpsertShow(context, new Show { ShowId = 5, Title = "Drama Play", Description = "A dramatic performance", StartTime = DateTime.Now.AddHours(9), EndTime = DateTime.Now.AddHours(11), Genre = Genre.Drama, OpeningNight = false });
         context.SaveChanges();
 
         //Seed Tickets
@@ -77,9 +82,14 @@ public static class DbSeeder
         {
             foreach (Seat seat in seats)
             {
-                UpsertTicket(context, new Ticket { TicketId = ticketId++, Price = (decimal)(random.NextDouble() * 100), SeatId = seat.SeatId, ShowId = show.ShowId });
+                var ticket = new Ticket { TicketId = ticketId++, Price = 0, SeatId = seat.SeatId, Seat = seats.FirstOrDefault(s => s.SeatId == seat.SeatId), ShowId = show.ShowId, Show = shows.FirstOrDefault(s => s.ShowId == show.ShowId), Status = Status.Available };
+                var webModelsShow = _mapper.Map<Web.Models.Show>(show);
+                var webModelTicket = _mapper.Map<Web.Models.Ticket>(ticket);
+                ticket.Price = ShowPriceCalculator.CalculatePrice(webModelsShow, webModelTicket, show.OpeningNight);
+                UpsertTicket(context, ticket);
             }
         }
+        context.SaveChanges();
 
         //Seed Admin user
         var admin = new Customer
