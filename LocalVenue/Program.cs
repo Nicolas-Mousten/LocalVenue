@@ -11,6 +11,13 @@ using Shared.WebComponents;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Let builder read appsettings.json and environment variables (azure webapp settings)
+builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddEnvironmentVariables();
+
+var TMDB_API_KEY = builder.Configuration["TMDB_API_KEY"] ?? throw new ArgumentNullException("TMDB_API_KEY");
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -30,6 +37,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Database context setup starts
 var connectionString = builder.Configuration.GetConnectionString("VenueContext") ?? throw new ArgumentNullException("VenueContext");
+
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
     options.UseMySql(connectionString, ServerVersion.Parse("8.0-mysql"));
