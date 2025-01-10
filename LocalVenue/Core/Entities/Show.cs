@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using LocalVenue.Core.Enums;
 
 namespace LocalVenue.Core.Entities;
@@ -13,6 +14,9 @@ public class Show
     public string Title { get; set; } = string.Empty;
 
     public string? Description { get; set; }
+
+    [NotMapped]
+    public ICollection<Actor> Actors { get; set; }
 
     public DateTime StartTime { get; set; }
 

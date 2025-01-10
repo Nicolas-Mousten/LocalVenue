@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using LocalVenue.Web;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
@@ -8,6 +9,8 @@ using Shared.WebComponents;
 using LocalVenue.Core.Services;
 using LocalVenue.Services;
 using LocalVenue.Services.Interfaces;
+using Polly;
+using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +46,25 @@ builder.Services.AddScoped<IShowService, ShowService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 // Database context setup ends
+
+// TMDB HTTP requests setup start
+builder.Services.AddScoped<IActorService, ActorService>();
+
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
+            retryAttempt)));
+}
+
+builder.Services.AddHttpClient("TmdbClient", client =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration.GetSection("TMDB").GetSection("Url").Value ?? throw new ArgumentNullException("TMDB.Url"));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", builder.Configuration.GetSection("TMDB").GetSection("Token").Value ?? throw new ArgumentNullException("TMDB.Token"));
+    })
+    .AddPolicyHandler(GetRetryPolicy());
+// TMDB HTTP requests setup ends
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
