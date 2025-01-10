@@ -2,12 +2,41 @@ using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 public static class DbSeeder
 {
     public static void UpsertSeed(VenueContext context)
     {
-        if (context.Users.Any())
+        if (context.Shows.Any(show => show.EndTime < DateTime.Now))
+        {
+            int offset = 1;
+            var showsToUpdate = new List<Show>();
+            foreach (var show in context.Shows)
+            {
+                var existingShow = context.Shows.Find(show.ShowId);
+                if (existingShow != null)
+                {
+                    context.Entry(existingShow).State = EntityState.Detached;
+                }
+
+                var newShow = new Show
+                {
+                    ShowId = show.ShowId,
+                    Title = show.Title,
+                    Description = show.Description,
+                    StartTime = DateTime.Now.AddHours(offset),
+                    EndTime = DateTime.Now.AddHours(offset + 2),
+                    Genre = show.Genre
+                };
+                showsToUpdate.Add(newShow);
+                offset += 2;
+            }
+            context.Shows.UpdateRange(showsToUpdate);
+            context.SaveChanges();
+        }
+
+        if (context.Shows.Any())
         {
             return;
         }
@@ -32,11 +61,11 @@ public static class DbSeeder
         context.SaveChanges();
 
         // Seed Shows
-        UpsertShow(context, new Show { ShowId = 1, Title = "Comedy Night", Description = "A night full of laughs", StartTime = DateTime.Now, EndTime = DateTime.Now.AddHours(2), Genre = Genre.Comedy });
-        UpsertShow(context, new Show { ShowId = 2, Title = "Magic Show", Description = "A magical evening", StartTime = DateTime.Now.AddHours(2), EndTime = DateTime.Now.AddHours(4), Genre = Genre.Romance });
-        UpsertShow(context, new Show { ShowId = 3, Title = "Rock Concert", Description = "Rock the night away", StartTime = DateTime.Now.AddHours(4), EndTime = DateTime.Now.AddHours(6), Genre = Genre.Horror });
-        UpsertShow(context, new Show { ShowId = 4, Title = "Dance Performance", Description = "An evening of dance", StartTime = DateTime.Now.AddHours(8), EndTime = DateTime.Now.AddHours(10), Genre = Genre.Documentary });
-        UpsertShow(context, new Show { ShowId = 5, Title = "Drama Play", Description = "A dramatic performance", StartTime = DateTime.Now.AddHours(10), EndTime = DateTime.Now.AddHours(12), Genre = Genre.Drama });
+        UpsertShow(context, new Show { ShowId = 1, Title = "Comedy Night", Description = "A night full of laughs", StartTime = DateTime.Now.AddHours(1), EndTime = DateTime.Now.AddHours(3), Genre = Genre.Comedy });
+        UpsertShow(context, new Show { ShowId = 2, Title = "Magic Show", Description = "A magical evening", StartTime = DateTime.Now.AddHours(3), EndTime = DateTime.Now.AddHours(5), Genre = Genre.Romance });
+        UpsertShow(context, new Show { ShowId = 3, Title = "Rock Concert", Description = "Rock the night away", StartTime = DateTime.Now.AddHours(5), EndTime = DateTime.Now.AddHours(7), Genre = Genre.Horror });
+        UpsertShow(context, new Show { ShowId = 4, Title = "Dance Performance", Description = "An evening of dance", StartTime = DateTime.Now.AddHours(7), EndTime = DateTime.Now.AddHours(9), Genre = Genre.Documentary });
+        UpsertShow(context, new Show { ShowId = 5, Title = "Drama Play", Description = "A dramatic performance", StartTime = DateTime.Now.AddHours(9), EndTime = DateTime.Now.AddHours(11), Genre = Genre.Drama });
         context.SaveChanges();
 
         //Seed Tickets
