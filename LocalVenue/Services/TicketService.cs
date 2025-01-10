@@ -53,13 +53,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
             throw new ArgumentException($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned");
         }
 
-        // map some stuff for before price calculation
-        var seat = await context.Seats.FindAsync(ticket.SeatId);
-        var webSeat = mapper.Map<Web.Models.Seat>(seat);
-        var webModelsShow = mapper.Map<Web.Models.Show>(show);
-        var webModelTicket = mapper.Map<Web.Models.Ticket>(ticket);
-        webModelTicket.Seat = webSeat;
-        ticket.Price = ShowPriceCalculator.CalculatePrice(webModelsShow, webModelTicket, show.OpeningNight);
+        ticket.Seat = await context.Seats.FindAsync(ticket.SeatId); // price calculator needs seat
+        ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
+        ticket.Seat = null; // remove seat from ticket to avoid duplicate insert
 
         return await base.AddItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }

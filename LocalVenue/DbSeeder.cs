@@ -11,7 +11,7 @@ namespace LocalVenue;
 
 public static class DbSeeder
 {
-    public static void UpsertSeed(VenueContext context, IMapper _mapper)
+    public static void UpsertSeed(VenueContext context, IMapper mapper)
     {
         if (context.Shows.Any(show => show.EndTime < DateTime.Now))
         {
@@ -83,9 +83,7 @@ public static class DbSeeder
             foreach (Seat seat in seats)
             {
                 var ticket = new Ticket { TicketId = ticketId++, Price = 0, SeatId = seat.SeatId, Seat = seats.FirstOrDefault(s => s.SeatId == seat.SeatId), ShowId = show.ShowId, Show = shows.FirstOrDefault(s => s.ShowId == show.ShowId), Status = Status.Available };
-                var webModelsShow = _mapper.Map<Web.Models.Show>(show);
-                var webModelTicket = _mapper.Map<Web.Models.Ticket>(ticket);
-                ticket.Price = ShowPriceCalculator.CalculatePrice(webModelsShow, webModelTicket, show.OpeningNight);
+                ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
                 UpsertTicket(context, ticket);
             }
         }
