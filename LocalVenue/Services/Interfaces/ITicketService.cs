@@ -9,6 +9,6 @@ namespace LocalVenue.Services.Interfaces
         Task<Ticket> UpdateTicket(Ticket ticket);
         Task<Ticket> DeleteTicket(long id);
         Task JoinShow(List<Ticket> tickets, string customerId);
-        Task LeaveShow(List<Ticket> tickets, string customerId);
+        Task<string> LeaveShow(List<Ticket> tickets, string customerId);
     }
 }

@@ -6,10 +6,15 @@
 @using LocalVenue.Web.Components.JoltyUI
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ITicketService TicketService
+@inject IShowService ShowService
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @code {
     [Parameter] public List<Ticket>? Tickets { get; set; }
+    [Parameter] public string ShowId { get; set; }
+    [Parameter] public EventCallback RefreshParent { get; set; }
     private ClaimsPrincipal? _currentUser;
     private string? _userId;
     
@@ -20,7 +25,6 @@
 
         if (_currentUser.Identity?.IsAuthenticated ?? false)
         {
-            // Retrieve specific claims (e.g., User ID, email)
             _userId = _currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }
@@ -56,6 +60,7 @@
                             @if (seat.SoldToCustomerId == _userId)
                             {
                                 <p>This is your seat</p>
+                                <button @onclick="() => RemoveSeatFromReturnTickets(seat)">Return Ticket</button>
                             }
                         }
                         </div>
@@ -66,8 +71,14 @@
             }
         </div>
     }
-    Total Price: 
+    <p>Tickets: @_tickets.Count, Total Price:</p> 
     <button @onclick="BuyTickets">Buy Tickets</button>
+    <p>@ticketsToReturn.Count</p>
+    @if (ticketsToReturn.Count != 0)
+    {
+        <button @onclick="ReturnTicket">Return Tickets</button>
+    }
+    <p>@ticketServiceMessage</p>
 </div>
 
 
@@ -95,7 +106,8 @@
 
 @code {
     private List<LocalVenue.Core.Entities.Ticket> _tickets = new List<LocalVenue.Core.Entities.Ticket>();
-    
+    private List<LocalVenue.Core.Entities.Ticket> ticketsToReturn = new List<LocalVenue.Core.Entities.Ticket>();
+    private string ticketServiceMessage { get; set; }
     
     private string GetSeatColor(Status status)
     {
@@ -110,7 +122,7 @@
     
     private void AddSeatToTickets(LocalVenue.Web.Models.Ticket seat)
     {
-        // Create a new ticket for the selected seat
+        
         var newTicket = new Core.Entities.Ticket()
         {
             TicketId = seat.Id,
@@ -120,14 +132,42 @@
             Status = seat.Status,
             CustomerId = _userId
         };
-
-        // Add the ticket to the tickets list
-        _tickets.Add(newTicket);
+        if (!_tickets.Contains(newTicket))
+        {
+            _tickets.Add(newTicket);
+        }
+    }
+    private void RemoveSeatFromReturnTickets(LocalVenue.Web.Models.Ticket seat)
+    {
+        
+        var newTicket = new Core.Entities.Ticket()
+        {
+            TicketId = seat.Id,
+            ShowId = seat.ShowId,
+            SeatId = seat.SeatId,
+            Price = seat.Price,
+            Status = seat.Status,
+            CustomerId = _userId
+        };
+        if (!ticketsToReturn.Contains(newTicket))
+        {
+            ticketsToReturn.Add(newTicket);
+        }
     }
     
     private async Task BuyTickets()
     {
         await TicketService.JoinShow(_tickets, _userId);
+        _tickets.Clear();
+        await RefreshParent.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private async Task ReturnTicket()
+    {
+        ticketServiceMessage = await TicketService.LeaveShow(ticketsToReturn, _userId);
+        ticketsToReturn.Clear();
+        await RefreshParent.InvokeAsync();
         StateHasChanged();
     }
 }

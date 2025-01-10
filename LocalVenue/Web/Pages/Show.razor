@@ -19,7 +19,7 @@
         <p><strong>Genre:</strong> @ModelShow.Genre</p>
     </div>
 
-    <SeatDisplay Tickets="ModelShow.Tickets" />
+    <SeatDisplay Tickets="ModelShow.Tickets" ShowId="ShowId" RefreshParent="RefreshData" />
 }
 
 
@@ -40,12 +40,21 @@
         }
 
         ModelShow = await ShowService.GetShowWithTicketsAsync(validatedShowId);
-        Console.WriteLine(ModelShow);
         if (ModelShow is null)
         {
             ErrorMessage = "Showet findes ikke";
         }
-
     }
-
+    private async Task RefreshData()
+    {
+        if (long.TryParse(ShowId, out var validatedShowId))
+        {
+            var updatedShow = await ShowService.GetShowWithTicketsAsync(validatedShowId);
+            if (updatedShow is not null)
+            {
+                ModelShow = updatedShow;  // Update the show details in the parent
+            }
+        }
+        StateHasChanged();
+    }
 }

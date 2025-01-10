@@ -115,7 +115,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         await context.SaveChangesAsync();
     }
 
-    public async Task LeaveShow(List<Ticket> tickets, string customerId)
+    public async Task<string> LeaveShow(List<Ticket> tickets, string customerId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         Show? show = await context.Shows.FindAsync(tickets.First().ShowId);
@@ -125,9 +125,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         }
         
         //Check if the time is less than a day before show starts.
-        if (show.StartTime <= DateTime.Now.AddHours(24))
+        if (lessThanADayLeft(show))
         {
-            throw new ArgumentException($"It is not possible to return a ticket a day before the show starts.");
+            return "It is not possible to return a ticket a day before the show starts.";
         }
         
         //add the customer to those seats
@@ -143,5 +143,12 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         }
         
         await context.SaveChangesAsync();
+        return "Tickets have been returned";
+    }
+
+
+    public bool lessThanADayLeft(Show show)
+    {
+        return show.StartTime <= DateTime.Now.AddHours(24);
     }
 }
