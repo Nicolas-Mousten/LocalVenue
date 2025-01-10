@@ -79,10 +79,16 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             ticket.CustomerId = null;
         }
-        if (await context.Shows.FindAsync(ticket.ShowId) == null)
+
+        var show = await context.Shows.FindAsync(ticket.ShowId);
+        if (show == null)
         {
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }
+
+        ticket.Seat = await context.Seats.FindAsync(ticket.SeatId); // price calculator needs seat
+        ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
+        ticket.Seat = null; // remove seat from ticket to avoid duplicate insert
 
         return await base.UpdateItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
