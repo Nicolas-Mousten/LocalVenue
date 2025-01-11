@@ -19,13 +19,9 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/dotnet-format-lint.yml
 
-  sonarcloud:
-    needs: format-lint
-    secrets: inherit
-    uses: ./.github/workflows/sonarcloud.yml
-
-  xunit-test:
+  xunit-test-with-sonarcloud:
     needs: format-lint
     uses: ./.github/workflows/dotnet-build-test-publish.yml
+    secrets: inherit
     with:
       publish: false
