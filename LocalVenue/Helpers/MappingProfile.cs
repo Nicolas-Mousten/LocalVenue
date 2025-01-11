@@ -26,7 +26,6 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.Seat, opt => opt.MapFrom(src => src.Seat))
             .ForMember(dest => dest.SoldToCustomerId, opt => opt.MapFrom(src => src.CustomerId));
 
-
         CreateMap<Web.Models.Ticket, Core.Entities.Ticket>()
             .ForMember(dest => dest.TicketId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Seat, opt => opt.MapFrom(src => src.Seat))
