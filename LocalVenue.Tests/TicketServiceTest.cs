@@ -69,7 +69,7 @@ public class TicketServiceTest
 
         Seat seat = new Seat
         {
-            SeatId = 1,
+            SeatId = 4,
             Section = "Front",
             Row = 1,
             Number = 1
