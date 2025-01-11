@@ -19,6 +19,9 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Install tool
+        run: dotnet tool install --global dotnet-coverage
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -27,6 +30,10 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --logger "trx;LogFileName=TestResults.xml"
+
+      - name: Coverage
+        run: dotnet-coverage collect "dotnet test" -f xml -o "TestResults/coverage.xml"
+        #run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage.xml
 
       - name: Publish Test Results
         if: always()
@@ -63,6 +70,11 @@ jobs:
         with:
           name: TestResults
 
+      - name: Download coverage report from last job
+        uses: actions/download-artifact@v4
+        with:
+          name: TestResults
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
@@ -94,6 +106,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vstest.reportsPaths="TestResults/*.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin 
+                              /k:"KEA-Gruppe6_LocalVenue" 
+                              /o:"kea-gruppe6" 
+                              /d:sonar.token="${{ secrets.SONAR_TOKEN }}" 
+                              /d:sonar.host.url="https://sonarcloud.io"                               
+                              /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+                              /d:sonar.cs.vstest.reportsPaths="TestResults/*.xml"
           dotnet build
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
