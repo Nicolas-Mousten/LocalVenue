@@ -4,7 +4,6 @@ using LocalVenue.Core.Entities;
 using LocalVenue.Core.Models;
 using LocalVenue.Core.Services;
 using LocalVenue.Services.Interfaces;
-using LocalVenue.Translators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -141,6 +140,6 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
             return new List<Web.Models.Show>();
         }
 
-        return shows.Select(ShowTranslator.Translate).ToList();
+        return shows.Select(_mapper.Map<Web.Models.Show>).ToList();
     }
 }
