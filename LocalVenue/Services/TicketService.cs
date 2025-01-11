@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
 
-public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper? mapper = null) : GenericCRUDService<Ticket>(contextFactory), ITicketService
+public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Ticket>(contextFactory), ITicketService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
@@ -99,10 +99,14 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         return await base.DeleteItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 
-    public async Task JoinShow(List<Ticket> tickets, string customerId)
+    public async Task JoinShow(long showId, List<LocalVenue.Web.Models.Ticket> tickets, string customerId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-        Show? show = await context.Shows.FindAsync(tickets.First().ShowId);
+        Show show = await context.Shows.FindAsync(showId);
+        if (show == null)
+        {
+            throw new ArgumentException($"Show with id '{showId}' does not exist");
+        }
         if (await context.Users.FindAsync(customerId) == null)
         {
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
@@ -111,31 +115,49 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         //add the customer to those seats
         foreach (var ticket in tickets)
         {
-            ticket.TicketId = ticket.TicketId;
-            ticket.ShowId = ticket.ShowId;
-            ticket.SeatId = ticket.SeatId;
-            ticket.Price = ticket.Price;
+            Ticket newTicket = new Ticket
+            {
+                TicketId = ticket.Id,
+                ShowId = ticket.ShowId,
+                Show = show,
+                SeatId = ticket.SeatId,
+                Seat = new Seat
+                {
+                    SeatId = ticket.SeatId,
+                    Section = ticket.Seat.Section,
+                    Row = ticket.Seat.Row,
+                    Number = ticket.Seat.Number
+                },
+                Price = ticket.Price,
+                Status = ticket.Status,
+                CustomerId = null,
+                Customer = null
+            };
             if (ticket.Status != Status.Available)
             {
-                throw new ArgumentException($"Ticket {ticket.TicketId} is not available for purchase");
+                throw new ArgumentException($"Ticket {ticket.Id} is not available for purchase");
             }
 
-            if (ticket.CustomerId != null)
+            if (ticket.SoldToCustomerId != null)
             {
-                throw new ArgumentException($"Ticket {ticket.TicketId} is already purchased by another customer");
+                throw new ArgumentException($"Ticket {ticket.Id} is already purchased by another customer");
             }
-            ticket.Status = Status.Sold;
-            ticket.CustomerId = customerId.ToString();
-            await UpdateTicket(ticket);
+            newTicket.Status = Status.Sold;
+            newTicket.CustomerId = customerId.ToString();
+            await UpdateTicket(newTicket);
         }
 
         await context.SaveChangesAsync();
     }
 
-    public async Task<string> LeaveShow(List<Ticket> tickets, string customerId)
+    public async Task<string> LeaveShow(long showId, List<LocalVenue.Web.Models.Ticket> tickets, string customerId)
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-        Show? show = await context.Shows.FindAsync(tickets.First().ShowId);
+        Show show = await context.Shows.FindAsync(showId);
+        if (show == null)
+        {
+            throw new ArgumentException($"Show with id '{customerId}' does not exist");
+        }
         if (await context.Users.FindAsync(customerId) == null)
         {
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
@@ -149,14 +171,27 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         
         //add the customer to those seats
         foreach (var ticket in tickets)
-        {
-            ticket.TicketId = ticket.TicketId;
-            ticket.ShowId = ticket.ShowId;
-            ticket.SeatId = ticket.SeatId;
-            ticket.Price = ticket.Price;
-            ticket.Status = Status.Available;
-            ticket.CustomerId = null;
-            await UpdateTicket(ticket);
+        {Ticket newTicket = new Ticket
+            {
+                TicketId = ticket.Id,
+                ShowId = ticket.ShowId,
+                Show = show,
+                SeatId = ticket.SeatId,
+                Seat = new Seat
+                {
+                    SeatId = ticket.SeatId,
+                    Section = ticket.Seat.Section,
+                    Row = ticket.Seat.Row,
+                    Number = ticket.Seat.Number
+                },
+                Price = ticket.Price,
+                Status = ticket.Status,
+                CustomerId = null,
+                Customer = null
+            };
+            newTicket.Status = Status.Available;
+            newTicket.CustomerId = null;
+            await UpdateTicket(newTicket);
         }
         
         await context.SaveChangesAsync();

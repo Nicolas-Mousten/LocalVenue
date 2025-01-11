@@ -18,8 +18,8 @@
     private ClaimsPrincipal? _currentUser;
     private string? _userId;
 
-    private List<LocalVenue.Core.Entities.Ticket> _tickets = new List<LocalVenue.Core.Entities.Ticket>();
-    private List<LocalVenue.Core.Entities.Ticket> ticketsToReturn = new List<LocalVenue.Core.Entities.Ticket>();
+    private List<Ticket> _tickets = new List<Ticket>();
+    private List<Ticket> ticketsToReturn = new List<Ticket>();
     private string ticketServiceMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -35,13 +35,13 @@
 
     private string GetSeatColor(LocalVenue.Web.Models.Ticket seat)
     {
-        if (_tickets.Any(t => t.SeatId == seat.SeatId)) // Check if the seat is selected for purchase
+        if (_tickets.Any(t => t.SeatId == seat.SeatId)) 
         {
-            return "yellow"; // Change color to yellow if selected for purchase
+            return "yellow"; 
         }
-        else if (ticketsToReturn.Any(t => t.SeatId == seat.SeatId)) // Check if the seat is selected for return
+        else if (ticketsToReturn.Any(t => t.SeatId == seat.SeatId)) 
         {
-            return "yellow"; // Change color to yellow if selected for return
+            return "yellow"; 
         }
 
         return seat.Status switch
@@ -53,49 +53,35 @@
         };
     }
 
-    private void AddSeatToTickets(LocalVenue.Web.Models.Ticket seat)
+    private void AddSeatToTickets(Ticket seat)
     {
-        var newTicket = new Core.Entities.Ticket()
-        {
-            TicketId = seat.Id,
-            ShowId = seat.ShowId,
-            SeatId = seat.SeatId,
-            Price = seat.Price,
-            Status = seat.Status,
-            CustomerId = null
-        };
-
         if (!_tickets.Any(t => t.SeatId == seat.SeatId))
         {
-            _tickets.Add(newTicket);
+            _tickets.Add(seat);
         }
 
-        StateHasChanged(); // Ensure UI updates
+        StateHasChanged();
     }
 
-    private void RemoveSeatFromReturnTickets(LocalVenue.Web.Models.Ticket seat)
+    private void RemoveSeatFromReturnTickets(Ticket seat)
     {
-        var newTicket = new Core.Entities.Ticket()
-        {
-            TicketId = seat.Id,
-            ShowId = seat.ShowId,
-            SeatId = seat.SeatId,
-            Price = seat.Price,
-            Status = seat.Status,
-            CustomerId = _userId
-        };
+        
 
         if (!ticketsToReturn.Any(t => t.SeatId == seat.SeatId))
         {
-            ticketsToReturn.Add(newTicket);
+            ticketsToReturn.Add(seat);
         }
 
-        StateHasChanged(); // Ensure UI updates
+        StateHasChanged(); 
     }
 
     private async Task BuyTickets()
     {
-        await TicketService.JoinShow(_tickets, _userId);
+        if (!long.TryParse(ShowId, out var validatedShowId))
+        {
+            ticketServiceMessage = "Ikke et gyldigt show Id";
+        }
+        await TicketService.JoinShow(validatedShowId, _tickets, _userId);
         _tickets.Clear();
         await RefreshParent.InvokeAsync();
         StateHasChanged();
@@ -103,7 +89,11 @@
 
     private async Task ReturnTicket()
     {
-        ticketServiceMessage = await TicketService.LeaveShow(ticketsToReturn, _userId);
+        if (!long.TryParse(ShowId, out var validatedShowId))
+        {
+            ticketServiceMessage = "Ikke et gyldigt show Id";
+        }
+        ticketServiceMessage = await TicketService.LeaveShow(validatedShowId, ticketsToReturn, _userId);
         ticketsToReturn.Clear();
         await RefreshParent.InvokeAsync();
         StateHasChanged();
@@ -114,6 +104,7 @@
 {
     return;
 }
+<p>ShowId: @ShowId</p>
 <div class="seat-display">
     @foreach (var row in Tickets.GroupBy(s => s.Seat.Row).OrderBy(g => g.Key))
     {

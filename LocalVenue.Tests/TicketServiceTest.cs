@@ -1,6 +1,9 @@
-﻿using LocalVenue.Core;
+﻿using AutoMapper;
+using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Enums;
+using LocalVenue.Core.Services;
+using LocalVenue.Helpers;
 using LocalVenue.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -94,14 +97,24 @@ public class TicketServiceTest
 
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>();  // Assuming ShowProfile contains your mappings
+        });
+        var mapper = config.CreateMapper();
+        
+        var ticketService = new TicketService(contextFactoryRetrieve, mapper);
+        var seatService = new SeatService(contextFactoryRetrieve);
+        var showService = new ShowService(contextFactoryRetrieve, mapper);
 
-        var service = new TicketService(contextFactoryRetrieve);
-
-        await service.JoinShow(show.Tickets.ToList(), customer.Id.ToString());
-        var result = await service.GetTicket(ticket.TicketId);
+        var fetchShow = await showService.GetShowWithTicketsAsync(show.ShowId);
+        
+        await ticketService.JoinShow(show.ShowId, fetchShow.Tickets, customer.Id.ToString());
+        var result = await ticketService.GetTicket(ticket.TicketId);
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(ticket.CustomerId, result.CustomerId);
+        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId);
         Assert.Equal(Status.Sold, result.Status);
     }
     
@@ -175,13 +188,25 @@ public class TicketServiceTest
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
 
-        var service = new TicketService(contextFactoryRetrieve);
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>();  // Assuming ShowProfile contains your mappings
+        });
+        var mapper = config.CreateMapper();
+        
+        var ticketService = new TicketService(contextFactoryRetrieve, mapper);
+        var seatService = new SeatService(contextFactoryRetrieve);
+        var showService = new ShowService(contextFactoryRetrieve, mapper);
 
-        await service.LeaveShow(show.Tickets.ToList(), customer.Id.ToString());
-        var result = await service.GetTicket(ticket.TicketId);
+
+        var fetchShow = await showService.GetShowWithTicketsAsync(show.ShowId);
+            
+        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, customer.Id.ToString());
+        var result = await ticketService.GetTicket(ticket.TicketId);
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(null, result.CustomerId);
+        Assert.Null(result.CustomerId);
+        //Assert.Equal(null, result.CustomerId);
         Assert.Equal(Status.Available, result.Status);
     }
 }
