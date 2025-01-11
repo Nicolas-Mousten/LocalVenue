@@ -1,4 +1,4 @@
-name: .NET Lint, SonarCloud, Test on PR
+name: On PR workflow
 
 on:
   push:

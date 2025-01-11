@@ -1,4 +1,4 @@
-name: Deploy with test and analysis
+name: On-merge workflow
 
 on:
   push:

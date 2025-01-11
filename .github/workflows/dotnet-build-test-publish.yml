@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-test-publish:
-    name: Test and Publish artifact
+    name: Test and publish artifact
     runs-on: ubuntu-latest
 
     steps:
@@ -54,7 +54,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   sonarcloud:
-    name: SonarCloud
+    name: SonarCloud analysis
     runs-on: windows-latest
     needs: build-test-publish
 
