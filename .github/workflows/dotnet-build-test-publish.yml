@@ -33,7 +33,6 @@ jobs:
 
       - name: Coverage
         run: dotnet-coverage collect "dotnet test" -f xml -o "TestResults/coverage.xml"
-        #run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage.xml
 
       - name: Publish Test Results
         if: always()
@@ -65,15 +64,13 @@ jobs:
           java-version: 17
           distribution: "zulu" # Alternative distribution options are available.
 
-      - name: Download Test results from last job
+      - name: Download reports from last job
         uses: actions/download-artifact@v4
         with:
           name: TestResults
 
-      - name: Download coverage report from last job
-        uses: actions/download-artifact@v4
-        with:
-          name: TestResults
+      - name: List TestResults directory
+        run: ls -R TestResults
 
       - uses: actions/checkout@v4
         with:
@@ -106,6 +103,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths="TestResults/coverage.xml" /d:sonar.cs.vstest.reportsPaths="LocalVenue.Tests/TestResults/TestResults.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths="TestResults/coverage.xml" /d:sonar.cs.vstest.reportsPaths="TestResults/TestResults.xml"
           dotnet build
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
