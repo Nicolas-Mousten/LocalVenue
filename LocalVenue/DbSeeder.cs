@@ -1,11 +1,11 @@
+using AutoMapper;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
-using LocalVenue.Core.Models;
 using LocalVenue.Core.Enums;
+using LocalVenue.Core.Models;
 using LocalVenue.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 
 namespace LocalVenue;
 
