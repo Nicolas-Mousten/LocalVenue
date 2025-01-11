@@ -71,11 +71,15 @@
             }
         </div>
     }
-    <p>Tickets: @_tickets.Count, Total Price:</p> 
-    <button @onclick="BuyTickets">Buy Tickets</button>
-    <p>@ticketsToReturn.Count</p>
+    @if (_tickets.Count != 0)
+    {
+        <p>Tickets: @_tickets.Count, Total Price:</p> 
+        <button @onclick="BuyTickets">Buy Tickets</button>
+    }
+    
     @if (ticketsToReturn.Count != 0)
     {
+        <p>@ticketsToReturn.Count</p>
         <button @onclick="ReturnTicket">Return Tickets</button>
     }
     <p>@ticketServiceMessage</p>
