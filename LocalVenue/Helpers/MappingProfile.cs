@@ -30,8 +30,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.TicketId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Seat, opt => opt.MapFrom(src => src.Seat))
             .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.SoldToCustomerId));
-
+        
         CreateMap<Core.Entities.Seat, Web.Models.Seat>();
         CreateMap<Web.Models.Seat, Core.Entities.Seat>();
+            
     }
 }
