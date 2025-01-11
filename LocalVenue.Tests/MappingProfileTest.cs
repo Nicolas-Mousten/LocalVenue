@@ -23,7 +23,7 @@ public class MappingProfileTest
     }
 
     [Fact]
-    public void TicketRequestToCoreTicketFull()
+    public void TicketRequestToCoreTicket()
     {
         // Arrange
         var ticketRequest = new RequestModels.TicketRequest { TicketId = 1, ShowId = 1, SeatId = 1, Price = 50.5M, Status = Core.Enums.Status.Available, CustomerId = "1" };
@@ -42,7 +42,7 @@ public class MappingProfileTest
     }
 
     [Fact]
-    public void TicketRequestToCoreTicketPartial()
+    public void TicketRequestToCoreTicketNullProperties()
     {
         // Arrange        
         var ticketRequest = new RequestModels.TicketRequest { ShowId = 1, SeatId = 1, Price = 50.5M, Status = Core.Enums.Status.Available };
@@ -61,7 +61,7 @@ public class MappingProfileTest
     }
 
     [Fact]
-    public void ShowRequestToCoreShowFull()
+    public void ShowRequestToCoreShow()
     {
         // Arrange
         var showRequest = new RequestModels.ShowRequest { ShowId = 1, Title = "Show 1", Description = "Lorem ipsum", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy };
@@ -80,7 +80,7 @@ public class MappingProfileTest
     }
 
     [Fact]
-    public void ShowRequestToCoreShowPartial()
+    public void ShowRequestToCoreShowNullProperties()
     {
         // Arrange
         var showRequest = new RequestModels.ShowRequest { Title = "Show 1", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy };
