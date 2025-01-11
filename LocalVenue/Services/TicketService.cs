@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
 
-public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Ticket>(contextFactory), ITicketService
+public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper? mapper = null) : GenericCRUDService<Ticket>(contextFactory), ITicketService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
