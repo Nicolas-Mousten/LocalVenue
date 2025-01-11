@@ -261,7 +261,7 @@ public class TicketServiceTest
             TicketId = 2,
             ShowId = show.ShowId,
             Show = show,
-            SeatId = 1,
+            SeatId = 2,
             Seat = seat,
             Price = 50,
             Status = Status.Sold,
