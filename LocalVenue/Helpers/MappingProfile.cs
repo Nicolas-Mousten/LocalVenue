@@ -33,5 +33,6 @@ public class MappingProfile : Profile
 
         CreateMap<Core.Entities.Seat, Web.Models.Seat>();
         CreateMap<Web.Models.Seat, Core.Entities.Seat>();
+        CreateMap<Core.Models.Actor, Web.Models.Actor>();
     }
 }

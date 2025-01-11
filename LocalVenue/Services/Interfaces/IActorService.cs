@@ -1,4 +1,5 @@
 using LocalVenue.Core.Entities;
+using LocalVenue.Core.Models;
 
 namespace LocalVenue.Services.Interfaces;
 
