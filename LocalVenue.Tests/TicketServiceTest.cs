@@ -28,90 +28,87 @@ public class TicketServiceTest
         serviceProvider = services.BuildServiceProvider();
     }
     private async Task SeedDatabaseAsync()
+    {
+        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+
+        // Ensure database is reset for a clean slate
+        await context.Database.EnsureDeletedAsync();
+        await context.Database.EnsureCreatedAsync();
+
+        // Check and add customer if not exists
+        if (!await context.Users.AnyAsync(u => u.Id == "0c9cd65f-2054-4086-a569-2e50997a8be9"))
         {
-            var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-            
-            await using (var context = await dbContextFactory.CreateDbContextAsync())
+            Customer customer = new Customer
             {
-                // Check if customer already exists before adding
-                var existingCustomer = await context.Users
-                    .FirstOrDefaultAsync(u => u.Id == "0c9cd65f-2054-4086-a569-2e50997a8be9");
-                
-                if (existingCustomer == null)
-                {
-                    Customer customer = new Customer
-                    {
-                        Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
-                        UserName = "Nicolas",
-                        NormalizedUserName = "NICOLAS",
-                        Email = "nicolas.mousten@gmail.com",
-                        NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
-                        EmailConfirmed = false,
-                        PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
-                        SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
-                        ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
-                        PhoneNumber = null,
-                        PhoneNumberConfirmed = false,
-                        TwoFactorEnabled = false,
-                        LockoutEnd = null,
-                        LockoutEnabled = false,
-                        AccessFailedCount = 0,
-                        FirstName = "Nicolas",
-                        LastName = "Mousten",
-                        IsGoldenMember = false,
-                        Tickets = new List<Ticket>()
-                    };
+                Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
+                UserName = "Nicolas",
+                NormalizedUserName = "NICOLAS",
+                Email = "nicolas.mousten@gmail.com",
+                NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
+                EmailConfirmed = false,
+                PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
+                SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
+                ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
+                PhoneNumber = null,
+                PhoneNumberConfirmed = false,
+                TwoFactorEnabled = false,
+                LockoutEnd = null,
+                LockoutEnabled = false,
+                AccessFailedCount = 0,
+                FirstName = "Nicolas",
+                LastName = "Mousten",
+                IsGoldenMember = false,
+                Tickets = new List<Ticket>()
+            };
 
-                    context.Users.Add(customer);
-                }
-
-                // Check if the show already exists before adding
-                var existingShow = await context.Shows
-                    .FirstOrDefaultAsync(s => s.ShowId == 1);
-
-                if (existingShow == null)
-                {
-                    Show show = new Show
-                    {
-                        ShowId = 1,
-                        Title = "TestShow",
-                        Description = "A show to test on",
-                        StartTime = DateTime.Now.AddDays(1).AddHours(12),
-                        EndTime = DateTime.Now.AddDays(1).AddHours(14),
-                        Genre = Genre.Musical,
-                        OpeningNight = false,
-                        Tickets = new List<Ticket>()
-                    };
-
-                    Seat seat = new Seat
-                    {
-                        SeatId = 1,
-                        Section = "Front",
-                        Row = 1,
-                        Number = 1
-                    };
-
-                    Ticket ticket = new Ticket
-                    {
-                        TicketId = 1,
-                        ShowId = show.ShowId,
-                        Show = show,
-                        SeatId = 1,
-                        Seat = seat,
-                        Price = 50,
-                        Status = Status.Available,
-                        CustomerId = null,
-                        Customer = null
-                    };
-
-                    show.Tickets?.Add(ticket);
-
-                    context.Shows.Add(show);
-                }
-
-                await context.SaveChangesAsync();
-            }
+            context.Users.Add(customer);
         }
+
+        // Check and add show if not exists
+        if (!await context.Shows.AnyAsync(s => s.ShowId == 1))
+        {
+            Show show = new Show
+            {
+                ShowId = 1,
+                Title = "TestShow",
+                Description = "A show to test on",
+                StartTime = DateTime.Now.AddDays(1).AddHours(12),
+                EndTime = DateTime.Now.AddDays(1).AddHours(14),
+                Genre = Genre.Musical,
+                OpeningNight = false,
+                Tickets = new List<Ticket>()
+            };
+
+            Seat seat = new Seat
+            {
+                SeatId = 1,
+                Section = "Front",
+                Row = 1,
+                Number = 1
+            };
+
+            Ticket ticket = new Ticket
+            {
+                TicketId = 1,
+                ShowId = show.ShowId,
+                Show = show,
+                SeatId = seat.SeatId,
+                Seat = seat,
+                Price = 50,
+                Status = Status.Available,
+                CustomerId = null,
+                Customer = null
+            };
+
+            show.Tickets.Add(ticket);
+
+            context.Shows.Add(show);
+        }
+
+        await context.SaveChangesAsync();
+    }
 
     [Fact]
     public async Task TestTicketServiceBuySeat()
