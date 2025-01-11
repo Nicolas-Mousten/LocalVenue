@@ -28,8 +28,6 @@ else
 }
 builder.Configuration.AddEnvironmentVariables();
 
-var TMDB_API_KEY = builder.Configuration["TMDB_API_KEY"] ?? throw new ArgumentNullException("TMDB_API_KEY");
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
