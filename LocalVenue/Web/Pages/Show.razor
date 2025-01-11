@@ -3,7 +3,7 @@
 @using LocalVenue.Services.Interfaces
 @using LocalVenue.Web.Components.VenueComponents
 @inject IShowService ShowService
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @if (ErrorMessage is not null)
 {
@@ -65,5 +65,4 @@
         }
 
     }
-
 }
