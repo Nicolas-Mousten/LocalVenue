@@ -8,6 +8,7 @@ using LocalVenue.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Customer = LocalVenue.Core.Entities.Customer;
 
 namespace LocalVenue.Tests;
 public class TicketServiceTest
@@ -23,78 +24,101 @@ public class TicketServiceTest
             options.UseInMemoryDatabase("InMemoryDb")
                 .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
         });
-
+        
         serviceProvider = services.BuildServiceProvider();
     }
+    private async Task SeedDatabaseAsync()
+        {
+            var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+            
+            await using (var context = await dbContextFactory.CreateDbContextAsync())
+            {
+                // Check if customer already exists before adding
+                var existingCustomer = await context.Users
+                    .FirstOrDefaultAsync(u => u.Id == "0c9cd65f-2054-4086-a569-2e50997a8be9");
+                
+                if (existingCustomer == null)
+                {
+                    Customer customer = new Customer
+                    {
+                        Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
+                        UserName = "Nicolas",
+                        NormalizedUserName = "NICOLAS",
+                        Email = "nicolas.mousten@gmail.com",
+                        NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
+                        EmailConfirmed = false,
+                        PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
+                        SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
+                        ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
+                        PhoneNumber = null,
+                        PhoneNumberConfirmed = false,
+                        TwoFactorEnabled = false,
+                        LockoutEnd = null,
+                        LockoutEnabled = false,
+                        AccessFailedCount = 0,
+                        FirstName = "Nicolas",
+                        LastName = "Mousten",
+                        IsGoldenMember = false,
+                        Tickets = new List<Ticket>()
+                    };
 
+                    context.Users.Add(customer);
+                }
+
+                // Check if the show already exists before adding
+                var existingShow = await context.Shows
+                    .FirstOrDefaultAsync(s => s.ShowId == 1);
+
+                if (existingShow == null)
+                {
+                    Show show = new Show
+                    {
+                        ShowId = 1,
+                        Title = "TestShow",
+                        Description = "A show to test on",
+                        StartTime = DateTime.Now.AddDays(1).AddHours(12),
+                        EndTime = DateTime.Now.AddDays(1).AddHours(14),
+                        Genre = Genre.Musical,
+                        OpeningNight = false,
+                        Tickets = new List<Ticket>()
+                    };
+
+                    Seat seat = new Seat
+                    {
+                        SeatId = 1,
+                        Section = "Front",
+                        Row = 1,
+                        Number = 1
+                    };
+
+                    Ticket ticket = new Ticket
+                    {
+                        TicketId = 1,
+                        ShowId = show.ShowId,
+                        Show = show,
+                        SeatId = 1,
+                        Seat = seat,
+                        Price = 50,
+                        Status = Status.Available,
+                        CustomerId = null,
+                        Customer = null
+                    };
+
+                    show.Tickets?.Add(ticket);
+
+                    context.Shows.Add(show);
+                }
+
+                await context.SaveChangesAsync();
+            }
+        }
 
     [Fact]
     public async Task TestTicketServiceBuySeat()
     {
         // Arrange
-        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        await SeedDatabaseAsync();
         
-        Customer customer = new Customer
-        {
-            Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
-            UserName = "Nicolas",
-            NormalizedUserName = "NICOLAS",
-            Email = "nicolas.mousten@gmail.com",
-            NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
-            EmailConfirmed = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
-            SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
-            ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
-            PhoneNumber = null,
-            PhoneNumberConfirmed = false,
-            TwoFactorEnabled = false,
-            LockoutEnd = null,
-            LockoutEnabled = false,
-            AccessFailedCount = 0,
-            FirstName = "Nicolas",
-            LastName = "Mousten",
-            IsGoldenMember = false,
-            Tickets = new List<Ticket>()
-        };
-        Show show = new Show
-        {
-            ShowId = 1,
-            Title = "TestShow",
-            Description = "A show to test on",
-            StartTime = DateTime.Now.AddDays(1).AddHours(12),
-            EndTime = DateTime.Now.AddDays(1).AddHours(14),
-            Genre = Genre.Musical,
-            OpeningNight = false,
-            Tickets = new List<Ticket>()
-        };
-        Seat seat = new Seat
-        {
-            SeatId = 1,
-            Section = "Front",
-            Row = 1,
-            Number = 1
-        };
-        Ticket ticket = new Ticket
-        {
-            TicketId = 1,
-            ShowId = show.ShowId,
-            Show = show,
-            SeatId = 1,
-            Seat = seat,
-            Price = 50,
-            Status = Status.Available,
-            CustomerId = null,
-            Customer = null
-        };
-        
-        show.Tickets?.Add(ticket);
-        await using (var context = await dbContextFactory.CreateDbContextAsync())
-        {
-            context.Users.Add(customer);
-            context.Shows.Add(show);
-            await context.SaveChangesAsync();
-        }
-
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
         
@@ -108,10 +132,10 @@ public class TicketServiceTest
         var seatService = new SeatService(contextFactoryRetrieve);
         var showService = new ShowService(contextFactoryRetrieve, mapper);
 
-        var fetchShow = await showService.GetShowWithTicketsAsync(show.ShowId);
+        var fetchShow = await showService.GetShowWithTicketsAsync(1);
         
-        await ticketService.JoinShow(show.ShowId, fetchShow.Tickets, customer.Id.ToString());
-        var result = await ticketService.GetTicket(ticket.TicketId);
+        await ticketService.JoinShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be9");
+        var result = await ticketService.GetTicket(1);
         // Assert
         Assert.NotNull(result);
         Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId);
@@ -122,68 +146,7 @@ public class TicketServiceTest
     public async Task TestTicketServiceReturnSeat()
     {
         // Arrange
-        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-        
-        Customer customer = new Customer
-        {
-            Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
-            UserName = "Nicolas",
-            NormalizedUserName = "NICOLAS",
-            Email = "nicolas.mousten@gmail.com",
-            NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
-            EmailConfirmed = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
-            SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
-            ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
-            PhoneNumber = null,
-            PhoneNumberConfirmed = false,
-            TwoFactorEnabled = false,
-            LockoutEnd = null,
-            LockoutEnabled = false,
-            AccessFailedCount = 0,
-            FirstName = "Nicolas",
-            LastName = "Mousten",
-            IsGoldenMember = false,
-            Tickets = new List<Ticket>()
-        };
-        Show show = new Show
-        {
-            ShowId = 1,
-            Title = "TestShow",
-            Description = "A show to test on",
-            StartTime = DateTime.Now.AddDays(1).AddHours(12),
-            EndTime = DateTime.Now.AddDays(1).AddHours(14),
-            Genre = Genre.Musical,
-            OpeningNight = false,
-            Tickets = new List<Ticket>()
-        };
-        Seat seat = new Seat
-        {
-            SeatId = 1,
-            Section = "Front",
-            Row = 1,
-            Number = 1
-        };
-        Ticket ticket = new Ticket
-        {
-            TicketId = 1,
-            ShowId = show.ShowId,
-            Show = show,
-            SeatId = 1,
-            Seat = seat,
-            Price = 50,
-            Status = Status.Sold,
-            CustomerId = "0c9cd65f-2054-4086-a569-2e50997a8be9",
-            Customer = customer
-        };
-        
-        show.Tickets?.Add(ticket);
-        await using (var context = await dbContextFactory.CreateDbContextAsync())
-        {
-            context.Users.Add(customer);
-            context.Shows.Add(show);
-            await context.SaveChangesAsync();
-        }
+        await SeedDatabaseAsync();
 
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
@@ -199,10 +162,10 @@ public class TicketServiceTest
         var showService = new ShowService(contextFactoryRetrieve, mapper);
 
 
-        var fetchShow = await showService.GetShowWithTicketsAsync(show.ShowId);
+        var fetchShow = await showService.GetShowWithTicketsAsync(1);
             
-        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, customer.Id.ToString());
-        var result = await ticketService.GetTicket(ticket.TicketId);
+        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be9");
+        var result = await ticketService.GetTicket(1);
         // Assert
         Assert.NotNull(result);
         Assert.Null(result.CustomerId);
@@ -215,10 +178,10 @@ public class TicketServiceTest
     {
         // Arrange
         var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-        
+
         Customer customer = new Customer
         {
-            Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
+            Id = "0c9cd65f-2054-4086-a569-2e50997a8be6",
             UserName = "Nicolas",
             NormalizedUserName = "NICOLAS",
             Email = "nicolas.mousten@gmail.com",
@@ -240,7 +203,7 @@ public class TicketServiceTest
         };
         Show show = new Show
         {
-            ShowId = 1,
+            ShowId = 2,
             Title = "TestShow",
             Description = "A show to test on",
             StartTime = DateTime.Now.AddHours(12),
@@ -251,14 +214,14 @@ public class TicketServiceTest
         };
         Seat seat = new Seat
         {
-            SeatId = 1,
+            SeatId = 2,
             Section = "Front",
             Row = 1,
             Number = 1
         };
         Ticket ticket = new Ticket
         {
-            TicketId = 1,
+            TicketId = 2,
             ShowId = show.ShowId,
             Show = show,
             SeatId = 1,
@@ -268,7 +231,7 @@ public class TicketServiceTest
             CustomerId = "0c9cd65f-2054-4086-a569-2e50997a8be9",
             Customer = customer
         };
-        
+
         show.Tickets?.Add(ticket);
         await using (var context = await dbContextFactory.CreateDbContextAsync())
         {
@@ -291,14 +254,14 @@ public class TicketServiceTest
         var showService = new ShowService(contextFactoryRetrieve, mapper);
 
 
-        var fetchShow = await showService.GetShowWithTicketsAsync(show.ShowId);
+        var fetchShow = await showService.GetShowWithTicketsAsync(2);
             
-        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, customer.Id.ToString());
-        var result = await ticketService.GetTicket(ticket.TicketId);
+        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be6");
+        var result = await ticketService.GetTicket(2);
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.CustomerId);
-        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId); 
+        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be6", result.CustomerId); 
         Assert.Equal(Status.Sold, result.Status);
     }
 }
