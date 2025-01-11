@@ -9,6 +9,7 @@ on:
 
 jobs:
   build-test-publish:
+    name: Test and Publish artifact
     runs-on: ubuntu-latest
 
     steps:
@@ -46,7 +47,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
 
   sonarcloud:
-    name: Build and analyze
+    name: SonarCloud
     runs-on: windows-latest
     needs: build-test-publish
 
@@ -93,6 +94,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io /d:sonar.cs.vstest.reportsPaths="TestResults/*.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vstest.reportsPaths="TestResults/*.xml"
           dotnet build
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"

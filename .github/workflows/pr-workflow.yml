@@ -16,10 +16,12 @@ on:
 
 jobs:
   format-lint:
+    name: Format and Lint
     secrets: inherit
     uses: ./.github/workflows/dotnet-format-lint.yml
 
   xunit-test-with-sonarcloud:
+    name: Test and Analyze
     needs: format-lint
     uses: ./.github/workflows/dotnet-build-test-publish.yml
     secrets: inherit
