@@ -1,13 +1,15 @@
+using AutoMapper;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Enums;
 using LocalVenue.Core.Services;
+using LocalVenue.Helpers;
 using LocalVenue.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
 
-public class TicketService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Ticket>(contextFactory), ITicketService
+public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Ticket>(contextFactory), ITicketService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
@@ -16,9 +18,12 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         return await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
 
-    public async Task<Ticket> AddTicket(Ticket ticket)
+    public async Task<Ticket> AddTicket(Ticket ticket, VenueContext? context = null)
     {
-        await using var context = await _contextFactory.CreateDbContextAsync();
+        if (context == null)
+        {
+            context = await _contextFactory.CreateDbContextAsync();
+        }
 
         //Check if the ticket's seat, customer, and show exist
         if (await context.Seats.FindAsync(ticket.SeatId) == null)
@@ -36,7 +41,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         {
             ticket.CustomerId = null;
         }
-        if (await context.Shows.FindAsync(ticket.ShowId) == null)
+
+        var show = await context.Shows.FindAsync(ticket.ShowId);
+        if (show == null)
         {
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }
@@ -46,6 +53,10 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         {
             throw new ArgumentException($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned");
         }
+
+        ticket.Seat = await context.Seats.FindAsync(ticket.SeatId); // price calculator needs seat
+        ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
+        ticket.Seat = null; // remove seat from ticket to avoid duplicate insert
 
         return await base.AddItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }
@@ -69,10 +80,16 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
         {
             ticket.CustomerId = null;
         }
-        if (await context.Shows.FindAsync(ticket.ShowId) == null)
+
+        var show = await context.Shows.FindAsync(ticket.ShowId);
+        if (show == null)
         {
             throw new ArgumentException($"Show with id '{ticket.ShowId}' does not exist");
         }
+
+        ticket.Seat = await context.Seats.FindAsync(ticket.SeatId); // price calculator needs seat
+        ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
+        ticket.Seat = null; // remove seat from ticket to avoid duplicate insert
 
         return await base.UpdateItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
     }

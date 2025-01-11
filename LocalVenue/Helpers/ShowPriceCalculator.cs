@@ -1,4 +1,5 @@
-﻿using LocalVenue.Web.Models;
+﻿using AutoMapper;
+using LocalVenue.Web.Models;
 
 namespace LocalVenue.Helpers;
 
@@ -36,6 +37,11 @@ public static class ShowPriceCalculator
             additionalPrice += BasePrice * 0.15m;
         }
 
+        if (ticket.Seat == null)
+        {
+            throw new ArgumentException("Ticket must have a seat");
+        }
+
         if (ticket.Seat.Row <= 2)
         {
             additionalPrice += BasePrice * 0.25m;
@@ -47,6 +53,14 @@ public static class ShowPriceCalculator
         }
 
         return BasePrice + additionalPrice;
+    }
+
+    public static decimal CalculatePrice(Core.Entities.Show show, Core.Entities.Ticket ticket, bool openingNight, IMapper mapper)
+    {
+        var webShow = mapper.Map<Show>(show);
+        var webTicket = mapper.Map<Ticket>(ticket);
+
+        return CalculatePrice(webShow, webTicket, openingNight);
     }
 
     public static bool ShowLastForMoreThanTwoHours(Show show)
