@@ -103,7 +103,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory) : Gen
                 throw new ArgumentException($"Ticket {ticket.TicketId} is not available for purchase");
             }
 
-            if (ticket.CustomerId == null)
+            if (ticket.CustomerId != null)
             {
                 throw new ArgumentException($"Ticket {ticket.TicketId} is already purchased by another customer");
             }
