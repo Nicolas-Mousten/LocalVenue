@@ -106,12 +106,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin 
-                              /k:"KEA-Gruppe6_LocalVenue" 
-                              /o:"kea-gruppe6" 
-                              /d:sonar.token="${{ secrets.SONAR_TOKEN }}" 
-                              /d:sonar.host.url="https://sonarcloud.io"                               
-                              /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          .\.sonar\scanner\dotnet-sonarscanner begin `
+                              /k:"KEA-Gruppe6_LocalVenue" `
+                              /o:"kea-gruppe6" `
+                              /d:sonar.token="${{ secrets.SONAR_TOKEN }}" `
+                              /d:sonar.host.url="https://sonarcloud.io" `                 
+                              /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml `
                               /d:sonar.cs.vstest.reportsPaths="TestResults/*.xml"
           dotnet build
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
