@@ -1,0 +1,40 @@
+{
+  "adult": false,
+  "backdrop_path": "/wOMDIg0sDpCNmIPzaLH7aibuuW0.jpg",
+  "belongs_to_collection": null,
+  "budget": 0,
+  "genres": [
+    {
+      "id": 18,
+      "name": "Drama"
+    }
+  ],
+  "homepage": "",
+  "id": 1198734,
+  "imdb_id": "tt11769340",
+  "origin_country": ["IN"],
+  "original_language": "gu",
+  "original_title": "Mara Pappa Superhero",
+  "overview": "Mara Pappa Superhero is about a 9 year old girl's struggle to establish that her father is a superhero. She takes it as a challenge to convince everybody that her father is a superhero.",
+  "popularity": 0.485,
+  "poster_path": "/ngNdDP8BTmRDNXfp7e07QDpoOXL.jpg",
+  "production_companies": [
+    {
+      "id": 212393,
+      "logo_path": null,
+      "name": "Saiffron Entertainment",
+      "origin_country": ""
+    }
+  ],
+  "production_countries": [],
+  "release_date": "2024-01-19",
+  "revenue": 0,
+  "runtime": 120,
+  "spoken_languages": [],
+  "status": "Released",
+  "tagline": "",
+  "title": "Mara Pappa Superhero",
+  "video": false,
+  "vote_average": 0,
+  "vote_count": 0
+}
