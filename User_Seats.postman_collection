@@ -25,11 +25,11 @@
 							"\r",
 							"var jsonData = pm.response.json();\r",
 							"\r",
-							"pm.test(\"Has token\", function() {\r",
-							"    pm.expect(jsonData[\"token\"]).to.be.a('string');\r",
+							"pm.test(\"Has cookieValue\", function() {\r",
+							"    pm.expect(jsonData[\"cookieValue\"]).to.be.a('string');\r",
 							"});\r",
 							"\r",
-							"pm.globals.set(\"BEARER_TOKEN\", jsonData[\"token\"]);"
+							"pm.collectionVariables.set(\"COOKIE_VALUE\", jsonData[\"cookieValue\"]);"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -226,18 +226,31 @@
 						"type": "text/javascript",
 						"packages": {}
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Retrieve the cookie value from the environment variable\r",
+							"var cookieValue = pm.variables.get(\"COOKIE_VALUE\");\r",
+							"\r",
+							"if (cookieValue) {\r",
+							"    // Add the cookie to the request headers\r",
+							"    pm.request.headers.add({\r",
+							"        key: \"Set-Cookie\",\r",
+							"        value: cookieValue\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
 				}
 			],
 			"request": {
 				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{BEARER_TOKEN}}",
-							"type": "string"
-						}
-					]
+					"type": "apikey"
 				},
 				"method": "POST",
 				"header": [],
@@ -872,6 +885,10 @@
 			"key": "ERROR_SEAT_SECTION",
 			"value": "underground",
 			"type": "string"
+		},
+		{
+			"key": "COOKIE_VALUE",
+			"value": ""
 		}
 	]
 }
