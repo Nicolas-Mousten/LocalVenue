@@ -27,11 +27,20 @@ public class UserController : ControllerBase
             return BadRequest("Invalid login attempt.");
         }
 
-        var result = await _signInManager.PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(
+            user,
+            request.Password,
+            isPersistent: false,
+            lockoutOnFailure: false
+        );
         if (result.Succeeded)
         {
             // Get the authentication cookie
-            var authCookie = HttpContext.Response.Headers["Set-Cookie"].FirstOrDefault(header => header != null && header.StartsWith(".AspNetCore.Identity.Application"));
+            var authCookie = HttpContext
+                .Response.Headers["Set-Cookie"]
+                .FirstOrDefault(header =>
+                    header != null && header.StartsWith(".AspNetCore.Identity.Application")
+                );
 
             if (authCookie != null)
             {
