@@ -12,7 +12,13 @@ public class ShowPriceCalculatorTest
     [InlineData("2023-10-01T18:00:00", "2023-10-01T19:30:00", false)] // Less than 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:00:00", false)] // Exactly 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T18:00:00", false)] // Zero duration
-    [InlineData("2023-10-01T18:00:00", "2023-10-02T18:00:00", true)] // 24 hours
+    [InlineData("2023-10-01T18:00:00", "2023-10-02T18:00:00", true)] // 24 hours    
+    [InlineData("2023-10-01T18:00:00", "2023-10-01T20:00:01", true)] // 2h 0m 1s
+    [InlineData("2023-10-01T18:00:00", "2023-10-01T19:59:59", false)] // 1h 59m 59s
+    [InlineData("2023-10-01T18:00:00", "2023-10-01T17:59:59", false)] // -1 second
+    [InlineData("2023-10-01T18:00:00", "2023-10-01T18:00:01", false)] // 1 second
+    [InlineData("0001-01-01T00:00:00", "9999-12-31T23:59:59", true)] // Timespan max
+
     public void ShowLastForMoreThanTwoHours_ShouldReturnExpectedResult(string startTime, string endTime,
         bool expectedResult)
     {

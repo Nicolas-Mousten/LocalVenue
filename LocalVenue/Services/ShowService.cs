@@ -11,7 +11,7 @@ using Ticket = LocalVenue.Core.Entities.Ticket;
 
 namespace LocalVenue.Services;
 
-public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Show>(contextFactory), IShowService
+public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper, IActorService actorService, ITicketService ticketService) : GenericCRUDService<Show>(contextFactory), IShowService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
     private readonly IMapper _mapper = mapper;
@@ -29,6 +29,8 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
         // include seats for tickets
         show.Tickets?.ToList().ForEach(ticket => context.Entry(ticket).Reference(t => t.Seat).Load());
         show.Tickets?.ToList().ForEach(ticket => context.Entry(ticket).Reference(t => t.Customer).Load());
+        // grab a random set of actors for the show
+        show.Actors = await actorService.GetRandomActors();
 
         return show;
     }
@@ -68,7 +70,6 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
                 Status = Core.Enums.Status.Available
             };
 
-            TicketService ticketService = new TicketService(_contextFactory, _mapper);
             await ticketService.AddTicket(newTicket, context);
         }
         context.SaveChanges();

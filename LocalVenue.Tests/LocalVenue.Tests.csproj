@@ -27,4 +27,10 @@
     <ProjectReference Include="..\LocalVenue\LocalVenue.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Helpers/*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
