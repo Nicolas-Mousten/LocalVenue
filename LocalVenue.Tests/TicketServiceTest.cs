@@ -69,7 +69,7 @@ public class TicketServiceTest
 
         Seat seat = new Seat
         {
-            SeatId = 4,
+            SeatId = 8,
             Section = "Front",
             Row = 1,
             Number = 1
@@ -77,7 +77,7 @@ public class TicketServiceTest
 
         Ticket ticket = new Ticket
         {
-            TicketId = 1,
+            TicketId = 101,
             ShowId = show.ShowId,
             Show = show,
             SeatId = seat.SeatId,
@@ -114,7 +114,7 @@ public class TicketServiceTest
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
         
         await ticketService.JoinShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be9");
-        var result = await ticketService.GetTicket(1);
+        var result = await ticketService.GetTicket(101);
         // Assert
         Assert.NotNull(result);
         Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId);
@@ -162,17 +162,17 @@ public class TicketServiceTest
         };
         Seat seat = new Seat
         {
-            SeatId = 3,
+            SeatId = 10,
             Section = "Front",
             Row = 1,
             Number = 1
         };
         Ticket ticket = new Ticket
         {
-            TicketId = 3,
+            TicketId = 13,
             ShowId = show.ShowId,
             Show = show,
-            SeatId = 3,
+            SeatId = seat.SeatId,
             Seat = seat,
             Price = 50,
             Status = Status.Sold,
@@ -207,7 +207,7 @@ public class TicketServiceTest
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
             
         await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be3");
-        var result = await ticketService.GetTicket(1);
+        var result = await ticketService.GetTicket(101);
         // Assert
         Assert.NotNull(result);
         Assert.Null(result.CustomerId);
@@ -256,14 +256,14 @@ public class TicketServiceTest
         };
         Seat seat = new Seat
         {
-            SeatId = 2,
+            SeatId = 7,
             Section = "Front",
             Row = 1,
             Number = 1
         };
         Ticket ticket = new Ticket
         {
-            TicketId = 2,
+            TicketId = 100,
             ShowId = show.ShowId,
             Show = show,
             SeatId = 2,
@@ -301,7 +301,7 @@ public class TicketServiceTest
         var fetchShow = await showService.GetShowWithTicketsAsync(2);
             
         await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be6");
-        var result = await ticketService.GetTicket(2);
+        var result = await ticketService.GetTicket(100);
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.CustomerId);
