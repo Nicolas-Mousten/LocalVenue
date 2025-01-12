@@ -49,7 +49,7 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
                             new JsonSerializerOptions(JsonSerializerDefaults.Web)
                         );
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // the "cast" array is empty, or a field in an actor is empty
                     // run the while loop again
@@ -64,14 +64,16 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
                     continue;
                 }
 
-                if (actors.Count < 3)
+                if (actors != null && actors.Count < 3)
                 {
                     // run the while loop again
                     response.StatusCode = HttpStatusCode.NotFound;
                     continue;
                 }
 
-                return actors.Count > 12 ? actors.Take(12).ToList() : actors;
+                return actors != null && actors.Count > 12
+                    ? actors.Take(12).ToList()
+                    : actors ?? new List<Actor>();
             }
             catch (Exception e)
             {
@@ -93,7 +95,7 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
                 .TryGetInt64(out var maxMovieId);
             return maxMovieId;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw new HttpRequestException("Did not get a response from TMDB api.");
         }

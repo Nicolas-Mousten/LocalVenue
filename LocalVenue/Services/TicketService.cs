@@ -138,7 +138,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
     )
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-        Show show = await context.Shows.FindAsync(showId);
+        Show? show = await context.Shows.FindAsync(showId);
         if (show == null)
         {
             throw new ArgumentException($"Show with id '{showId}' does not exist");
@@ -196,7 +196,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
     )
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
-        Show show = await context.Shows.FindAsync(showId);
+        Show? show = await context.Shows.FindAsync(showId);
         if (show == null)
         {
             throw new ArgumentException($"Show with id '{customerId}' does not exist");

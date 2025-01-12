@@ -32,7 +32,9 @@ public class UserController(
             // Get the authentication cookie
             var authCookie = HttpContext
                 .Response.Headers["Set-Cookie"]
-                .FirstOrDefault(header => header.StartsWith(".AspNetCore.Identity.Application"));
+                .FirstOrDefault(header =>
+                    header != null && header.StartsWith(".AspNetCore.Identity.Application")
+                );
 
             if (authCookie != null)
             {
