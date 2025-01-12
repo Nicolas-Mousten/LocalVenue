@@ -2,9 +2,10 @@
 @using LocalVenue.Core.Enums
 @using LocalVenue.Services.Interfaces
 @using LocalVenue.Web.Components.VenueComponents
+@using Microsoft.AspNetCore.Authorization
 @inject IShowService ShowService
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-
+@attribute [Authorize]
 @if (ErrorMessage is not null)
 {
     <h3 class="text-center text-danger">@ErrorMessage</h3>
