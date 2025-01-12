@@ -5,6 +5,7 @@ using LocalVenue.Core.Enums;
 using LocalVenue.Core.Services;
 using LocalVenue.Helpers;
 using LocalVenue.Services;
+using LocalVenue.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,6 @@ namespace LocalVenue.Tests;
 public class TicketServiceTest
 {
     private readonly ServiceProvider serviceProvider;
-    
     
     public TicketServiceTest()
     {
@@ -106,7 +106,10 @@ public class TicketServiceTest
         
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var seatService = new SeatService(contextFactoryRetrieve);
-        var showService = new ShowService(contextFactoryRetrieve, mapper);
+        
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService);
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
         
@@ -196,7 +199,9 @@ public class TicketServiceTest
         
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var seatService = new SeatService(contextFactoryRetrieve);
-        var showService = new ShowService(contextFactoryRetrieve, mapper);
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService);
 
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
@@ -288,7 +293,9 @@ public class TicketServiceTest
         
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var seatService = new SeatService(contextFactoryRetrieve);
-        var showService = new ShowService(contextFactoryRetrieve, mapper);
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService);
 
 
         var fetchShow = await showService.GetShowWithTicketsAsync(2);
