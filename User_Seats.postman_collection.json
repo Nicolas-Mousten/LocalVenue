@@ -13,6 +13,10 @@
 					"listen": "test",
 					"script": {
 						"exec": [
+							"pm.test(\"Admin email \" + pm.globals.get(\"EMAIL\") + \" PASSWORD \" + pm.globals.get(\"PASSWORD\") , function() {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
 							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
 							"\r",
 							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
