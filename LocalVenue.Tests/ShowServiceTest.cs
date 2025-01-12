@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Show = LocalVenue.Web.Models.Show;
 
+namespace LocalVenue.Tests;
+
 public class ShowServiceTest
 {
     private readonly ServiceProvider serviceProvider;
