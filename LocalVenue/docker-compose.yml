@@ -14,8 +14,6 @@ services:
     build:
       dockerfile: Dockerfile
     container_name: LocalVenue
-    environment:
-      - JWT_KEY=jsakghdiusydwuyet3874twueygsueaygr3874taw374wuyrogsf738at48a37wt4uwyetguwygfkagsruwayr8ww3yt7487w3t48wt7y4uygetruwgqrpwergy
     depends_on:
       - self-service-mysql
     ports:
