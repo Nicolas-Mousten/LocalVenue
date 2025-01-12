@@ -116,7 +116,7 @@ public class SeatController : ControllerBase
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return NotFound(e.Message);
         }
     }
 }

@@ -1,0 +1,894 @@
+{
+	"info": {
+		"_postman_id": "5fb7cca4-8422-4e2f-a135-fe99ab65b445",
+		"name": "Seats",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33447732"
+	},
+	"item": [
+		{
+			"name": "Log In",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Has cookieValue\", function() {\r",
+							"    pm.expect(jsonData[\"cookieValue\"]).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"COOKIE_VALUE\", jsonData[\"cookieValue\"]);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": {{EMAIL}},\r\n  \"password\": {{PASSWORD}},\r\n  \"twoFactorCode\": \"string\",\r\n  \"twoFactorRecoveryCode\": \"string\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/User/login",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"User",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSeat Not Found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"var seatId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"\r",
+							"pm.test(\"Returns expected error message\", function () {\r",
+							"    var responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.include('Seat with id ' + seatId + ' not found');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/{{NON_EXISTING_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"{{NON_EXISTING_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Seat Bad Parameters",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400 Bad request\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Each element in the errors.Section array is not empty\", function () {\r",
+							"    pm.response.json().errors.Section.forEach(function(section) {\r",
+							"    pm.expect(section).to.not.be.empty;\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"    \r",
+							"pm.test(\"Section is required error message present\", function () {\r",
+							"    pm.response.json().errors.Section.forEach(function(section) {\r",
+							"    pm.expect(section).to.be.eq(\"The Section field is required.\")\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{BEARER_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"section\": \"\",\r\n  \"row\": {{CREATE_SEAT_ROW}},\r\n  \"number\": {{CREATE_SEAT_NUMBER}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Seat Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Has seatId\", function() {\r",
+							"    pm.expect(jsonData[\"seatId\"]).to.be.a('number');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"seatId is non-negative integer\", function() {\r",
+							"    pm.expect(jsonData[\"seatId\"]).to.be.a('number').and.to.be.at.least(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Section, row, and number are non-empty strings or non-negative integers\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    \r",
+							"    pm.expect(responseData.section).to.satisfy((value) => {\r",
+							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"    }, \"Section should be a non-empty string or a non-negative integer\");\r",
+							"\r",
+							"    pm.expect(responseData.row).to.satisfy((value) => {\r",
+							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"    }, \"Row should be a non-empty string or a non-negative integer\");\r",
+							"\r",
+							"    pm.expect(responseData.number).to.satisfy((value) => {\r",
+							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"    }, \"Number should be a non-empty string or a non-negative integer\");\r",
+							"});\r",
+							"\r",
+							"pm.environment.set('CREATED_SEAT_ID', jsonData['seatId'])\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Retrieve the cookie value from the environment variable\r",
+							"var cookieValue = pm.variables.get(\"COOKIE_VALUE\");\r",
+							"\r",
+							"if (cookieValue) {\r",
+							"    // Add the cookie to the request headers\r",
+							"    pm.request.headers.add({\r",
+							"        key: \"Set-Cookie\",\r",
+							"        value: cookieValue\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"section\": {{CREATE_SEAT_SECTION}},\r\n  \"row\": {{CREATE_SEAT_ROW}},\r\n  \"number\": {{CREATE_SEAT_NUMBER}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Seat Bad Request Parameter Error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/\"{{CREATED_SEAT_ID}}\"",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"\"{{CREATED_SEAT_ID}}\""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSeat success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.to.have.status(200));\r",
+							"});\r",
+							"\r",
+							"\r",
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - seatId, section, row, and number\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('seatId');\r",
+							"    pm.expect(responseData).to.have.property('section');\r",
+							"    pm.expect(responseData).to.have.property('row');\r",
+							"    pm.expect(responseData).to.have.property('number');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"SeatId is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData.seatId).to.be.a('number').and.to.be.at.least(0);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Section, row, and number are non-empty strings or non-negative integers\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    \r",
+							"    pm.expect(responseData.section).to.satisfy((value) => {\r",
+							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"    }, \"Section should be a non-empty string or a non-negative integer\");\r",
+							"\r",
+							"    pm.expect(responseData.row).to.satisfy((value) => {\r",
+							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"    }, \"Row should be a non-empty string or a non-negative integer\");\r",
+							"\r",
+							"    pm.expect(responseData.number).to.satisfy((value) => {\r",
+							"        return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"    }, \"Number should be a non-empty string or a non-negative integer\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/{{CREATED_SEAT_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"{{CREATED_SEAT_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSeatsInRow Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var responseData = pm.response.json().$values;\r",
+							"\r",
+							"pm.test(\"Values response is not empty\", function () {\r",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Seat value has correct data types\", function () {\r",
+							"    responseData.forEach((value, index) => {\r",
+							"        if (index === 0) {\r",
+							"            pm.expect(value).to.be.an('object');\r",
+							"        \r",
+							"            pm.expect(value.section).to.satisfy((value) => {\r",
+							"                return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"            }, \"Section should be a non-empty string or a non-negative integer\");\r",
+							"\r",
+							"            pm.expect(value.row).to.satisfy((value) => {\r",
+							"                return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"            }, \"Row should be a non-empty string or a non-negative integer\");\r",
+							"\r",
+							"            pm.expect(value.number).to.satisfy((value) => {\r",
+							"                return (typeof value === 'string' && value.length > 0) || (typeof value === 'number' && value >= 0);\r",
+							"            }, \"Number should be a non-empty string or a non-negative integer\");\r",
+							"                }\r",
+							"            });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/Row/{{CREATE_SEAT_ROW}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"Row",
+						"{{CREATE_SEAT_ROW}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSeatsInRow Seats Not Found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"var seatId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"\r",
+							"pm.test(\"Returns expected error message\", function () {\r",
+							"    var responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.include('No seats found in row ' + seatId);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/Row/{{NON_EXISTING_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"Row",
+						"{{NON_EXISTING_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetSeatsInRow Seats Bad Request Url Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns expected error message\", function () {\r",
+							"    var responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.include(\"The value '\").and.to.include(\"' is not valid\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/Row/'{{CREATE_SEAT_ROW}}'",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"Row",
+						"'{{CREATE_SEAT_ROW}}'"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateSeat Seat Bad Request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Returns expected error message\", function () {\r",
+							"    var responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.include('invalid start of a value');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seatId\": {{CREATED_SEAT_ID}},\r\n    \"section\": {{ERROR_SEAT_SECTION}},\r\n    \"row\": {{UPDATE_SEAT_ROW}},\r\n    \"number\": {{UPDATE_SEAT_NUMBER}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateSeat Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has the required fields - seatId, section, row, and number\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('seatId');\r",
+							"    pm.expect(responseData).to.have.property('section');\r",
+							"    pm.expect(responseData).to.have.property('row');\r",
+							"    pm.expect(responseData).to.have.property('number');\r",
+							"});\r",
+							"\r",
+							"var jsonData = pm.response.json();\r",
+							"var seatId = pm.environment.get(\"CREATED_SEAT_ID\");\r",
+							"\r",
+							"pm.test(\"Has seatId. Same as the requested seatId\", function() {\r",
+							"    pm.expect(jsonData[\"seatId\"]).to.be.a('number');\r",
+							"    pm.expect(jsonData[\"seatId\"]).to.eq(seatId);\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seatId\": {{CREATED_SEAT_ID}},\r\n    \"section\": {{UPDATE_SEAT_SECTION}},\r\n    \"row\": {{UPDATE_SEAT_ROW}},\r\n    \"number\": {{UPDATE_SEAT_NUMBER}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateSeat Seat Not Found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"var seatId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"\r",
+							"pm.test(\"Returns expected error message\", function () {\r",
+							"    var responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.include('No seats found with id ' + seatId);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"seatId\": {{NON_EXISTING_ID}},\r\n    \"section\": {{UPDATE_SEAT_SECTION}},\r\n    \"row\": {{UPDATE_SEAT_ROW}},\r\n    \"number\": {{UPDATE_SEAT_NUMBER}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Seat Not Found",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 404\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"var seatId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"\r",
+							"pm.test(\"Returns expected error message\", function () {\r",
+							"    var responseText = pm.response.text();\r",
+							"    pm.expect(responseText).to.include(\"Item with key '\" + seatId + \"' not found\");\r",
+							"}); "
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/{{NON_EXISTING_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"{{NON_EXISTING_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Seat Success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
+							"\r",
+							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(expected_reponse_time);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/api/Seat/{{CREATED_SEAT_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"api",
+						"Seat",
+						"{{CREATED_SEAT_ID}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "webUrl",
+			"value": "http://localhost:5116"
+		},
+		{
+			"key": "CREATE_SEAT_ROW",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "CREATE_SEAT_SECTION",
+			"value": "\"Front\"",
+			"type": "string"
+		},
+		{
+			"key": "CREATE_SEAT_NUMBER",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "CREATED_SEAT_ID",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "UPDATE_SEAT_SECTION",
+			"value": "\"Left\"",
+			"type": "string"
+		},
+		{
+			"key": "UPDATE_SEAT_ROW",
+			"value": "2",
+			"type": "string"
+		},
+		{
+			"key": "UPDATE_SEAT_NUMBER",
+			"value": "3",
+			"type": "string"
+		},
+		{
+			"key": "NON_EXISTING_ID",
+			"value": "-1",
+			"type": "string"
+		},
+		{
+			"key": "ERROR_SEAT_SECTION",
+			"value": "underground",
+			"type": "string"
+		},
+		{
+			"key": "COOKIE_VALUE",
+			"value": ""
+		}
+	]
+}
