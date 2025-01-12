@@ -69,7 +69,7 @@ jobs:
           done
         shell: bash
 
-      - name: Run Postman tests - Collection 1
+      - name: Run Postman tests - Users and Seats
         run: |
           newman run "User_Seats.postman_collection.json" \
             --global-var "BASE_URL=https://localvenue-webapp-casp0006.azurewebsites.net/" \
@@ -80,7 +80,7 @@ jobs:
             --reporter-htmlextra-export testResults/runreport1.html \
             --reporter-htmlextra-darkTheme
 
-      - name: Run Postman tests - Collection 2
+      - name: Run Postman tests - Shows and Tickets
         run: |
           newman run "Shows_Tickets.postman_collection.json" \
             --global-var "BASE_URL=https://localvenue-webapp-casp0006.azurewebsites.net/" \
