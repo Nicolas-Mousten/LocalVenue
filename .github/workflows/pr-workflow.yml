@@ -26,7 +26,7 @@ jobs:
         run: dotnet tool install -g csharpier
 
       - name: Run dotnet csharpier
-        run: dotnet csharpier --check .
+        run: dotnet csharpier --check --loglevel debug .
 
   xunit-test-with-sonarcloud:
     name: Test and Analyze
