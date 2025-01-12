@@ -7,27 +7,28 @@ namespace LocalVenue.Tests;
 
 public class ShowPriceCalculatorTest
 {
-
     [Theory]
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:30:00", true)] // More than 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T19:30:00", false)] // Less than 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:00:00", false)] // Exactly 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T18:00:00", false)] // Zero duration
-    [InlineData("2023-10-01T18:00:00", "2023-10-02T18:00:01", true)] // 1d 00h 00m 01s    
+    [InlineData("2023-10-01T18:00:00", "2023-10-02T18:00:01", true)] // 1d 00h 00m 01s
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:00:01", true)] // 2h 0m 1s
     [InlineData("2023-10-01T18:00:00", "2023-10-01T19:59:59", false)] // 1h 59m 59s
     [InlineData("2023-10-01T18:00:00", "2023-10-01T17:59:59", false)] // -1 second
     [InlineData("2023-10-01T18:00:00", "2023-10-01T18:00:01", false)] // 1 second
     [InlineData("0001-01-01T00:00:00", "9999-12-31T23:59:59", true)] // Timespan max
-
-    public void ShowLastForMoreThanTwoHours_ShouldReturnExpectedResult(string startTime, string endTime,
-        bool expectedResult)
+    public void ShowLastForMoreThanTwoHours_ShouldReturnExpectedResult(
+        string startTime,
+        string endTime,
+        bool expectedResult
+    )
     {
         // Arrange
         var show = new Show
         {
             StartTime = DateTime.Parse(startTime),
-            EndTime = DateTime.Parse(endTime)
+            EndTime = DateTime.Parse(endTime),
         };
 
         // Act
@@ -54,8 +55,13 @@ public class ShowPriceCalculatorTest
     [InlineData(true, 18, false, 2, 194)]
     [InlineData(true, 18, true, 3, 182)]
     [InlineData(true, 18, true, 2, 212)]
-    public void CalculatePrice_ShouldReturnExpectedResult(bool openingNight, int startHour, bool moreThanTwoHours,
-        int row, decimal expectedPrice)
+    public void CalculatePrice_ShouldReturnExpectedResult(
+        bool openingNight,
+        int startHour,
+        bool moreThanTwoHours,
+        int row,
+        decimal expectedPrice
+    )
     {
         // Arrange
         var show = new Show
@@ -64,12 +70,9 @@ public class ShowPriceCalculatorTest
             EndTime = moreThanTwoHours
                 ? new DateTime(2023, 10, 01, startHour + 3, 00, 00)
                 : new DateTime(2023, 10, 01, startHour + 1, 30, 00),
-            OpeningNight = openingNight
+            OpeningNight = openingNight,
         };
-        var ticket = new Ticket
-        {
-            Seat = new Seat { Row = row }
-        };
+        var ticket = new Ticket { Seat = new Seat { Row = row } };
 
         // Act
         var result = ShowPriceCalculator.CalculatePrice(show, ticket, openingNight);
@@ -86,15 +89,14 @@ public class ShowPriceCalculatorTest
         {
             StartTime = new DateTime(2023, 10, 01, 18, 00, 00),
             EndTime = new DateTime(2023, 10, 01, 20, 30, 00),
-            OpeningNight = true
+            OpeningNight = true,
         };
-        var ticket = new Ticket
-        {
-            Seat = null!
-        };
+        var ticket = new Ticket { Seat = null! };
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => ShowPriceCalculator.CalculatePrice(show, ticket, true));
+        Assert.Throws<ArgumentException>(
+            () => ShowPriceCalculator.CalculatePrice(show, ticket, true)
+        );
     }
 
     [Fact]
@@ -111,9 +113,9 @@ public class ShowPriceCalculatorTest
                 Tickets =
                 [
                     new() { Seat = new Seat { Row = 1 } },
-                    new() { Seat = new Seat { Row = 3 } }
-                ]
-            }
+                    new() { Seat = new Seat { Row = 3 } },
+                ],
+            },
         };
 
         // Act
@@ -137,8 +139,8 @@ public class ShowPriceCalculatorTest
                 StartTime = new DateTime(2023, 10, 01, 18, 00, 00),
                 EndTime = new DateTime(2023, 10, 01, 20, 30, 00),
                 OpeningNight = true,
-                Tickets = null
-            }
+                Tickets = null,
+            },
         };
 
         // Act
@@ -174,8 +176,8 @@ public class ShowPriceCalculatorTest
                 StartTime = new DateTime(2023, 10, 01, 18, 00, 00),
                 EndTime = new DateTime(2023, 10, 01, 20, 30, 00),
                 OpeningNight = true,
-                Tickets = []
-            }
+                Tickets = [],
+            },
         };
 
         // Act

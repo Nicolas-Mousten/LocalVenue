@@ -9,13 +9,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Services;
 
-public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper) : GenericCRUDService<Ticket>(contextFactory), ITicketService
+public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper)
+    : GenericCRUDService<Ticket>(contextFactory),
+        ITicketService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
 
     public async Task<Ticket> GetTicket(long id)
     {
-        return await base.GetItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
+        return await base.GetItem(
+            id,
+            ticket => ticket.Show!,
+            ticket => ticket.Customer!,
+            ticket => ticket.Seat!
+        );
     }
 
     public async Task<Ticket> AddTicket(Ticket ticket, VenueContext? context = null)
@@ -34,7 +41,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             if (await context.Users.FindAsync(ticket.CustomerId) == null)
             {
-                throw new ArgumentException($"Customer with id '{ticket.CustomerId}' does not exist");
+                throw new ArgumentException(
+                    $"Customer with id '{ticket.CustomerId}' does not exist"
+                );
             }
         }
         else
@@ -49,16 +58,27 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         }
 
         //Check if the ticket for show and seat already exists
-        if (await context.Tickets.AnyAsync(t => t.ShowId == ticket.ShowId && t.SeatId == ticket.SeatId))
+        if (
+            await context.Tickets.AnyAsync(t =>
+                t.ShowId == ticket.ShowId && t.SeatId == ticket.SeatId
+            )
+        )
         {
-            throw new ArgumentException($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned");
+            throw new ArgumentException(
+                $"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned"
+            );
         }
 
         ticket.Seat = await context.Seats.FindAsync(ticket.SeatId); // price calculator needs seat
         ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
         ticket.Seat = null; // remove seat from ticket to avoid duplicate insert
 
-        return await base.AddItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
+        return await base.AddItem(
+            ticket,
+            ticket => ticket.Show!,
+            ticket => ticket.Customer!,
+            ticket => ticket.Seat!
+        );
     }
 
     public async Task<Ticket> UpdateTicket(Ticket ticket)
@@ -73,7 +93,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             if (await context.Users.FindAsync(ticket.CustomerId) == null)
             {
-                throw new ArgumentException($"Customer with id '{ticket.CustomerId}' does not exist");
+                throw new ArgumentException(
+                    $"Customer with id '{ticket.CustomerId}' does not exist"
+                );
             }
         }
         else
@@ -91,15 +113,29 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
         ticket.Seat = null; // remove seat from ticket to avoid duplicate insert
 
-        return await base.UpdateItem(ticket, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
+        return await base.UpdateItem(
+            ticket,
+            ticket => ticket.Show!,
+            ticket => ticket.Customer!,
+            ticket => ticket.Seat!
+        );
     }
 
     public async Task<Ticket> DeleteTicket(long id)
     {
-        return await base.DeleteItem(id, ticket => ticket.Show!, ticket => ticket.Customer!, ticket => ticket.Seat!);
+        return await base.DeleteItem(
+            id,
+            ticket => ticket.Show!,
+            ticket => ticket.Customer!,
+            ticket => ticket.Seat!
+        );
     }
 
-    public async Task JoinShow(long showId, List<LocalVenue.Web.Models.Ticket> tickets, string customerId)
+    public async Task JoinShow(
+        long showId,
+        List<LocalVenue.Web.Models.Ticket> tickets,
+        string customerId
+    )
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         Show show = await context.Shows.FindAsync(showId);
@@ -112,7 +148,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
         }
 
-        //add the customer to those seats 
+        //add the customer to those seats
         //TO-DO change it to call database so it dosn't take data from frontend only id's
         foreach (var ticket in tickets)
         {
@@ -127,12 +163,12 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
                     SeatId = ticket.SeatId,
                     Section = ticket.Seat.Section,
                     Row = ticket.Seat.Row,
-                    Number = ticket.Seat.Number
+                    Number = ticket.Seat.Number,
                 },
                 Price = ticket.Price,
                 Status = ticket.Status,
                 CustomerId = null,
-                Customer = null
+                Customer = null,
             };
             if (ticket.Status != Status.Available)
             {
@@ -141,7 +177,9 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
 
             if (ticket.SoldToCustomerId != null)
             {
-                throw new ArgumentException($"Ticket {ticket.Id} is already purchased by another customer");
+                throw new ArgumentException(
+                    $"Ticket {ticket.Id} is already purchased by another customer"
+                );
             }
             newTicket.Status = Status.Sold;
             newTicket.CustomerId = customerId.ToString();
@@ -151,7 +189,11 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         await context.SaveChangesAsync();
     }
 
-    public async Task<string> LeaveShow(long showId, List<LocalVenue.Web.Models.Ticket> tickets, string customerId)
+    public async Task<string> LeaveShow(
+        long showId,
+        List<LocalVenue.Web.Models.Ticket> tickets,
+        string customerId
+    )
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
         Show show = await context.Shows.FindAsync(showId);
@@ -184,12 +226,12 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
                     SeatId = ticket.SeatId,
                     Section = ticket.Seat.Section,
                     Row = ticket.Seat.Row,
-                    Number = ticket.Seat.Number
+                    Number = ticket.Seat.Number,
                 },
                 Price = ticket.Price,
                 Status = ticket.Status,
                 CustomerId = null,
-                Customer = null
+                Customer = null,
             };
             newTicket.Status = Status.Available;
             newTicket.CustomerId = null;
@@ -199,7 +241,6 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         await context.SaveChangesAsync();
         return "Tickets have been returned";
     }
-
 
     public bool lessThanADayLeft(Show show)
     {

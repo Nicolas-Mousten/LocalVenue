@@ -18,7 +18,10 @@ public class SeatController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [SwaggerOperation(Summary = "Gets a seat by ID", Description = "Retrieves a specific seat by its ID.")]
+    [SwaggerOperation(
+        Summary = "Gets a seat by ID",
+        Description = "Retrieves a specific seat by its ID."
+    )]
     [SwaggerResponse(200, "Returns the seat", typeof(Seat))]
     [SwaggerResponse(404, "If the seat is not found", typeof(string))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
@@ -40,7 +43,10 @@ public class SeatController : ControllerBase
     }
 
     [HttpGet("row/{row}")]
-    [SwaggerOperation(Summary = "Gets seats in a row", Description = "Retrieves a list of seats in a specific row.")]
+    [SwaggerOperation(
+        Summary = "Gets seats in a row",
+        Description = "Retrieves a list of seats in a specific row."
+    )]
     [SwaggerResponse(200, "Returns the list of seats", typeof(List<Seat>))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     [SwaggerResponse(404, "If no seats exist in row", typeof(string))]
@@ -63,7 +69,10 @@ public class SeatController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    [SwaggerOperation(Summary = "Creates a new seat", Description = "Creates a new seat with the provided details.")]
+    [SwaggerOperation(
+        Summary = "Creates a new seat",
+        Description = "Creates a new seat with the provided details."
+    )]
     [SwaggerResponse(201, "Returns the created seat", typeof(Seat))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<Seat>> AddSeat(Seat seat)
@@ -82,7 +91,10 @@ public class SeatController : ControllerBase
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "Updates an existing seat", Description = "Updates the details of an existing seat.")]
+    [SwaggerOperation(
+        Summary = "Updates an existing seat",
+        Description = "Updates the details of an existing seat."
+    )]
     [SwaggerResponse(200, "Returns the updated seat", typeof(Seat))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     [SwaggerResponse(404, "If the seat is not found", typeof(string))]
@@ -104,7 +116,10 @@ public class SeatController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Deletes a seat", Description = "Deletes a specific seat by its ID.")]
+    [SwaggerOperation(
+        Summary = "Deletes a seat",
+        Description = "Deletes a specific seat by its ID."
+    )]
     [SwaggerResponse(200, "Returns the deleted object", typeof(Seat))]
     [SwaggerResponse(404, "If the seat is not found", typeof(string))]
     public async Task<ActionResult<Seat>> DeleteSeat(long id)

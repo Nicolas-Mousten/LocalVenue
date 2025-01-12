@@ -7,7 +7,12 @@ namespace LocalVenue.Services.Interfaces
 {
     public interface IShowService
     {
-        Task<PagedList<Show>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title");
+        Task<PagedList<Show>> GetShows(
+            int page,
+            int pageSize,
+            string? searchParameter,
+            string? searchProperty = "Title"
+        );
         Task<Show> GetShow(long id);
         Task<Show> GetShow(string searchParameter, string searchProperty = "Title");
         Task<List<Ticket>> GetAvailableTicketsForShow(long showId);

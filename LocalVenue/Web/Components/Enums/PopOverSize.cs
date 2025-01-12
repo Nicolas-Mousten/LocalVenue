@@ -16,7 +16,7 @@ public static class PopOverSizeExtensions
             PopOverSize.Small => "ui-popover--sd",
             PopOverSize.Default => "ui-popover--md",
             PopOverSize.Large => "ui-popover--ld",
-            _ => throw new ArgumentOutOfRangeException(nameof(modalSize), modalSize, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(modalSize), modalSize, null),
         };
     }
 }

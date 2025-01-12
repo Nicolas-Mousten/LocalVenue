@@ -1,5 +1,5 @@
-using LocalVenue.Core.Enums;
 using System;
+using LocalVenue.Core.Enums;
 using Xunit;
 
 namespace LocalVenue.Tests
@@ -27,7 +27,9 @@ namespace LocalVenue.Tests
             var invalidGender = (Gender)999;
 
             // Act & Assert
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => invalidGender.ToNewString());
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(
+                () => invalidGender.ToNewString()
+            );
             Assert.Equal("gender", exception.ParamName);
         }
     }

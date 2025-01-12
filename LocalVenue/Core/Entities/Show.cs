@@ -1,7 +1,7 @@
-using LocalVenue.Core.Enums;
-using LocalVenue.Core.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using LocalVenue.Core.Enums;
+using LocalVenue.Core.Models;
 
 namespace LocalVenue.Core.Entities;
 
@@ -27,5 +27,4 @@ public class Show
     public bool OpeningNight { get; set; }
 
     public ICollection<Ticket>? Tickets { get; set; }
-
 }

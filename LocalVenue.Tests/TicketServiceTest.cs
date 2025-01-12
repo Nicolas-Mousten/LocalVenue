@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Customer = LocalVenue.Core.Entities.Customer;
 
 namespace LocalVenue.Tests;
+
 public class TicketServiceTest
 {
     private readonly ServiceProvider serviceProvider;
@@ -21,7 +22,8 @@ public class TicketServiceTest
         var services = new ServiceCollection();
         services.AddDbContextFactory<VenueContext>(options =>
         {
-            options.UseInMemoryDatabase("InMemoryDb")
+            options
+                .UseInMemoryDatabase("InMemoryDb")
                 .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
         });
 
@@ -32,7 +34,9 @@ public class TicketServiceTest
     public async Task TestTicketServiceBuySeat()
     {
         // Arrange
-        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var dbContextFactory = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
         Customer customer = new Customer
         {
             Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
@@ -41,7 +45,8 @@ public class TicketServiceTest
             Email = "nicolas.mousten@gmail.com",
             NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
             EmailConfirmed = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
+            PasswordHash =
+                "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
             SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
             ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
             PhoneNumber = null,
@@ -53,7 +58,7 @@ public class TicketServiceTest
             FirstName = "Nicolas",
             LastName = "Mousten",
             IsGoldenMember = false,
-            Tickets = new List<Ticket>()
+            Tickets = new List<Ticket>(),
         };
         Show show = new Show
         {
@@ -64,7 +69,7 @@ public class TicketServiceTest
             EndTime = DateTime.Now.AddDays(1).AddHours(14),
             Genre = Genre.Musical,
             OpeningNight = false,
-            Tickets = new List<Ticket>()
+            Tickets = new List<Ticket>(),
         };
 
         Seat seat = new Seat
@@ -72,7 +77,7 @@ public class TicketServiceTest
             SeatId = 8,
             Section = "Front",
             Row = 1,
-            Number = 1
+            Number = 1,
         };
 
         Ticket ticket = new Ticket
@@ -85,7 +90,7 @@ public class TicketServiceTest
             Price = 50,
             Status = Status.Available,
             CustomerId = null,
-            Customer = null
+            Customer = null,
         };
 
         show.Tickets.Add(ticket);
@@ -96,11 +101,13 @@ public class TicketServiceTest
             await context.SaveChangesAsync();
         }
         // Act
-        var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var contextFactoryRetrieve = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
 
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<MappingProfile>();  // Assuming ShowProfile contains your mappings
+            cfg.AddProfile<MappingProfile>(); // Assuming ShowProfile contains your mappings
         });
         var mapper = config.CreateMapper();
 
@@ -109,11 +116,20 @@ public class TicketServiceTest
 
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
+        var showService = new ShowService(
+            contextFactoryRetrieve,
+            mapper,
+            actorService,
+            ticketService
+        );
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
 
-        await ticketService.JoinShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be9");
+        await ticketService.JoinShow(
+            fetchShow.Id,
+            fetchShow.Tickets,
+            "0c9cd65f-2054-4086-a569-2e50997a8be9"
+        );
         var result = await ticketService.GetTicket(101);
         // Assert
         Assert.NotNull(result);
@@ -125,7 +141,9 @@ public class TicketServiceTest
     public async Task TestTicketServiceReturnSeat()
     {
         // Arrange
-        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var dbContextFactory = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
 
         Customer customer = new Customer
         {
@@ -135,7 +153,8 @@ public class TicketServiceTest
             Email = "nicolas.mousten@gmail.com",
             NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
             EmailConfirmed = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
+            PasswordHash =
+                "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
             SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
             ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
             PhoneNumber = null,
@@ -147,7 +166,7 @@ public class TicketServiceTest
             FirstName = "Nicolas",
             LastName = "Mousten",
             IsGoldenMember = false,
-            Tickets = new List<Ticket>()
+            Tickets = new List<Ticket>(),
         };
         Show show = new Show
         {
@@ -158,14 +177,14 @@ public class TicketServiceTest
             EndTime = DateTime.Now.AddHours(14),
             Genre = Genre.Musical,
             OpeningNight = false,
-            Tickets = new List<Ticket>()
+            Tickets = new List<Ticket>(),
         };
         Seat seat = new Seat
         {
             SeatId = 10,
             Section = "Front",
             Row = 1,
-            Number = 1
+            Number = 1,
         };
         Ticket ticket = new Ticket
         {
@@ -177,7 +196,7 @@ public class TicketServiceTest
             Price = 50,
             Status = Status.Sold,
             CustomerId = "0c9cd65f-2054-4086-a569-2e50997a8be9",
-            Customer = customer
+            Customer = customer,
         };
 
         show.Tickets?.Add(ticket);
@@ -189,7 +208,9 @@ public class TicketServiceTest
         }
 
         // Act
-        var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var contextFactoryRetrieve = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
 
         var config = new MapperConfiguration(cfg =>
         {
@@ -201,12 +222,20 @@ public class TicketServiceTest
         var seatService = new SeatService(contextFactoryRetrieve);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
-
+        var showService = new ShowService(
+            contextFactoryRetrieve,
+            mapper,
+            actorService,
+            ticketService
+        );
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
 
-        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be3");
+        await ticketService.LeaveShow(
+            fetchShow.Id,
+            fetchShow.Tickets,
+            "0c9cd65f-2054-4086-a569-2e50997a8be3"
+        );
         var result = await ticketService.GetTicket(101);
         // Assert
         Assert.NotNull(result);
@@ -215,11 +244,15 @@ public class TicketServiceTest
         Assert.Equal(Status.Available, result.Status);
     }
 
-    [Fact(DisplayName = "Test if the ticket status remains 'Sold' after the customer tries to leave the show less than 24 hours before it begins")]
+    [Fact(
+        DisplayName = "Test if the ticket status remains 'Sold' after the customer tries to leave the show less than 24 hours before it begins"
+    )]
     public async Task TestTicketServiceReturnSeatOutOfDate()
     {
         // Arrange
-        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var dbContextFactory = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
 
         Customer customer = new Customer
         {
@@ -229,7 +262,8 @@ public class TicketServiceTest
             Email = "nicolas.mousten@gmail.com",
             NormalizedEmail = "NICOLAS.MOUSTEN@GMAIL.COM",
             EmailConfirmed = false,
-            PasswordHash = "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
+            PasswordHash =
+                "AQAAAAIAAYagAAAAEJWgg4FDKFWNh/AYIzVE/3nxRluYnwDmUfDnpc75ZUylWzJYkphFBrhqFkRAgm16YA==",
             SecurityStamp = "S4KC54SOPWVKCI7KA6MGFCDMBS5SVWXG",
             ConcurrencyStamp = "9ceff3cb-b5c8-4562-bcef-4a4f0d3c3761",
             PhoneNumber = null,
@@ -241,7 +275,7 @@ public class TicketServiceTest
             FirstName = "Nicolas",
             LastName = "Mousten",
             IsGoldenMember = false,
-            Tickets = new List<Ticket>()
+            Tickets = new List<Ticket>(),
         };
         Show show = new Show
         {
@@ -252,14 +286,14 @@ public class TicketServiceTest
             EndTime = DateTime.Now.AddHours(14),
             Genre = Genre.Musical,
             OpeningNight = false,
-            Tickets = new List<Ticket>()
+            Tickets = new List<Ticket>(),
         };
         Seat seat = new Seat
         {
             SeatId = 7,
             Section = "Front",
             Row = 1,
-            Number = 1
+            Number = 1,
         };
         Ticket ticket = new Ticket
         {
@@ -271,7 +305,7 @@ public class TicketServiceTest
             Price = 50,
             Status = Status.Sold,
             CustomerId = "0c9cd65f-2054-4086-a569-2e50997a8be6",
-            Customer = customer
+            Customer = customer,
         };
 
         show.Tickets?.Add(ticket);
@@ -283,7 +317,9 @@ public class TicketServiceTest
         }
 
         // Act
-        var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var contextFactoryRetrieve = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
 
         var config = new MapperConfiguration(cfg =>
         {
@@ -295,12 +331,20 @@ public class TicketServiceTest
         var seatService = new SeatService(contextFactoryRetrieve);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
-
+        var showService = new ShowService(
+            contextFactoryRetrieve,
+            mapper,
+            actorService,
+            ticketService
+        );
 
         var fetchShow = await showService.GetShowWithTicketsAsync(2);
 
-        await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be6");
+        await ticketService.LeaveShow(
+            fetchShow.Id,
+            fetchShow.Tickets,
+            "0c9cd65f-2054-4086-a569-2e50997a8be6"
+        );
         var result = await ticketService.GetTicket(100);
         // Assert
         Assert.NotNull(result);

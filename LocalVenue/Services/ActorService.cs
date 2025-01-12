@@ -1,13 +1,13 @@
+using System.Diagnostics;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using AutoMapper;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Models;
 using LocalVenue.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace LocalVenue.Services;
 
@@ -42,9 +42,12 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
 
                 try
                 {
-                    actors = JsonDocument.Parse(response.Content.ReadAsStringAsync(CancellationToken.None).Result).
-                        RootElement.GetProperty("cast").
-                        Deserialize<List<Actor>>(new JsonSerializerOptions(JsonSerializerDefaults.Web));
+                    actors = JsonDocument
+                        .Parse(response.Content.ReadAsStringAsync(CancellationToken.None).Result)
+                        .RootElement.GetProperty("cast")
+                        .Deserialize<List<Actor>>(
+                            new JsonSerializerOptions(JsonSerializerDefaults.Web)
+                        );
                 }
                 catch (Exception e)
                 {
@@ -84,7 +87,10 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
         try
         {
             var response = await client.GetAsync("movie/latest");
-            JsonDocument.Parse(response.Content.ReadAsStringAsync(CancellationToken.None).Result).RootElement.GetProperty("id").TryGetInt64(out var maxMovieId);
+            JsonDocument
+                .Parse(response.Content.ReadAsStringAsync(CancellationToken.None).Result)
+                .RootElement.GetProperty("id")
+                .TryGetInt64(out var maxMovieId);
             return maxMovieId;
         }
         catch (Exception e)

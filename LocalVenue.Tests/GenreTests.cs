@@ -1,5 +1,5 @@
-using LocalVenue.Core.Enums;
 using System;
+using LocalVenue.Core.Enums;
 using Xunit;
 
 namespace LocalVenue.Tests
@@ -29,7 +29,9 @@ namespace LocalVenue.Tests
             var invalidGenre = (Genre)999;
 
             // Act & Assert
-            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => invalidGenre.ToNewString());
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(
+                () => invalidGenre.ToNewString()
+            );
             Assert.Equal("Genre", exception.ParamName);
         }
     }

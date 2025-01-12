@@ -5,7 +5,6 @@ using LocalVenue.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-
 namespace LocalVenue.Controllers;
 
 [ApiController]
@@ -22,18 +21,31 @@ public class ShowController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Gets a paginated list of shows", Description = "Retrieves a paginated list of shows with optional search parameters.")]
+    [SwaggerOperation(
+        Summary = "Gets a paginated list of shows",
+        Description = "Retrieves a paginated list of shows with optional search parameters."
+    )]
     [SwaggerResponse(200, "Returns the list of shows", typeof(IEnumerable<Show>))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<IEnumerable<Show>>> GetShows(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
         [FromQuery] string? searchParameter = null,
-        [FromQuery, SwaggerParameter("The property to search by. Defaults to 'Title' if left empty.")] string? searchProperty = null)
+        [
+            FromQuery,
+            SwaggerParameter("The property to search by. Defaults to 'Title' if left empty.")
+        ]
+            string? searchProperty = null
+    )
     {
         try
         {
-            var shows = await _showService.GetShows(page, pageSize, searchParameter, searchProperty);
+            var shows = await _showService.GetShows(
+                page,
+                pageSize,
+                searchParameter,
+                searchProperty
+            );
             return Ok(shows);
         }
         catch (Exception e)
@@ -43,9 +55,16 @@ public class ShowController : ControllerBase
     }
 
     [HttpGet("{showId}/tickets")]
-    [SwaggerOperation(Summary = "Gets available tickets for a show", Description = "Retrieves a list of available tickets for a specific show by its ID.")]
+    [SwaggerOperation(
+        Summary = "Gets available tickets for a show",
+        Description = "Retrieves a list of available tickets for a specific show by its ID."
+    )]
     [SwaggerResponse(200, "Returns the list of available tickets", typeof(IEnumerable<Ticket>))]
-    [SwaggerResponse(404, "If the show is not found or show has no available tickets", typeof(string))]
+    [SwaggerResponse(
+        404,
+        "If the show is not found or show has no available tickets",
+        typeof(string)
+    )]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<Ticket>> GetAvailableTicketsForShow(long showId)
     {
@@ -65,7 +84,10 @@ public class ShowController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [SwaggerOperation(Summary = "Gets a show by ID", Description = "Retrieves a specific show by its ID.")]
+    [SwaggerOperation(
+        Summary = "Gets a show by ID",
+        Description = "Retrieves a specific show by its ID."
+    )]
     [SwaggerResponse(200, "Returns the show", typeof(Show))]
     [SwaggerResponse(404, "If the show is not found", typeof(string))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
@@ -87,7 +109,10 @@ public class ShowController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Creates a new show", Description = "Creates a new show with the provided details.")]
+    [SwaggerOperation(
+        Summary = "Creates a new show",
+        Description = "Creates a new show with the provided details."
+    )]
     [SwaggerResponse(201, "Returns the created show", typeof(Show))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<Show>> AddShow(ShowRequest showRequestDTO)
@@ -107,7 +132,10 @@ public class ShowController : ControllerBase
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "Updates an existing show", Description = "Updates the details of an existing show.")]
+    [SwaggerOperation(
+        Summary = "Updates an existing show",
+        Description = "Updates the details of an existing show."
+    )]
     [SwaggerResponse(200, "Returns the updated show", typeof(Show))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     [SwaggerResponse(404, "If the show is not found", typeof(string))]
@@ -130,7 +158,10 @@ public class ShowController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Deletes a show", Description = "Deletes a specific show by its ID.")]
+    [SwaggerOperation(
+        Summary = "Deletes a show",
+        Description = "Deletes a specific show by its ID."
+    )]
     [SwaggerResponse(200, "Returns the deleted object", typeof(Show))]
     [SwaggerResponse(404, "If the show is not found", typeof(string))]
     public async Task<ActionResult<Show>> DeleteShow(long id)

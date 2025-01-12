@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using AutoMapper;
 using LocalVenue;
 using LocalVenue.Core;
@@ -12,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
 using Shared.WebComponents;
-using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +20,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(Directory.GetCurrentDirectory());
 if (builder.Environment.IsDevelopment())
 {
-    builder.Configuration.AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true);
+    builder.Configuration.AddJsonFile(
+        "appsettings.Development.json",
+        optional: false,
+        reloadOnChange: true
+    );
 }
 else
 {
@@ -29,13 +33,18 @@ else
 builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
-builder.Services.AddControllers()
+builder
+    .Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = System
+            .Text
+            .Json
+            .Serialization
+            .ReferenceHandler
+            .Preserve;
     });
 builder.Services.AddAutoMapper(typeof(Program)); //AutoMapper configuration
 builder.Services.AddEndpointsApiExplorer();
@@ -46,7 +55,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // Database context setup starts
-var connectionString = builder.Configuration.GetConnectionString("VenueContext") ?? throw new ArgumentNullException("VenueContext");
+var connectionString =
+    builder.Configuration.GetConnectionString("VenueContext")
+    ?? throw new ArgumentNullException("VenueContext");
 
 builder.Services.AddDbContextFactory<VenueContext>(options =>
 {
@@ -57,6 +68,7 @@ builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IShowService, ShowService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+
 // Database context setup ends
 
 // TMDB HTTP requests setup start
@@ -66,33 +78,49 @@ static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 {
     return HttpPolicyExtensions
         .HandleTransientHttpError()
-        .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
-            retryAttempt)));
+        .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 }
 
-builder.Services.AddHttpClient("TmdbClient", client =>
-    {
-        client.BaseAddress = new Uri(builder.Configuration.GetSection("TMDB").GetSection("Url").Value ?? throw new ArgumentNullException("TMDB.Url"));
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", builder.Configuration.GetSection("TMDB").GetSection("Token").Value ?? throw new ArgumentNullException("TMDB.Token"));
-    })
+builder
+    .Services.AddHttpClient(
+        "TmdbClient",
+        client =>
+        {
+            client.BaseAddress = new Uri(
+                builder.Configuration.GetSection("TMDB").GetSection("Url").Value
+                    ?? throw new ArgumentNullException("TMDB.Url")
+            );
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                builder.Configuration.GetSection("TMDB").GetSection("Token").Value
+                    ?? throw new ArgumentNullException("TMDB.Token")
+            );
+        }
+    )
     .AddPolicyHandler(GetRetryPolicy());
+
 // TMDB HTTP requests setup ends
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-    {
-        options.LoginPath = "/login";
-        options.LogoutPath = "/logout";
-        options.AccessDeniedPath = "/404";
-        options.Cookie.Name = "CookieAuth";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.MaxAge = TimeSpan.FromDays(1);
-        options.Cookie.IsEssential = true;
-    });
+builder
+    .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        options =>
+        {
+            options.LoginPath = "/login";
+            options.LogoutPath = "/logout";
+            options.AccessDeniedPath = "/404";
+            options.Cookie.Name = "CookieAuth";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Strict;
+            options.Cookie.MaxAge = TimeSpan.FromDays(1);
+            options.Cookie.IsEssential = true;
+        }
+    );
 
-builder.Services.AddIdentity<Customer, IdentityRole>(options =>
+builder
+    .Services.AddIdentity<Customer, IdentityRole>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
         options.SignIn.RequireConfirmedPhoneNumber = false;
@@ -141,7 +169,8 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Microsoft.Data.SqlClient.SqlException)
         {
-            if (i == retryCount - 1) throw;
+            if (i == retryCount - 1)
+                throw;
             Thread.Sleep(delay);
         }
     }
@@ -162,8 +191,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<BlazorCookieLoginMiddleware>();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 app.MapControllers();
 

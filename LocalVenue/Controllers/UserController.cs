@@ -7,7 +7,10 @@ namespace LocalVenue.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(SignInManager<Customer> signInManager, UserManager<Customer> userManager) : ControllerBase
+public class UserController(
+    SignInManager<Customer> signInManager,
+    UserManager<Customer> userManager
+) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult> Login(LoginRequest request)
@@ -18,11 +21,18 @@ public class UserController(SignInManager<Customer> signInManager, UserManager<C
             return BadRequest("Invalid login attempt.");
         }
 
-        var result = await signInManager.PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: false);
+        var result = await signInManager.PasswordSignInAsync(
+            user,
+            request.Password,
+            isPersistent: false,
+            lockoutOnFailure: false
+        );
         if (result.Succeeded)
         {
             // Get the authentication cookie
-            var authCookie = HttpContext.Response.Headers["Set-Cookie"].FirstOrDefault(header => header.StartsWith(".AspNetCore.Identity.Application"));
+            var authCookie = HttpContext
+                .Response.Headers["Set-Cookie"]
+                .FirstOrDefault(header => header.StartsWith(".AspNetCore.Identity.Application"));
 
             if (authCookie != null)
             {
