@@ -2,7 +2,6 @@
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Enums;
-using LocalVenue.Core.Services;
 using LocalVenue.Helpers;
 using LocalVenue.Services;
 using LocalVenue.Tests.Helpers;
