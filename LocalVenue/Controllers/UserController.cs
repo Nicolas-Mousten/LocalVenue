@@ -21,7 +21,14 @@ public class UserController(SignInManager<Customer> signInManager, UserManager<C
         var result = await signInManager.PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: false);
         if (result.Succeeded)
         {
-            return Ok("Login successful.");
+            // Get the authentication cookie
+            var authCookie = HttpContext.Response.Headers["Set-Cookie"].FirstOrDefault(header => header.StartsWith(".AspNetCore.Identity.Application"));
+
+            if (authCookie != null)
+            {
+                var cookieValue = authCookie.Split(';').FirstOrDefault();
+                return Ok(new { CookieValue = cookieValue });
+            }
         }
 
         if (result.IsLockedOut)

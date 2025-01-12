@@ -36,8 +36,16 @@
             <Column Title="Genre" TextAlign="TextAlign.Center" Value="@nameof(Show.Genre)"></Column>
             <Column Title="Rediger" WidthPercent="5" TextAlign="TextAlign.Right" Value="@string.Empty">
                 <CustomDisplay Context="item">
-                    <button class="btn btn-success" @onclick="() => EditShow(item)"><i
-                            class="bi bi-pencil-square"></i></button>
+                    <button class="btn btn-success" @onclick="() => EditShow(item)">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
+                </CustomDisplay>
+            </Column>
+            <Column Title="Slet" WidthPercent="5" TextAlign="TextAlign.Right" Value="@string.Empty">
+                <CustomDisplay Context="item">
+                    <button class="btn btn-danger" @onclick="() => DeleteShowModal(item)">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </CustomDisplay>
             </Column>
         </Grid>
@@ -103,20 +111,57 @@
     </FooterContent>
 </Modal>
 
+<Modal @ref="RefundShowModal" Title="Refusionsoversigt for annulleret forestilling" Id="refund-show-modal">
+    <Body>
+    @if (RefundList is not null)
+    {
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Antal biletter</th>
+                <th>Kunde Navn</th>
+                <th>Kunde Email</th>
+                <th>Total refusion</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var refundList in RefundList)
+            {
+                <tr>
+                    <td>@refundList.TicketCount</td>
+                    <td>@refundList.CustomerName</td>
+                    <td>@refundList.CustomerEmail</td>
+                    <td>@refundList.TotalAmount.ToString("C2")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    </Body>
+    <FooterContent>
+        <div class="d-flex flex-grow-1 justify-content-between">
+            <button class="btn btn-secondary" @onclick="() => RefundShowModal?.Close()">Annuler</button>
+            <button class="btn btn-danger" @onclick="() => DeleteShow(ShowToDelete)">Slet Show</button>
+        </div>
+    </FooterContent>
+</Modal>
 
 @code {
     public List<Show>? AllShows { get; set; }
     private Show Show { get; set; } = new();
+    private Show? ShowToDelete { get; set; }
+    private List<RefundList>? RefundList { get; set; }
 
     private bool CreatingNewShow { get; set; }
 
     private Modal? Modal { get; set; }
+    private Modal? RefundShowModal { get; set; }
     private EditForm? EditForm { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var shows = await ShowService.GetAllShows();
-        AllShows = shows.Select(Mapper.Map<Web.Models.Show>).ToList();
+        AllShows = shows.Select(Mapper.Map<Show>).ToList();
     }
 
     private void EditShow(Show show)
@@ -162,6 +207,36 @@
         }
     }
 
+    private async Task DeleteShowModal(Show show)
+    {
+        RefundList = await ShowService.GetRefundListAsync(show.Id);
+        ShowToDelete = show;
+        RefundShowModal?.Open();
+    }
+
+    private async Task DeleteShow(Show? show)
+    {
+        if (show is null)
+        {
+            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke slette show, prøv igen", Js);
+            return; 
+        }
+        
+        var deleteShow = await ShowService.DeleteShow(show.Id);
+        var shows = await ShowService.GetAllShows();
+        AllShows = shows.Select(Mapper.Map<Show>).ToList();
+        RefundShowModal?.Close();
+
+        if (deleteShow is not null)
+        {
+            Toast.SimpleToast(ToastType.Success, "Show slettet", Js);
+        }
+        else
+        {
+            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke slette show, prøv igen", Js);
+        }
+    }
+    
     private async Task UpdateShow()
     {
         if (EditForm?.EditContext?.Validate() == false)
