@@ -1,44 +1,159 @@
 ﻿@using LocalVenue.Core.Enums
+@using LocalVenue.Services
+@using LocalVenue.Services.Interfaces
 @using LocalVenue.Shared.Enums
 @using LocalVenue.Web.Models
 @using LocalVenue.Web.Components.JoltyUI
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITicketService TicketService
+@inject IShowService ShowService
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @code {
     [Parameter] public List<Ticket>? Tickets { get; set; }
+    [Parameter] public string ShowId { get; set; }
+    [Parameter] public EventCallback RefreshParent { get; set; }
+    private ClaimsPrincipal? _currentUser;
+    private string? _userId;
+
+    private List<Ticket> _tickets = new List<Ticket>();
+    private List<Ticket> ticketsToReturn = new List<Ticket>();
+    private string ticketServiceMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _currentUser = authState.User;
+
+        if (_currentUser.Identity?.IsAuthenticated ?? false)
+        {
+            _userId = _currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        }
+    }
+
+    private string GetSeatColor(LocalVenue.Web.Models.Ticket seat)
+    {
+        if (_tickets.Any(t => t.SeatId == seat.SeatId)) 
+        {
+            return "yellow"; 
+        }
+        else if (ticketsToReturn.Any(t => t.SeatId == seat.SeatId)) 
+        {
+            return "yellow"; 
+        }
+
+        return seat.Status switch
+        {
+            Status.Available => "lightgreen",
+            Status.Sold => "red",
+            Status.Reserved => "yellow",
+            _ => "gray"
+        };
+    }
+
+    private void AddSeatToTickets(Ticket seat)
+    {
+        if (!_tickets.Any(t => t.SeatId == seat.SeatId))
+        {
+            _tickets.Add(seat);
+        }
+
+        StateHasChanged();
+    }
+
+    private void RemoveSeatFromReturnTickets(Ticket seat)
+    {
+        
+
+        if (!ticketsToReturn.Any(t => t.SeatId == seat.SeatId))
+        {
+            ticketsToReturn.Add(seat);
+        }
+
+        StateHasChanged(); 
+    }
+
+    private async Task BuyTickets()
+    {
+        if (!long.TryParse(ShowId, out var validatedShowId))
+        {
+            ticketServiceMessage = "Ikke et gyldigt show Id";
+        }
+        await TicketService.JoinShow(validatedShowId, _tickets, _userId);
+        _tickets.Clear();
+        await RefreshParent.InvokeAsync();
+        StateHasChanged();
+    }
+
+    private async Task ReturnTicket()
+    {
+        if (!long.TryParse(ShowId, out var validatedShowId))
+        {
+            ticketServiceMessage = "Ikke et gyldigt show Id";
+        }
+        ticketServiceMessage = await TicketService.LeaveShow(validatedShowId, ticketsToReturn, _userId);
+        ticketsToReturn.Clear();
+        await RefreshParent.InvokeAsync();
+        StateHasChanged();
+    }
 }
 
 @if (Tickets is null)
 {
     return;
 }
+<p>ShowId: @ShowId</p>
 <div class="seat-display">
     @foreach (var row in Tickets.GroupBy(s => s.Seat.Row).OrderBy(g => g.Key))
     {
         <div class="seat-row">
             @foreach (var seat in row.OrderBy(s => s.Seat.Number))
             {
-                <div class="seat pointer" data-ui-toggle="@seat.PopOverId" style="background-color: @(GetSeatColor(seat.Status))"></div>
-                <PopOver ShowCloseX="false" Title="@string.Empty" Direction="Direction.Top" Size="PopOverSize.Small"  Id="@seat.PopOverId">
+                <div class="seat pointer" data-ui-toggle="@seat.PopOverId" 
+                     style="background-color: @(GetSeatColor(seat))"></div>
+                <PopOver ShowCloseX="false" Title="@string.Empty" Direction="Direction.Top" Size="PopOverSize.Small" Id="@seat.PopOverId">
                     <Body>
-                    <div class="p4">
-                        @if (seat.Status == Status.Available)
-                        {
-                            <p class="mb-2">Seat: @seat.Seat.Row - Row: @seat.Seat.Number</p>
-                            <p>Pris: @seat.Price.ToString("C2")</p>
-                        } else if (seat.Status == Status.Reserved)
-                        {
-                            
-                        }
+                        <div class="p4">
+                            @if (seat.Status == Status.Available)
+                            {
+                                <p class="mb-2">Seat: @seat.Seat.Row - Row: @seat.Seat.Number</p>
+                                <p>Price: @seat.Price.ToString("C2")</p>
+                                <button class="btn btn-primary" @onclick="() => AddSeatToTickets(seat)">Add to My Tickets</button>
+                            }
+                            else if (seat.Status == Status.Reserved)
+                            {
+                                <p>This seat is reserved.</p>
+                            }
+                            else if (seat.Status == Status.Sold)
+                            {
+                                @if (seat.SoldToCustomerId == _userId)
+                                {
+                                    <p>This is your seat</p>
+                                    <button @onclick="() => RemoveSeatFromReturnTickets(seat)">Return Ticket</button>
+                                }
+                            }
                         </div>
                     </Body>
-                    <FooterContent/>
+                    <FooterContent />
                 </PopOver>
-                
             }
         </div>
     }
+    @if (_tickets.Count != 0)
+    {
+        <p>Tickets: @_tickets.Count, Total Price: @(_tickets.Sum(t => t.Price).ToString("C2"))</p>
+        <button @onclick="BuyTickets">Buy Tickets</button>
+    }
+
+    @if (ticketsToReturn.Count != 0)
+    {
+        <p>Tickets to Return: @ticketsToReturn.Count</p>
+        <button @onclick="ReturnTicket">Return Tickets</button>
+    }
+    <p>@ticketServiceMessage</p>
 </div>
-
-
 
 <style>
     .seat-display {
@@ -59,17 +174,7 @@
         justify-content: center;
         margin-right: 5px;
     }
-</style>
-
-@code {
-    private string GetSeatColor(Status status)
-    {
-        return status switch
-        {
-            Status.Available => "lightgreen",
-            Status.Sold => "red",
-            Status.Reserved => "yellow",
-            _ => "gray"
-        };
+    .pointer {
+        cursor: pointer;
     }
-}
+</style>
