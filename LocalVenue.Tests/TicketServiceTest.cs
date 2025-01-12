@@ -109,7 +109,7 @@ public class TicketServiceTest
         
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService);
+        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
         
@@ -201,7 +201,7 @@ public class TicketServiceTest
         var seatService = new SeatService(contextFactoryRetrieve);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService);
+        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
 
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
@@ -295,7 +295,7 @@ public class TicketServiceTest
         var seatService = new SeatService(contextFactoryRetrieve);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService);
+        var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
 
 
         var fetchShow = await showService.GetShowWithTicketsAsync(2);
