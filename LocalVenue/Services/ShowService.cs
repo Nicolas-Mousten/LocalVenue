@@ -1,7 +1,6 @@
 using AutoMapper;
 using LocalVenue.Core;
 using LocalVenue.Core.Models;
-using LocalVenue.Core.Services;
 using LocalVenue.Services.Interfaces;
 using LocalVenue.Web.Models;
 using Microsoft.EntityFrameworkCore;

@@ -2,9 +2,10 @@
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Enums;
+using LocalVenue.Core.Services;
 using LocalVenue.Helpers;
 using LocalVenue.Services;
-using Microsoft.AspNetCore.Builder;
+using LocalVenue.Tests.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +58,11 @@ public class ShowServiceTest
         });
         var mapper = config.CreateMapper();
         
-        var service = new ShowService(contextFactoryRetrieve, mapper);
+        var ticketService = new TicketService(contextFactoryRetrieve, mapper);
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+        
+        var service = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
 
         var show = new Show
         {

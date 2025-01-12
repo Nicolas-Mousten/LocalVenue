@@ -36,13 +36,16 @@
             <Column Title="Genre" TextAlign="TextAlign.Center" Value="@nameof(Show.Genre)"></Column>
             <Column Title="Rediger" WidthPercent="5" TextAlign="TextAlign.Right" Value="@string.Empty">
                 <CustomDisplay Context="item">
-                    <button class="btn btn-success" @onclick="() => EditShow(item)"><i
-                                                                                        class="bi bi-pencil-square"></i></button>
+                    <button class="btn btn-success" @onclick="() => EditShow(item)">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
                 </CustomDisplay>
             </Column>
             <Column Title="Slet" WidthPercent="5" TextAlign="TextAlign.Right" Value="@string.Empty">
                 <CustomDisplay Context="item">
-                    <button class="btn btn-danger" @onclick="() => DeleteShowModal(item)"></button>
+                    <button class="btn btn-danger" @onclick="() => DeleteShowModal(item)">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </CustomDisplay>
             </Column>
         </Grid>
