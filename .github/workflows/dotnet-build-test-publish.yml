@@ -19,8 +19,8 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Install tool
-        run: dotnet tool install --global dotnet-coverage
+      # - name: Install tool
+      #   run: dotnet tool install --global dotnet-coverage
 
       - name: Restore dependencies
         run: dotnet restore
@@ -31,8 +31,8 @@ jobs:
       - name: Test
         run: dotnet test --no-build --logger "trx;LogFileName=TestResults.xml"
 
-      - name: Coverage
-        run: dotnet-coverage collect "dotnet test" -f xml -o "TestResults/coverage.xml"
+      # - name: Coverage
+      #   run: dotnet-coverage collect "dotnet test" -f xml -o "TestResults/coverage.xml"
 
       - name: Publish Test Results
         if: always()
@@ -64,13 +64,13 @@ jobs:
           java-version: 17
           distribution: "zulu" # Alternative distribution options are available.
 
-      - name: Download reports from last job
-        uses: actions/download-artifact@v4
-        with:
-          name: TestResults
+      # - name: Download reports from last job
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: TestResults
 
-      - name: List TestResults directory
-        run: ls -R TestResults
+      # - name: List TestResults directory
+      #   run: ls -R TestResults
 
       - uses: actions/checkout@v4
         with:
@@ -98,11 +98,15 @@ jobs:
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
 
+      - name: Install dotnet-coverage tool
+        run: dotnet tool install --global dotnet-coverage
+
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths="**\coverage.xml" /d:sonar.cs.vstest.reportsPaths="**\TestResults.xml"
-          dotnet build
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"KEA-Gruppe6_LocalVenue" /o:"kea-gruppe6" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.vscoveragexml.reportsPaths="**/coverage.xml" /d:sonar.cs.vstest.reportsPaths="**/TestResults.xml"
+          dotnet build --no-incremental
+          dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
