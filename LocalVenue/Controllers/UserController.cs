@@ -31,7 +31,7 @@ public class UserController : ControllerBase
         if (result.Succeeded)
         {
             // Get the authentication cookie
-            var authCookie = HttpContext.Response.Headers["Set-Cookie"].FirstOrDefault(header => header.StartsWith(".AspNetCore.Identity.Application"));
+            var authCookie = HttpContext.Response.Headers["Set-Cookie"].FirstOrDefault(header => header != null && header.StartsWith(".AspNetCore.Identity.Application"));
 
             if (authCookie != null)
             {
