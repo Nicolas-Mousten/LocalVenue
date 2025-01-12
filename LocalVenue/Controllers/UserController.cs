@@ -11,13 +11,11 @@ public class UserController : ControllerBase
 {
     private readonly SignInManager<Customer> _signInManager;
     private readonly UserManager<Customer> _userManager;
-    private readonly IConfiguration _configuration;
 
-    public UserController(SignInManager<Customer> signInManager, UserManager<Customer> userManager, IConfiguration configuration)
+    public UserController(SignInManager<Customer> signInManager, UserManager<Customer> userManager)
     {
         _signInManager = signInManager;
         _userManager = userManager;
-        _configuration = configuration;
     }
 
     [HttpPost("login")]
