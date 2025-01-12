@@ -218,7 +218,7 @@
 							"    }, \"Number should be a non-empty string or a non-negative integer\");\r",
 							"});\r",
 							"\r",
-							"pm.environment.set('CREATED_SEAT_ID', jsonData['seatId'])\r",
+							"pm.collectionVariables.set('CREATED_SEAT_ID', jsonData['seatId'])\r",
 							"\r",
 							"\r",
 							""
