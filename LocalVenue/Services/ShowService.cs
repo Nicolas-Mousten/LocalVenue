@@ -17,7 +17,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
 
     public async Task<PagedList<Show>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title")
     {
-        return await base.GetItems(page, pageSize, searchParameter, searchProperty ?? "Title", show => show.Tickets!); ;
+        return await base.GetItems(page, pageSize, searchParameter, searchProperty ?? "Title", show => show.Tickets!);
     }
 
     public async Task<Show> GetShow(long id)

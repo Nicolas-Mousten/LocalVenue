@@ -7,12 +7,13 @@ namespace LocalVenue.Tests;
 
 public class ShowPriceCalculatorTest
 {
+
     [Theory]
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:30:00", true)] // More than 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T19:30:00", false)] // Less than 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:00:00", false)] // Exactly 2 hours
     [InlineData("2023-10-01T18:00:00", "2023-10-01T18:00:00", false)] // Zero duration
-    [InlineData("2023-10-01T18:00:00", "2023-10-02T18:00:00", true)] // 24 hours    
+    [InlineData("2023-10-01T18:00:00", "2023-10-02T18:00:01", true)] // 1d 00h 00m 01s    
     [InlineData("2023-10-01T18:00:00", "2023-10-01T20:00:01", true)] // 2h 0m 1s
     [InlineData("2023-10-01T18:00:00", "2023-10-01T19:59:59", false)] // 1h 59m 59s
     [InlineData("2023-10-01T18:00:00", "2023-10-01T17:59:59", false)] // -1 second
@@ -75,6 +76,25 @@ public class ShowPriceCalculatorTest
 
         // Assert
         Assert.Equal(expectedPrice, result);
+    }
+
+    [Fact]
+    public void CalculatePrice_InvalidSeat_ThrowsArgumentException()
+    {
+        // Arrange
+        var show = new Show
+        {
+            StartTime = new DateTime(2023, 10, 01, 18, 00, 00),
+            EndTime = new DateTime(2023, 10, 01, 20, 30, 00),
+            OpeningNight = true
+        };
+        var ticket = new Ticket
+        {
+            Seat = null!
+        };
+
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => ShowPriceCalculator.CalculatePrice(show, ticket, true));
     }
 
     [Fact]
@@ -165,5 +185,4 @@ public class ShowPriceCalculatorTest
         Assert.NotNull(result);
         Assert.Empty(result[0].Tickets!);
     }
-
 }
