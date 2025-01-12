@@ -1,8 +1,9 @@
 ﻿@page "/Show/{ShowId}"
+@using LocalVenue.Core.Enums
 @using LocalVenue.Services.Interfaces
 @using LocalVenue.Web.Components.VenueComponents
 @inject IShowService ShowService
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @if (ErrorMessage is not null)
 {
@@ -12,14 +13,31 @@
 @if (ModelShow is not null)
 {
     <div class="show-info">
-        <h1>@ModelShow.Title</h1>
-        <p>@ModelShow.Description</p>
-        <p><strong>Start Time:</strong> @ModelShow.StartTime</p>
-        <p><strong>End Time:</strong> @ModelShow.EndTime</p>
-        <p><strong>Genre:</strong> @ModelShow.Genre</p>
-    </div>
+        <div>
+            <div>
+                <h1>@ModelShow.Title</h1>
+                <p>@ModelShow.Description</p>
+                <p><strong>Start Time:</strong> @ModelShow.StartTime</p>
+                <p><strong>End Time:</strong> @ModelShow.EndTime</p>
+                <p><strong>Genre:</strong> @ModelShow.Genre</p>
+            </div>
 
-    <SeatDisplay Tickets="ModelShow.Tickets" ShowId="@ShowId" RefreshParent="RefreshData" />
+            <SeatDisplay Tickets="ModelShow.Tickets" ShowId="@ShowId" RefreshParent="RefreshData" />
+        </div>
+        
+        <div class="d-flex flex-column">
+            <h3>Actors</h3>
+            <div class="row row-cols-xxl-6 row-cols-xl-5 row-cols-lg-4 row-cols-md-2 row-cols-sm-1 row row-gap-2 column-gap-2 mt-md-3">
+                @foreach (var Actor in ModelShow.Actors)
+                {
+                    <div class="col">
+                        <strong>Name:</strong> @Actor.Name
+                        <p class="mt-1"><strong>Gender:</strong> @Actor.Gender.ToNewString()</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 }
 
 
@@ -40,10 +58,12 @@
         }
 
         ModelShow = await ShowService.GetShowWithTicketsAsync(validatedShowId);
+
         if (ModelShow is null)
         {
             ErrorMessage = "Showet findes ikke";
         }
+
     }
     private async Task RefreshData()
     {
