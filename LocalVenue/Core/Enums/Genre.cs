@@ -13,7 +13,7 @@ public enum Genre
     Documentary = 5,
 }
 
-public static class Genre1
+public static class GenreExtensions
 {
     public static string ToNewString(this Genre Genre)
     {
