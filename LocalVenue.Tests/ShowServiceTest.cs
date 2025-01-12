@@ -29,6 +29,65 @@ public class ShowServiceTest
         serviceProvider = services.BuildServiceProvider();
     }
 
+    [Theory]
+    [InlineData("TestTitle", "Title")]
+    [InlineData("TestTitle", null)]
+    [InlineData("TestDescription", "Description")]
+    public async Task TestGetShowSearch(string searchParameter, string? searchProperty)
+    {
+        // Arrange
+        var contextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>(); // Assuming ShowProfile contains your mappings
+        });
+        var mapper = config.CreateMapper();
+
+        var ticketService = new TicketService(contextFactory, mapper);
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+
+        var service = new ShowService(contextFactory, mapper, actorService, ticketService);
+
+        var show = new Show
+        {
+            Id = 1,
+            Title = "TestTitle",
+            Description = "TestDescription",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Genre = Genre.Musical,
+            OpeningNight = false,
+        };
+
+        await service.CreateShowAsync(show);
+
+        // Act
+        var dataBaseShow = new Core.Entities.Show();
+        if (searchProperty == null)
+        {
+            dataBaseShow = await service.GetShow(searchParameter);
+        }
+        else
+        {
+            dataBaseShow = await service.GetShow(searchParameter, searchProperty!);
+        }
+
+        // Assert
+        Assert.NotNull(dataBaseShow);
+        Assert.Equal(show.Id, dataBaseShow.ShowId);
+        Assert.Equal(show.Title, dataBaseShow.Title);
+        Assert.Equal(show.Description, dataBaseShow.Description);
+        Assert.True(new TimeSpan(0, 0, 10) > dataBaseShow.StartTime - show.StartTime);
+        // Assert.Equal(show.StartTime, dataBaseShow.StartTime);
+        // Assert.Equal(show.EndTime, dataBaseShow.EndTime);
+        Assert.Equal(show.Genre, dataBaseShow.Genre);
+        Assert.Equal(show.OpeningNight, dataBaseShow.OpeningNight);
+
+        await serviceProvider.DisposeAsync();
+    }
+
     [Fact]
     public async Task TestShowServiceCreateShowWithTickets()
     {
