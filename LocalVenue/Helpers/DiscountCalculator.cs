@@ -10,11 +10,8 @@ namespace LocalVenue.Helpers
         )
         {
             {
-                foreach (
-                    var ticket in tickets
-                        .OrderByDescending(x => x.Price)
-                        .Take(ticketsAlreadyPurchased)
-                )
+                var ticketsToBuy = Math.Clamp(4 - ticketsAlreadyPurchased, 0, 4);
+                foreach (var ticket in tickets.OrderBy(x => x.Price).Take(ticketsToBuy))
                 {
                     ticket.Price *= 0.8m;
                 }
