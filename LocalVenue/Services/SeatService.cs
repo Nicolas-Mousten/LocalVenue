@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LocalVenue.Core.Services;
 
-public class SeatService(IDbContextFactory<VenueContext> contextFactory) : GenericCRUDService<Seat>(contextFactory), ISeatService
+public class SeatService(IDbContextFactory<VenueContext> contextFactory)
+    : GenericCRUDService<Seat>(contextFactory),
+        ISeatService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
-
 
     public async Task<List<Seat>> GetSeatsInRow(int row)
     {

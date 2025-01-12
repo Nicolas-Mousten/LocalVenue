@@ -17,7 +17,7 @@ public class Show
     public string? Description { get; set; }
 
     [NotMapped]
-    public ICollection<Actor> Actors { get; set; }
+    public ICollection<Actor>? Actors { get; set; }
 
     public DateTime StartTime { get; set; }
 
@@ -27,5 +27,4 @@ public class Show
     public bool OpeningNight { get; set; }
 
     public ICollection<Ticket>? Tickets { get; set; }
-
 }

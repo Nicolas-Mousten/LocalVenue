@@ -13,14 +13,14 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @code {
     [Parameter] public List<Ticket>? Tickets { get; set; }
-    [Parameter] public string ShowId { get; set; }
+    [Parameter] public required string ShowId { get; set; }
     [Parameter] public EventCallback RefreshParent { get; set; }
     private ClaimsPrincipal? _currentUser;
     private string? _userId;
 
     private List<Ticket> _tickets = new List<Ticket>();
     private List<Ticket> ticketsToReturn = new List<Ticket>();
-    private string ticketServiceMessage { get; set; }
+    private string? ticketServiceMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,13 +35,13 @@
 
     private string GetSeatColor(LocalVenue.Web.Models.Ticket seat)
     {
-        if (_tickets.Any(t => t.SeatId == seat.SeatId)) 
+        if (_tickets.Any(t => t.SeatId == seat.SeatId))
         {
-            return "yellow"; 
+            return "yellow";
         }
-        else if (ticketsToReturn.Any(t => t.SeatId == seat.SeatId)) 
+        else if (ticketsToReturn.Any(t => t.SeatId == seat.SeatId))
         {
-            return "yellow"; 
+            return "yellow";
         }
 
         return seat.Status switch
@@ -65,14 +65,14 @@
 
     private void RemoveSeatFromReturnTickets(Ticket seat)
     {
-        
+
 
         if (!ticketsToReturn.Any(t => t.SeatId == seat.SeatId))
         {
             ticketsToReturn.Add(seat);
         }
 
-        StateHasChanged(); 
+        StateHasChanged();
     }
 
     private async Task BuyTickets()
@@ -80,6 +80,11 @@
         if (!long.TryParse(ShowId, out var validatedShowId))
         {
             ticketServiceMessage = "Ikke et gyldigt show Id";
+        }
+        if (_userId == null)
+        {
+            ticketServiceMessage = "Du skal være logget ind for at købe billetter";
+            return;
         }
         await TicketService.JoinShow(validatedShowId, _tickets, _userId);
         _tickets.Clear();
@@ -92,6 +97,11 @@
         if (!long.TryParse(ShowId, out var validatedShowId))
         {
             ticketServiceMessage = "Ikke et gyldigt show Id";
+        }
+        if (_userId == null)
+        {
+            ticketServiceMessage = "Du skal være logget ind for at returnere billetter";
+            return;
         }
         ticketServiceMessage = await TicketService.LeaveShow(validatedShowId, ticketsToReturn, _userId);
         ticketsToReturn.Clear();
@@ -111,9 +121,11 @@
         <div class="seat-row">
             @foreach (var seat in row.OrderBy(s => s.Seat.Number))
             {
-                <div class="seat pointer" data-ui-toggle="@seat.PopOverId" 
-                     style="background-color: @(GetSeatColor(seat))"></div>
-                <PopOver ShowCloseX="false" Title="@string.Empty" Direction="Direction.Top" Size="PopOverSize.Small" Id="@seat.PopOverId">
+                <div class="seat pointer" data-ui-toggle="@seat.PopOverId" style="background-color: @(GetSeatColor(seat))">
+                </div>
+                <PopOver ShowCloseX="false" Title="@string.Empty" Direction="Direction.Top" Size="PopOverSize.Small"
+                    Id="@seat.PopOverId">
+
                     <Body>
                         <div class="p4">
                             @if (seat.Status == Status.Available)
@@ -161,10 +173,12 @@
         flex-direction: column;
         align-items: center;
     }
+
     .seat-row {
         display: flex;
         margin-bottom: 10px;
     }
+
     .seat {
         width: 30px;
         height: 30px;
@@ -174,6 +188,7 @@
         justify-content: center;
         margin-right: 5px;
     }
+
     .pointer {
         cursor: pointer;
     }

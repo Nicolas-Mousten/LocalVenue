@@ -5,8 +5,12 @@ namespace LocalVenue.Helpers;
 
 public class Toast
 {
-
-    public static async void SimpleToast(ToastType toastType, string message, IJSRuntime jsRuntime, int timeInSeconds = 3)
+    public static async void SimpleToast(
+        ToastType toastType,
+        string message,
+        IJSRuntime jsRuntime,
+        int timeInSeconds = 3
+    )
     {
         timeInSeconds *= 1000;
 
@@ -31,5 +35,4 @@ public class Toast
                 throw new ArgumentOutOfRangeException(nameof(toastType), toastType, null);
         }
     }
-
 }

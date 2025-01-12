@@ -1,5 +1,5 @@
-﻿using Microsoft.OpenApi.Attributes;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using Microsoft.OpenApi.Attributes;
 
 namespace LocalVenue.Core.Enums;
 
@@ -25,9 +25,7 @@ public static class GenreExtensions
             Genre.Horror => "Gyser",
             Genre.Romance => "Romantik",
             Genre.Documentary => "Dokumentar",
-            _ => throw new ArgumentOutOfRangeException(nameof(Genre), Genre, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(Genre), Genre, null),
         };
     }
-
-
 }

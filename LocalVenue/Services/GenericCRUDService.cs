@@ -1,12 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 using LocalVenue.Core;
 using LocalVenue.Core.Models;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 
 namespace LocalVenue.Services;
 
-public class GenericCRUDService<T> where T : class
+public class GenericCRUDService<T>
+    where T : class
 {
     private readonly IDbContextFactory<VenueContext> contextFactory;
 
@@ -40,23 +41,31 @@ public class GenericCRUDService<T> where T : class
         return $"{char.ToUpper(input[0])}{input[1..]}";
     }
 
-    public async Task<PagedList<T>> GetItems(int page, int pageSize, string? searchParameter, string searchProperty, params Expression<Func<T, object>>[]? includes)
+    public async Task<PagedList<T>> GetItems(
+        int page,
+        int pageSize,
+        string? searchParameter,
+        string searchProperty,
+        params Expression<Func<T, object>>[]? includes
+    )
     {
         searchProperty = FirstCharToUpper(searchProperty);
         IQueryable<T> query = IncludeProperties(includes!);
 
-        var property = typeof(T).GetProperty(searchProperty)
-                            ?? throw new ArgumentNullException($"Property '{searchProperty}' does not exist on type '{typeof(T).Name}'");
+        var property =
+            typeof(T).GetProperty(searchProperty)
+            ?? throw new ArgumentNullException(
+                $"Property '{searchProperty}' does not exist on type '{typeof(T).Name}'"
+            );
 
         if (!string.IsNullOrEmpty(searchParameter))
         {
-            query = query.Where(a => EF.Property<string>(a, searchProperty).Contains(searchParameter));
+            query = query.Where(a =>
+                EF.Property<string>(a, searchProperty).Contains(searchParameter)
+            );
         }
 
-        var items = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
         var nextPage = items.Count == pageSize ? (int?)page + 1 : null;
 
@@ -64,7 +73,7 @@ public class GenericCRUDService<T> where T : class
         {
             Count = items.Count,
             Results = items,
-            Next = nextPage
+            Next = nextPage,
         };
     }
 
@@ -72,13 +81,18 @@ public class GenericCRUDService<T> where T : class
     {
         IQueryable<T> query = IncludeProperties(includes!);
 
-        var keyProperty = typeof(T).GetProperties()
-                                   .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), false).Any())
-                                   ?? typeof(T).GetProperties()
-                                               .FirstOrDefault(p => p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
-                                   ?? throw new ArgumentNullException($"No key property found on type '{typeof(T).Name}'");
+        var keyProperty =
+            typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), false).Any())
+            ?? typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentNullException($"No key property found on type '{typeof(T).Name}'");
 
-        var item = await query.SingleOrDefaultAsync(e => EF.Property<long>(e, keyProperty.Name) == id);
+        var item = await query.SingleOrDefaultAsync(e =>
+            EF.Property<long>(e, keyProperty.Name) == id
+        );
 
         if (item == null)
         {
@@ -88,16 +102,25 @@ public class GenericCRUDService<T> where T : class
         return item;
     }
 
-    public async Task<T> GetItem(string searchParameter, string searchProperty, params Expression<Func<T, object>>[]? includes)
+    public async Task<T> GetItem(
+        string searchParameter,
+        string searchProperty,
+        params Expression<Func<T, object>>[]? includes
+    )
     {
         searchProperty = FirstCharToUpper(searchProperty);
         IQueryable<T> query = IncludeProperties(includes!);
 
-        var property = typeof(T).GetProperty(searchProperty)
-                            ?? throw new ArgumentNullException($"Property '{searchProperty}' does not exist on type '{typeof(T).Name}'");
+        var property =
+            typeof(T).GetProperty(searchProperty)
+            ?? throw new ArgumentNullException(
+                $"Property '{searchProperty}' does not exist on type '{typeof(T).Name}'"
+            );
 
         var items = await query.ToListAsync();
-        var item = items.FirstOrDefault(a => property.GetValue(a)?.ToString()?.ToLower().Contains(searchParameter.ToLower()) == true);
+        var item = items.FirstOrDefault(a =>
+            property.GetValue(a)?.ToString()?.ToLower().Contains(searchParameter.ToLower()) == true
+        );
         return item != null ? item : throw new ArgumentNullException(nameof(item));
     }
 
@@ -119,11 +142,14 @@ public class GenericCRUDService<T> where T : class
 
         IQueryable<T> query = IncludeProperties(includes!);
 
-        var keyProperty = typeof(T).GetProperties()
-                                   .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), false).Any())
-                                   ?? typeof(T).GetProperties()
-                                               .FirstOrDefault(p => p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
-                                   ?? throw new ArgumentNullException($"No key property found on type '{typeof(T).Name}'");
+        var keyProperty =
+            typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), false).Any())
+            ?? typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentNullException($"No key property found on type '{typeof(T).Name}'");
 
         var keyValue = keyProperty.GetValue(item);
         var dbItem = await GetItem((long)keyValue!, includes);

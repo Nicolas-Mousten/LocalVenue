@@ -15,11 +15,17 @@ public class MappingProfile : Profile
 
         CreateMap<Core.Entities.Show, Web.Models.Show>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ShowId))
-            .ForMember(dest => dest.Tickets, opt => opt.MapFrom(src => src.Tickets != null ? src.Tickets.ToList() : null));
+            .ForMember(
+                dest => dest.Tickets,
+                opt => opt.MapFrom(src => src.Tickets != null ? src.Tickets.ToList() : null)
+            );
 
         CreateMap<Web.Models.Show, Core.Entities.Show>()
             .ForMember(dest => dest.ShowId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.Tickets, opt => opt.MapFrom(src => src.Tickets != null ? src.Tickets.ToList() : null));
+            .ForMember(
+                dest => dest.Tickets,
+                opt => opt.MapFrom(src => src.Tickets != null ? src.Tickets.ToList() : null)
+            );
 
         CreateMap<Core.Entities.Ticket, Web.Models.Ticket>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.TicketId))

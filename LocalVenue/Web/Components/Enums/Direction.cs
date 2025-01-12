@@ -5,8 +5,7 @@ public enum Direction
     Top = 0,
     Bottom = 1,
     Left = 2,
-    Right = 3
-
+    Right = 3,
 }
 
 public static class DirectionExtensions
@@ -19,7 +18,7 @@ public static class DirectionExtensions
             Direction.Bottom => "bottom",
             Direction.Left => "left",
             Direction.Right => "right",
-            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null),
         };
     }
 }

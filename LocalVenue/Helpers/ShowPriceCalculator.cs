@@ -55,7 +55,12 @@ public static class ShowPriceCalculator
         return BasePrice + additionalPrice;
     }
 
-    public static decimal CalculatePrice(Core.Entities.Show show, Core.Entities.Ticket ticket, bool openingNight, IMapper mapper)
+    public static decimal CalculatePrice(
+        Core.Entities.Show show,
+        Core.Entities.Ticket ticket,
+        bool openingNight,
+        IMapper mapper
+    )
     {
         var webShow = mapper.Map<Show>(show);
         var webTicket = mapper.Map<Ticket>(ticket);

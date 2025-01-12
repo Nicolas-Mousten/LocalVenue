@@ -16,9 +16,9 @@ public class MappingProfileTest
     public MappingProfileTest()
     {
         var config = new MapperConfiguration(cfg =>
-                {
-                    cfg.AddProfile<MappingProfile>();
-                });
+        {
+            cfg.AddProfile<MappingProfile>();
+        });
         mapper = config.CreateMapper();
     }
 
@@ -26,7 +26,15 @@ public class MappingProfileTest
     public void TicketRequestToCoreTicket()
     {
         // Arrange
-        var ticketRequest = new RequestModels.TicketRequest { TicketId = 1, ShowId = 1, SeatId = 1, Price = 50.5M, Status = Core.Enums.Status.Available, CustomerId = "1" };
+        var ticketRequest = new RequestModels.TicketRequest
+        {
+            TicketId = 1,
+            ShowId = 1,
+            SeatId = 1,
+            Price = 50.5M,
+            Status = Core.Enums.Status.Available,
+            CustomerId = "1",
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Ticket>(ticketRequest);
@@ -44,8 +52,14 @@ public class MappingProfileTest
     [Fact]
     public void TicketRequestToCoreTicketNullProperties()
     {
-        // Arrange        
-        var ticketRequest = new RequestModels.TicketRequest { ShowId = 1, SeatId = 1, Price = 50.5M, Status = Core.Enums.Status.Available };
+        // Arrange
+        var ticketRequest = new RequestModels.TicketRequest
+        {
+            ShowId = 1,
+            SeatId = 1,
+            Price = 50.5M,
+            Status = Core.Enums.Status.Available,
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Ticket>(ticketRequest);
@@ -64,7 +78,15 @@ public class MappingProfileTest
     public void ShowRequestToCoreShow()
     {
         // Arrange
-        var showRequest = new RequestModels.ShowRequest { ShowId = 1, Title = "Show 1", Description = "Lorem ipsum", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy };
+        var showRequest = new RequestModels.ShowRequest
+        {
+            ShowId = 1,
+            Title = "Show 1",
+            Description = "Lorem ipsum",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddDays(1),
+            Genre = Core.Enums.Genre.Comedy,
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Show>(showRequest);
@@ -83,7 +105,13 @@ public class MappingProfileTest
     public void ShowRequestToCoreShowNullProperties()
     {
         // Arrange
-        var showRequest = new RequestModels.ShowRequest { Title = "Show 1", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy };
+        var showRequest = new RequestModels.ShowRequest
+        {
+            Title = "Show 1",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddDays(1),
+            Genre = Core.Enums.Genre.Comedy,
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Show>(showRequest);
@@ -101,9 +129,27 @@ public class MappingProfileTest
     [Fact]
     public void TestCoreShowToWebShowWithTicket()
     {
-        // Arrange        
-        var ticketCore = new Core.Entities.Ticket { TicketId = 1, ShowId = 1, SeatId = 1, Price = 50.5M, Status = Core.Enums.Status.Available, CustomerId = "1" };
-        var showCore = new Core.Entities.Show { ShowId = 1, Title = "Show 1", Description = "Lorem ipsum", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy, OpeningNight = true, Tickets = new List<Core.Entities.Ticket> { ticketCore } };
+        // Arrange
+        var ticketCore = new Core.Entities.Ticket
+        {
+            TicketId = 1,
+            ShowId = 1,
+            SeatId = 1,
+            Price = 50.5M,
+            Status = Core.Enums.Status.Available,
+            CustomerId = "1",
+        };
+        var showCore = new Core.Entities.Show
+        {
+            ShowId = 1,
+            Title = "Show 1",
+            Description = "Lorem ipsum",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddDays(1),
+            Genre = Core.Enums.Genre.Comedy,
+            OpeningNight = true,
+            Tickets = new List<Core.Entities.Ticket> { ticketCore },
+        };
 
         // Act
         var result = mapper.Map<Web.Models.Show>(showCore);
@@ -125,8 +171,17 @@ public class MappingProfileTest
     [Fact]
     public void TestCoreShowToWebShowNoTicket()
     {
-        // Arrange            
-        var showCore = new Core.Entities.Show { ShowId = 1, Title = "Show 1", Description = "Lorem ipsum", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy, OpeningNight = true };
+        // Arrange
+        var showCore = new Core.Entities.Show
+        {
+            ShowId = 1,
+            Title = "Show 1",
+            Description = "Lorem ipsum",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddDays(1),
+            Genre = Core.Enums.Genre.Comedy,
+            OpeningNight = true,
+        };
 
         // Act
         var result = mapper.Map<Web.Models.Show>(showCore);
@@ -147,9 +202,32 @@ public class MappingProfileTest
     public void TestWebShowToCoreShowWithTicket()
     {
         // Arrange
-        var seatWeb = new Web.Models.Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 };
-        var ticketWeb = new Web.Models.Ticket { Id = 1, Seat = seatWeb, Price = 50.5M, Status = Core.Enums.Status.Available, SoldToCustomerId = "1" };
-        var showWeb = new Web.Models.Show { Id = 1, Title = "Show 1", Description = "Lorem ipsum", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy, OpeningNight = true, Tickets = new List<Web.Models.Ticket> { ticketWeb } };
+        var seatWeb = new Web.Models.Seat
+        {
+            SeatId = 1,
+            Section = "Front",
+            Row = 1,
+            Number = 1,
+        };
+        var ticketWeb = new Web.Models.Ticket
+        {
+            Id = 1,
+            Seat = seatWeb,
+            Price = 50.5M,
+            Status = Core.Enums.Status.Available,
+            SoldToCustomerId = "1",
+        };
+        var showWeb = new Web.Models.Show
+        {
+            Id = 1,
+            Title = "Show 1",
+            Description = "Lorem ipsum",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddDays(1),
+            Genre = Core.Enums.Genre.Comedy,
+            OpeningNight = true,
+            Tickets = new List<Web.Models.Ticket> { ticketWeb },
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Show>(showWeb);
@@ -174,7 +252,16 @@ public class MappingProfileTest
     public void TestWebShowToCoreShowNoTicket()
     {
         // Arrange
-        var showWeb = new Web.Models.Show { Id = 1, Title = "Show 1", Description = "Lorem ipsum", StartTime = DateTime.Now, EndTime = DateTime.Now.AddDays(1), Genre = Core.Enums.Genre.Comedy, OpeningNight = true };
+        var showWeb = new Web.Models.Show
+        {
+            Id = 1,
+            Title = "Show 1",
+            Description = "Lorem ipsum",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddDays(1),
+            Genre = Core.Enums.Genre.Comedy,
+            OpeningNight = true,
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Show>(showWeb);
@@ -195,8 +282,23 @@ public class MappingProfileTest
     public void TestCoreTicketToWebTicket()
     {
         // Arrange
-        var seatCore = new Core.Entities.Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 };
-        var ticketCore = new Core.Entities.Ticket { TicketId = 1, ShowId = 1, SeatId = 1, Seat = seatCore, Price = 50.5M, Status = Core.Enums.Status.Available, CustomerId = "1" };
+        var seatCore = new Core.Entities.Seat
+        {
+            SeatId = 1,
+            Section = "Front",
+            Row = 1,
+            Number = 1,
+        };
+        var ticketCore = new Core.Entities.Ticket
+        {
+            TicketId = 1,
+            ShowId = 1,
+            SeatId = 1,
+            Seat = seatCore,
+            Price = 50.5M,
+            Status = Core.Enums.Status.Available,
+            CustomerId = "1",
+        };
 
         // Act
         var result = mapper.Map<Web.Models.Ticket>(ticketCore);
@@ -214,8 +316,21 @@ public class MappingProfileTest
     public void TestWebTicketToCoreTicket()
     {
         // Arrange
-        var seatWeb = new Web.Models.Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 };
-        var ticketWeb = new Web.Models.Ticket { Id = 1, Seat = seatWeb, Price = 50.5M, Status = Core.Enums.Status.Available, SoldToCustomerId = "1" };
+        var seatWeb = new Web.Models.Seat
+        {
+            SeatId = 1,
+            Section = "Front",
+            Row = 1,
+            Number = 1,
+        };
+        var ticketWeb = new Web.Models.Ticket
+        {
+            Id = 1,
+            Seat = seatWeb,
+            Price = 50.5M,
+            Status = Core.Enums.Status.Available,
+            SoldToCustomerId = "1",
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Ticket>(ticketWeb);
@@ -233,7 +348,13 @@ public class MappingProfileTest
     public void TestCoreSeatToWebSeat()
     {
         // Arrange
-        var seatCore = new Core.Entities.Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 };
+        var seatCore = new Core.Entities.Seat
+        {
+            SeatId = 1,
+            Section = "Front",
+            Row = 1,
+            Number = 1,
+        };
 
         // Act
         var result = mapper.Map<Web.Models.Seat>(seatCore);
@@ -250,7 +371,13 @@ public class MappingProfileTest
     public void TestWebSeatToCoreSeat()
     {
         // Arrange
-        var seatWeb = new Web.Models.Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 };
+        var seatWeb = new Web.Models.Seat
+        {
+            SeatId = 1,
+            Section = "Front",
+            Row = 1,
+            Number = 1,
+        };
 
         // Act
         var result = mapper.Map<Core.Entities.Seat>(seatWeb);
