@@ -30,6 +30,50 @@ public class ShowServiceTest
     }
 
     [Fact]
+    public async Task TestDeleteShow()
+    {
+        // Arrange
+        var contextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>();
+        });
+        var mapper = config.CreateMapper();
+
+        var ticketService = new TicketService(contextFactory, mapper);
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+
+        var service = new ShowService(contextFactory, mapper, actorService, ticketService);
+
+        var show = new Show
+        {
+            Id = 1,
+            Title = "TestTitle",
+            Description = "TestDescription",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Genre = Genre.Musical,
+            OpeningNight = false,
+        };
+
+        await service.CreateShowAsync(show);
+
+        var dataBaseShow = await service.GetShow(1);
+
+        // Act
+        await service.DeleteShow(1);
+
+        // Assert
+        Assert.NotNull(dataBaseShow);
+        Assert.Equal(1, dataBaseShow.ShowId);
+        await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.GetShow(1));
+
+        await serviceProvider.DisposeAsync();
+    }
+
+    [Fact]
     public async Task TestUpdateShow()
     {
         // Arrange
