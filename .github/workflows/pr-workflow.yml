@@ -1,12 +1,6 @@
 name: On PR workflow
 
 on:
-  push:
-    branches: ["master"]
-    paths:
-      #     - "LocalVenue/**"
-      #     - "LocalVenue.Tests/**"
-      - ".github/workflows/pr-workflow.yml"
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
@@ -17,8 +11,18 @@ on:
 jobs:
   format-lint:
     name: Format and Lint
-    secrets: inherit
-    uses: ./.github/workflows/dotnet-format-lint.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Run dotnet format
+        run: dotnet format --check
 
   xunit-test-with-sonarcloud:
     name: Test and Analyze
