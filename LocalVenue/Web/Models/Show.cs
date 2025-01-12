@@ -10,6 +10,8 @@ public class Show
     public string Title { get; set; } = string.Empty;
     [Required(ErrorMessage = "Skal udfyldes")]
     public string? Description { get; set; }
+    
+    public List<Actor> Actors { get; set; }
 
     public DateTime StartTime { get; set; }
 

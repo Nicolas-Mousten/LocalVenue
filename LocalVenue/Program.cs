@@ -1,15 +1,18 @@
+using System.Net.Http.Headers;
 using AutoMapper;
 using LocalVenue;
+using LocalVenue.Web;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Services;
 using LocalVenue.Services;
 using LocalVenue.Services.Interfaces;
-using LocalVenue.Web;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shared.WebComponents;
+using Polly;
+using Polly.Extensions.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +27,6 @@ else
     builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 }
 builder.Configuration.AddEnvironmentVariables();
-
-var TMDB_API_KEY = builder.Configuration["TMDB_API_KEY"] ?? throw new ArgumentNullException("TMDB_API_KEY");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -57,6 +58,25 @@ builder.Services.AddScoped<IShowService, ShowService>();
 builder.Services.AddScoped<ISeatService, SeatService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 // Database context setup ends
+
+// TMDB HTTP requests setup start
+builder.Services.AddScoped<IActorService, ActorService>();
+
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2,
+            retryAttempt)));
+}
+
+builder.Services.AddHttpClient("TmdbClient", client =>
+    {
+        client.BaseAddress = new Uri(builder.Configuration.GetSection("TMDB").GetSection("Url").Value ?? throw new ArgumentNullException("TMDB.Url"));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", builder.Configuration.GetSection("TMDB").GetSection("Token").Value ?? throw new ArgumentNullException("TMDB.Token"));
+    })
+    .AddPolicyHandler(GetRetryPolicy());
+// TMDB HTTP requests setup ends
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
