@@ -2,6 +2,7 @@ using Moq;
 using Moq.Language.Flow;
 using Moq.Protected;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace LocalVenue.Tests.Helpers
 {
@@ -16,6 +17,21 @@ namespace LocalVenue.Tests.Helpers
                         r.Method == requestMethod &&
                         r.RequestUri != null &&
                         r.RequestUri.ToString() == requestUrl
+                    ),
+                    ItExpr.IsAny<CancellationToken>()
+                );
+        }
+        
+        public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupSendAsyncRegex(this Mock<HttpMessageHandler> handler, HttpMethod requestMethod, string requestUrlRegex)
+        {
+            var regex = new Regex(requestUrlRegex);
+            
+            return handler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(r =>
+                        r.Method == requestMethod &&
+                        r.RequestUri != null &&
+                        r.RequestUri.ToString() == regex.Match(r.RequestUri.ToString()).Value
                     ),
                     ItExpr.IsAny<CancellationToken>()
                 );

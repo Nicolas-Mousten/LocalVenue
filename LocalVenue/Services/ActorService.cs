@@ -13,14 +13,6 @@ namespace LocalVenue.Services;
 
 public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
 {
-    private Random? Random { get; set; }
-    
-    public async Task<List<Actor>> GetRandomActors(Random random)
-    {
-        Random = random;
-        return await GetRandomActors();
-    }
-    
     public async Task<List<Actor>> GetRandomActors()
     {
         using HttpClient client = httpClientFactory.CreateClient("TmdbClient");
@@ -30,11 +22,11 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
         var response = new HttpResponseMessage();
         response.StatusCode = HttpStatusCode.NotFound;
 
-        Random ??= new Random();
+        var random = new Random();
         
         while (response.StatusCode == HttpStatusCode.NotFound)
         {
-            var randomMovieId = Random.NextInt64(1, maxMovieId);
+            var randomMovieId = random.NextInt64(1, maxMovieId);
             
             try
             {
