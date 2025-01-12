@@ -125,11 +125,14 @@ public class TicketServiceTest
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
 
-        await ticketService.JoinShow(
-            fetchShow.Id,
-            fetchShow.Tickets,
-            "0c9cd65f-2054-4086-a569-2e50997a8be9"
-        );
+        if (fetchShow != null && fetchShow.Tickets != null)
+        {
+            await ticketService.JoinShow(
+                fetchShow.Id,
+                fetchShow.Tickets,
+                "0c9cd65f-2054-4086-a569-2e50997a8be9"
+            );
+        }
         var result = await ticketService.GetTicket(101);
         // Assert
         Assert.NotNull(result);
@@ -231,11 +234,14 @@ public class TicketServiceTest
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
 
-        await ticketService.LeaveShow(
-            fetchShow.Id,
-            fetchShow.Tickets,
-            "0c9cd65f-2054-4086-a569-2e50997a8be3"
-        );
+        if (fetchShow != null && fetchShow.Tickets != null)
+        {
+            await ticketService.LeaveShow(
+                fetchShow.Id,
+                fetchShow.Tickets,
+                "0c9cd65f-2054-4086-a569-2e50997a8be3"
+            );
+        }
         var result = await ticketService.GetTicket(101);
         // Assert
         Assert.NotNull(result);
@@ -340,11 +346,14 @@ public class TicketServiceTest
 
         var fetchShow = await showService.GetShowWithTicketsAsync(2);
 
-        await ticketService.LeaveShow(
-            fetchShow.Id,
-            fetchShow.Tickets,
-            "0c9cd65f-2054-4086-a569-2e50997a8be6"
-        );
+        if (fetchShow != null && fetchShow.Tickets != null)
+        {
+            await ticketService.LeaveShow(
+                fetchShow.Id,
+                fetchShow.Tickets,
+                "0c9cd65f-2054-4086-a569-2e50997a8be6"
+            );
+        }
         var result = await ticketService.GetTicket(100);
         // Assert
         Assert.NotNull(result);

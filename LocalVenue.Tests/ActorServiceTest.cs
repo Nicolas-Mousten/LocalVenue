@@ -12,7 +12,6 @@ namespace LocalVenue.Tests
             // Arrange
             const int expectedCountMin = 3;
             const int expectedCountMax = 12;
-            const long nextInt64Floor = 1;
 
             // Act
             var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
