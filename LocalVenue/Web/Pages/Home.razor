@@ -46,8 +46,6 @@
     {
         Shows = await ShowService.GetCurrentAndFutureShowsAsync();
 
-        Console.WriteLine(Shows.Count);
-
         if (Shows.IsNullOrEmpty())
         {
             ErrorMessage = "Der spilles ikke nogle shows i øjeblikket.";

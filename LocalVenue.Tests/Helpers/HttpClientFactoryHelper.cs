@@ -40,18 +40,10 @@ namespace LocalVenue.Tests.Helpers
 
         private static string ReadJsonFile(string filePath)
         {
-            try
+            using (StreamReader reader = new StreamReader(filePath))
             {
-                using (StreamReader reader = new StreamReader(filePath))
-                {
-                    string jsonString = reader.ReadToEnd();
-                    return jsonString;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return string.Empty;
+                string jsonString = reader.ReadToEnd();
+                return jsonString;
             }
         }
     }
