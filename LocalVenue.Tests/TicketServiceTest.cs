@@ -65,24 +65,22 @@ public class TicketServiceTest
             ShowId = 1,
             Title = "TestShow",
             Description = "A show to test on",
-            StartTime = DateTime.Now.AddDays(1).AddHours(12),
-            EndTime = DateTime.Now.AddDays(1).AddHours(14),
+            StartTime = DateTime.Now.AddHours(32),
+            EndTime = DateTime.Now.AddHours(34),
             Genre = Genre.Musical,
             OpeningNight = false,
             Tickets = new List<Ticket>(),
         };
-
         Seat seat = new Seat
         {
-            SeatId = 8,
+            SeatId = 1,
             Section = "Front",
             Row = 1,
             Number = 1,
         };
-
         Ticket ticket = new Ticket
         {
-            TicketId = 101,
+            TicketId = 1,
             ShowId = show.ShowId,
             Show = show,
             SeatId = seat.SeatId,
@@ -127,13 +125,9 @@ public class TicketServiceTest
 
         if (fetchShow != null && fetchShow.Tickets != null)
         {
-            await ticketService.JoinShow(
-                fetchShow.Id,
-                fetchShow.Tickets,
-                "0c9cd65f-2054-4086-a569-2e50997a8be9"
-            );
+            await ticketService.JoinShow(fetchShow.Id, fetchShow.Tickets, customer.Id);
         }
-        var result = await ticketService.GetTicket(101);
+        var result = await ticketService.GetTicket(1);
         // Assert
         Assert.NotNull(result);
         Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId);
@@ -150,7 +144,7 @@ public class TicketServiceTest
 
         Customer customer = new Customer
         {
-            Id = "0c9cd65f-2054-4086-a569-2e50997a8be3",
+            Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
             UserName = "Nicolas",
             NormalizedUserName = "NICOLAS",
             Email = "nicolas.mousten@gmail.com",
@@ -173,32 +167,32 @@ public class TicketServiceTest
         };
         Show show = new Show
         {
-            ShowId = 3,
+            ShowId = 1,
             Title = "TestShow",
             Description = "A show to test on",
-            StartTime = DateTime.Now.AddHours(12),
-            EndTime = DateTime.Now.AddHours(14),
+            StartTime = DateTime.Now.AddHours(32),
+            EndTime = DateTime.Now.AddHours(34),
             Genre = Genre.Musical,
             OpeningNight = false,
             Tickets = new List<Ticket>(),
         };
         Seat seat = new Seat
         {
-            SeatId = 10,
+            SeatId = 1,
             Section = "Front",
             Row = 1,
             Number = 1,
         };
         Ticket ticket = new Ticket
         {
-            TicketId = 13,
+            TicketId = 1,
             ShowId = show.ShowId,
             Show = show,
             SeatId = seat.SeatId,
             Seat = seat,
             Price = 50,
             Status = Status.Sold,
-            CustomerId = "0c9cd65f-2054-4086-a569-2e50997a8be9",
+            CustomerId = customer.Id,
             Customer = customer,
         };
 
@@ -236,17 +230,12 @@ public class TicketServiceTest
 
         if (fetchShow != null && fetchShow.Tickets != null)
         {
-            await ticketService.LeaveShow(
-                fetchShow.Id,
-                fetchShow.Tickets,
-                "0c9cd65f-2054-4086-a569-2e50997a8be3"
-            );
+            await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, customer.Id);
         }
-        var result = await ticketService.GetTicket(101);
+        var result = await ticketService.GetTicket(1);
         // Assert
         Assert.NotNull(result);
         Assert.Null(result.CustomerId);
-        //Assert.Equal(null, result.CustomerId);
         Assert.Equal(Status.Available, result.Status);
     }
 
@@ -262,7 +251,7 @@ public class TicketServiceTest
 
         Customer customer = new Customer
         {
-            Id = "0c9cd65f-2054-4086-a569-2e50997a8be6",
+            Id = "0c9cd65f-2054-4086-a569-2e50997a8be9",
             UserName = "Nicolas",
             NormalizedUserName = "NICOLAS",
             Email = "nicolas.mousten@gmail.com",
@@ -285,7 +274,7 @@ public class TicketServiceTest
         };
         Show show = new Show
         {
-            ShowId = 2,
+            ShowId = 1,
             Title = "TestShow",
             Description = "A show to test on",
             StartTime = DateTime.Now.AddHours(12),
@@ -296,21 +285,21 @@ public class TicketServiceTest
         };
         Seat seat = new Seat
         {
-            SeatId = 7,
+            SeatId = 1,
             Section = "Front",
             Row = 1,
             Number = 1,
         };
         Ticket ticket = new Ticket
         {
-            TicketId = 100,
+            TicketId = 1,
             ShowId = show.ShowId,
             Show = show,
-            SeatId = 2,
+            SeatId = seat.SeatId,
             Seat = seat,
             Price = 50,
             Status = Status.Sold,
-            CustomerId = "0c9cd65f-2054-4086-a569-2e50997a8be6",
+            CustomerId = customer.Id,
             Customer = customer,
         };
 
@@ -344,21 +333,17 @@ public class TicketServiceTest
             ticketService
         );
 
-        var fetchShow = await showService.GetShowWithTicketsAsync(2);
+        var fetchShow = await showService.GetShowWithTicketsAsync(1);
 
         if (fetchShow != null && fetchShow.Tickets != null)
         {
-            await ticketService.LeaveShow(
-                fetchShow.Id,
-                fetchShow.Tickets,
-                "0c9cd65f-2054-4086-a569-2e50997a8be6"
-            );
+            await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, customer.Id);
         }
-        var result = await ticketService.GetTicket(100);
+        var result = await ticketService.GetTicket(1);
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.CustomerId);
-        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be6", result.CustomerId);
+        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId);
         Assert.Equal(Status.Sold, result.Status);
     }
 }
