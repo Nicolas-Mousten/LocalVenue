@@ -23,7 +23,9 @@ public class CustomerServiceTest
 
         services.AddDataProtection();
 
-        services.AddDbContext<VenueContext>(options => options.UseInMemoryDatabase("InMemoryDb"));
+        services.AddDbContext<VenueContext>(options =>
+            options.UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString())
+        );
 
         var userManagerMock = new Mock<UserManager<Customer>>(
             Mock.Of<IUserStore<Customer>>(),

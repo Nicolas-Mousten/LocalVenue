@@ -23,7 +23,7 @@ public class TicketServiceTest
         services.AddDbContextFactory<VenueContext>(options =>
         {
             options
-                .UseInMemoryDatabase("InMemoryDb")
+                .UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString())
                 .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
         });
 
