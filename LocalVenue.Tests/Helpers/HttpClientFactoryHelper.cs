@@ -11,6 +11,7 @@ namespace LocalVenue.Tests.Helpers
         private static string MovieCreditsUriRegex =
             @"^https://api\.themoviedb\.org/3/movie/\d{1,19}/credits$";
         private static string HttpClientName = "TmdbClient";
+
         private static string LatestMovieJson = ReadJsonFile("Helpers/jsonLatestMovie.json");
         private static string MovieCreditsJson = ReadJsonFile("Helpers/jsonMovieCredits.json");
 
