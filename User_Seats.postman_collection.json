@@ -41,7 +41,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"email\": {{EMAIL}},\r\n  \"password\": {{PASSWORD}},\r\n  \"twoFactorCode\": \"string\",\r\n  \"twoFactorRecoveryCode\": \"string\"\r\n}",
+					"raw": "{\r\n  \"email\": \"{{EMAIL}}\",\r\n  \"password\": \"{{PASSWORD}}\",\r\n  \"twoFactorCode\": \"string\",\r\n  \"twoFactorRecoveryCode\": \"string\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
