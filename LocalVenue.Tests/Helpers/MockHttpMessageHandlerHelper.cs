@@ -21,11 +21,11 @@ namespace LocalVenue.Tests.Helpers
                     ItExpr.IsAny<CancellationToken>()
                 );
         }
-        
+
         public static ISetup<HttpMessageHandler, Task<HttpResponseMessage>> SetupSendAsyncRegex(this Mock<HttpMessageHandler> handler, HttpMethod requestMethod, string requestUrlRegex)
         {
             var regex = new Regex(requestUrlRegex);
-            
+
             return handler.Protected()
                 .Setup<Task<HttpResponseMessage>>("SendAsync",
                     ItExpr.Is<HttpRequestMessage>(r =>

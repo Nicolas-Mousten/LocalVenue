@@ -15,7 +15,7 @@ namespace LocalVenue.Tests;
 public class TicketServiceTest
 {
     private readonly ServiceProvider serviceProvider;
-    
+
     public TicketServiceTest()
     {
         var services = new ServiceCollection();
@@ -24,7 +24,7 @@ public class TicketServiceTest
             options.UseInMemoryDatabase("InMemoryDb")
                 .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
         });
-        
+
         serviceProvider = services.BuildServiceProvider();
     }
 
@@ -87,7 +87,7 @@ public class TicketServiceTest
             CustomerId = null,
             Customer = null
         };
-        
+
         show.Tickets.Add(ticket);
         await using (var context = await dbContextFactory.CreateDbContextAsync())
         {
@@ -97,22 +97,22 @@ public class TicketServiceTest
         }
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-        
+
         var config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<MappingProfile>();  // Assuming ShowProfile contains your mappings
         });
         var mapper = config.CreateMapper();
-        
+
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var seatService = new SeatService(contextFactoryRetrieve);
-        
+
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
         var showService = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
-        
+
         await ticketService.JoinShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be9");
         var result = await ticketService.GetTicket(101);
         // Assert
@@ -120,7 +120,7 @@ public class TicketServiceTest
         Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be9", result.CustomerId);
         Assert.Equal(Status.Sold, result.Status);
     }
-    
+
     [Fact]
     public async Task TestTicketServiceReturnSeat()
     {
@@ -196,7 +196,7 @@ public class TicketServiceTest
             cfg.AddProfile<MappingProfile>();
         });
         var mapper = config.CreateMapper();
-        
+
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var seatService = new SeatService(contextFactoryRetrieve);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
@@ -205,7 +205,7 @@ public class TicketServiceTest
 
 
         var fetchShow = await showService.GetShowWithTicketsAsync(1);
-            
+
         await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be3");
         var result = await ticketService.GetTicket(101);
         // Assert
@@ -214,7 +214,7 @@ public class TicketServiceTest
         //Assert.Equal(null, result.CustomerId);
         Assert.Equal(Status.Available, result.Status);
     }
-    
+
     [Fact(DisplayName = "Test if the ticket status remains 'Sold' after the customer tries to leave the show less than 24 hours before it begins")]
     public async Task TestTicketServiceReturnSeatOutOfDate()
     {
@@ -290,7 +290,7 @@ public class TicketServiceTest
             cfg.AddProfile<MappingProfile>();
         });
         var mapper = config.CreateMapper();
-        
+
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var seatService = new SeatService(contextFactoryRetrieve);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
@@ -299,13 +299,13 @@ public class TicketServiceTest
 
 
         var fetchShow = await showService.GetShowWithTicketsAsync(2);
-            
+
         await ticketService.LeaveShow(fetchShow.Id, fetchShow.Tickets, "0c9cd65f-2054-4086-a569-2e50997a8be6");
         var result = await ticketService.GetTicket(100);
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.CustomerId);
-        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be6", result.CustomerId); 
+        Assert.Equal("0c9cd65f-2054-4086-a569-2e50997a8be6", result.CustomerId);
         Assert.Equal(Status.Sold, result.Status);
     }
 }

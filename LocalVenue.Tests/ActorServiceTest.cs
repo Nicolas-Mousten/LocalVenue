@@ -13,16 +13,16 @@ namespace LocalVenue.Tests
             const int expectedCountMin = 3;
             const int expectedCountMax = 12;
             const long nextInt64Floor = 1;
-            
+
             // Act
             var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
-            
+
             var actorService = new ActorService(mockFactory.Object);
 
             try
             {
                 var result = await actorService.GetRandomActors();
-                
+
                 // Assert
                 Assert.NotNull(result);
                 Assert.True(result.Count >= expectedCountMin);

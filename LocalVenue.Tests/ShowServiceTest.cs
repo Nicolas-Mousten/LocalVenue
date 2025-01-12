@@ -31,36 +31,36 @@ public class ShowServiceTest
     public async Task TestShowServiceCreateShowWithTickets()
     {
         // create a lot of seats for the database
-        
+
         var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
 
         int seatCount;
-        
+
         await using (var context = await dbContextFactory.CreateDbContextAsync())
         {
-            context.Seats.Add(new Seat {SeatId = 2, Section = "Front", Row = 1, Number = 1 });
-            context.Seats.Add(new Seat {SeatId = 3, Section = "Front", Row = 1, Number = 2 });
-            context.Seats.Add(new Seat {SeatId = 4, Section = "Front", Row = 1, Number = 3 });
-            context.Seats.Add(new Seat {SeatId = 5, Section = "Front", Row = 1, Number = 4 });
-            context.Seats.Add(new Seat {SeatId = 6, Section = "Front", Row = 1, Number = 5 });
+            context.Seats.Add(new Seat { SeatId = 2, Section = "Front", Row = 1, Number = 1 });
+            context.Seats.Add(new Seat { SeatId = 3, Section = "Front", Row = 1, Number = 2 });
+            context.Seats.Add(new Seat { SeatId = 4, Section = "Front", Row = 1, Number = 3 });
+            context.Seats.Add(new Seat { SeatId = 5, Section = "Front", Row = 1, Number = 4 });
+            context.Seats.Add(new Seat { SeatId = 6, Section = "Front", Row = 1, Number = 5 });
             await context.SaveChangesAsync();
             seatCount = context.Seats.Count();
         }
-        
-        
+
+
         // Act
         var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-        
+
         var config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile<MappingProfile>();  // Assuming ShowProfile contains your mappings
         });
         var mapper = config.CreateMapper();
-        
+
         var ticketService = new TicketService(contextFactoryRetrieve, mapper);
         var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
         var actorService = new ActorService(mockFactory.Object);
-        
+
         var service = new ShowService(contextFactoryRetrieve, mapper, actorService, ticketService);
 
         var show = new Show
@@ -77,7 +77,7 @@ public class ShowServiceTest
         await service.CreateShowAsync(show);
 
         var dataBaseShow = await service.GetShow(111);
-        
+
         // Assert
         Assert.NotNull(dataBaseShow);
         Assert.Equal(show.Id, dataBaseShow.ShowId);
@@ -89,7 +89,7 @@ public class ShowServiceTest
         Assert.Equal(show.OpeningNight, dataBaseShow.OpeningNight);
         Assert.NotNull(dataBaseShow.Tickets);
         Assert.Equal(seatCount, dataBaseShow.Tickets.Count);
-        
+
         await serviceProvider.DisposeAsync();
 
     }

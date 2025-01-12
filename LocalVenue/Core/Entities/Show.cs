@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using LocalVenue.Core.Enums;
 using LocalVenue.Core.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LocalVenue.Core.Entities;
 

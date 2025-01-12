@@ -1,6 +1,6 @@
+using LocalVenue.Core.Enums;
 using System;
 using Xunit;
-using LocalVenue.Core.Enums;
 
 namespace LocalVenue.Tests
 {

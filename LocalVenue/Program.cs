@@ -1,18 +1,18 @@
-using System.Net.Http.Headers;
 using AutoMapper;
 using LocalVenue;
-using LocalVenue.Web;
 using LocalVenue.Core;
 using LocalVenue.Core.Entities;
 using LocalVenue.Core.Services;
 using LocalVenue.Services;
 using LocalVenue.Services.Interfaces;
+using LocalVenue.Web;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Shared.WebComponents;
 using Polly;
 using Polly.Extensions.Http;
+using Shared.WebComponents;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 

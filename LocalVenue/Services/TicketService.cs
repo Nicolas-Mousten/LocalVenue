@@ -111,7 +111,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
         }
-        
+
         //add the customer to those seats 
         //TO-DO change it to call database so it dosn't take data from frontend only id's
         foreach (var ticket in tickets)
@@ -163,16 +163,17 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
         }
-        
+
         //Check if the time is less than a day before show starts.
         if (lessThanADayLeft(show))
         {
             return "It is not possible to return a ticket a day before the show starts.";
         }
-        
+
         //add the customer to those seats
         foreach (var ticket in tickets)
-        {Ticket newTicket = new Ticket
+        {
+            Ticket newTicket = new Ticket
             {
                 TicketId = ticket.Id,
                 ShowId = ticket.ShowId,
@@ -194,7 +195,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
             newTicket.CustomerId = null;
             await UpdateTicket(newTicket);
         }
-        
+
         await context.SaveChangesAsync();
         return "Tickets have been returned";
     }

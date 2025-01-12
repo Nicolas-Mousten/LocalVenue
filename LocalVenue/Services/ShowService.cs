@@ -154,9 +154,9 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
         {
             return [];
         }
-        
+
         var refundList = new List<RefundList>();
-        
+
         foreach (var ticket in show.Tickets!.Where(y => y.CustomerId is not null).GroupBy(x => x.CustomerId))
         {
             refundList.Add(new RefundList
