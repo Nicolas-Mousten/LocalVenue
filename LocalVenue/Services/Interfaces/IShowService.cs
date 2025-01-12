@@ -1,5 +1,7 @@
-using LocalVenue.Core.Entities;
 using LocalVenue.Core.Models;
+using LocalVenue.Web.Models;
+using Show = LocalVenue.Core.Entities.Show;
+using Ticket = LocalVenue.Core.Entities.Ticket;
 
 namespace LocalVenue.Services.Interfaces
 {
@@ -17,5 +19,6 @@ namespace LocalVenue.Services.Interfaces
         public Task<bool> UpdateShowAsync(Web.Models.Show show);
         public Task<Web.Models.Show?> GetShowWithTicketsAsync(long id);
         public Task<List<Web.Models.Show>> GetCurrentAndFutureShowsAsync();
+        public Task<List<RefundList>> GetRefundListAsync(long showId);
     }
 }

@@ -8,17 +8,17 @@ public enum Gender
     NonBinary = 3
 }
 
-public static class Gender1
+public static class GenderExtensions
 {
-    public static string ToNewString(this Gender Gender)
+    public static string ToNewString(this Gender gender)
     {
-        return Gender switch
+        return gender switch
         {
             Gender.NotSpecified => "Unknown",
             Gender.Female => "Female",
             Gender.Male => "Male",
             Gender.NonBinary => "Non-binary",
-            _ => throw new ArgumentOutOfRangeException(nameof(Gender), Gender, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(gender), gender, null)
         };
     }
 }
