@@ -1,12 +1,3 @@
-
-resource "random_password" "jwt_token_secret" {
-  # Generate a random password for JWT token secret
-  # This is not used to maintain the same secret between runs and development environments
-  length           = 128
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
 resource "azurerm_windows_web_app" "main" {
   name                = "localvenue-webapp-${var.azure_name_suffix}"
   resource_group_name = azurerm_resource_group.main.name
@@ -27,7 +18,8 @@ resource "azurerm_windows_web_app" "main" {
   app_settings = {
     "WEBSITE_RUN_FROM_PACKAGE" = "1",
     "ASPNETCORE_ENVIRONMENT"   = "Production"
-    "TMDB_API_KEY"             = var.tmdb_api_key
+    "TMDB__TOKEN"              = var.tmdb_token
+    "TMDB__BASEURL"            = var.tmdb_base
   }
   connection_string {
     name  = "VenueContext"

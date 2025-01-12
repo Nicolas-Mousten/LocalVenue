@@ -22,6 +22,10 @@ variable "azure_name_suffix" {
   type = string
 }
 
-variable "tmdb_api_key" {
+variable "tmdb_token" {
+  type = string
+}
+
+variable "tmdb_base" {
   type = string
 }
