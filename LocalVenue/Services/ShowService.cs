@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace LocalVenue.Services;
 
-public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper, IActorService actorService) : GenericCRUDService<Show>(contextFactory), IShowService
+public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper, IActorService actorService, ITicketService ticketService) : GenericCRUDService<Show>(contextFactory), IShowService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
     private readonly IMapper _mapper = mapper;
@@ -67,7 +67,6 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
                 Status = Core.Enums.Status.Available
             };
 
-            TicketService ticketService = new TicketService(_contextFactory, _mapper);
             await ticketService.AddTicket(newTicket, context);
         }
         context.SaveChanges();
