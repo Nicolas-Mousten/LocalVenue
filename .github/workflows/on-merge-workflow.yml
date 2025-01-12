@@ -69,12 +69,24 @@ jobs:
           done
         shell: bash
 
-      - name: Run Postman tests
+      - name: Run Postman tests - Collection 1
         run: |
-          newman run "LocalVenue Tests.postman_collection.json" \
-            --env-var "webUrl=https://localvenue-webapp-casp0006.azurewebsites.net/" \
+          newman run "User_Seats.postman_collection.json" \
+            --global-var "BASE_URL=https://localvenue-webapp-casp0006.azurewebsites.net/" \
+            --global-var "RESPONSE_TIME=2000" \
+            --global-var "EMAIL=${{ secrets.ADMIN_EMAIL }}" \
+            --global-var "PASSWORD=${{ secrets.ADMIN_PASSWORD }}" \
             --reporters cli,htmlextra \
-            --reporter-htmlextra-export testResults/runreport.html \
+            --reporter-htmlextra-export testResults/runreport1.html \
+            --reporter-htmlextra-darkTheme
+
+      - name: Run Postman tests - Collection 2
+        run: |
+          newman run "Shows_Tickets.postman_collection.json" \
+            --global-var "BASE_URL=https://localvenue-webapp-casp0006.azurewebsites.net/" \
+            --global-var "RESPONSE_TIME=2000" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export testResults/runreport2.html \
             --reporter-htmlextra-darkTheme
 
       - name: Publish Postman results
