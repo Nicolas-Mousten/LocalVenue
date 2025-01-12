@@ -13,21 +13,29 @@ namespace LocalVenue.Services;
 
 public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
 {
+    private Random? Random { get; set; }
+    
+    public async Task<List<Actor>> GetRandomActors(Random random)
+    {
+        Random = random;
+        return await GetRandomActors();
+    }
+    
     public async Task<List<Actor>> GetRandomActors()
     {
-        var maxMovieId = await GetMaxMovieId();
+        using HttpClient client = httpClientFactory.CreateClient("TmdbClient");
+        
+        var maxMovieId = await GetMaxMovieId(client);
         
         var response = new HttpResponseMessage();
         response.StatusCode = HttpStatusCode.NotFound;
 
-        Random rnd = new Random();
+        Random ??= new Random();
         
         while (response.StatusCode == HttpStatusCode.NotFound)
         {
-            var randomMovieId = rnd.NextInt64(1, maxMovieId);
-        
-            using HttpClient client = httpClientFactory.CreateClient("TmdbClient");
-        
+            var randomMovieId = Random.NextInt64(1, maxMovieId);
+            
             try
             {
                 response = await client.GetAsync("movie/" + randomMovieId + "/credits");
@@ -79,10 +87,8 @@ public class ActorService(IHttpClientFactory httpClientFactory) : IActorService
         throw new UnreachableException();
     }
 
-    private async Task<long> GetMaxMovieId()
+    private async Task<long> GetMaxMovieId(HttpClient client)
     {
-        using HttpClient client = httpClientFactory.CreateClient("TmdbClient");
-        
         try
         {
             var response = await client.GetAsync("movie/latest");
