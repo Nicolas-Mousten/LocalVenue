@@ -643,7 +643,7 @@
 							"\r",
 							"pm.test(\"Has seatId. Same as the requested seatId\", function() {\r",
 							"    pm.expect(jsonData[\"seatId\"]).to.be.a('number');\r",
-							"    pm.expect(jsonData[\"seatId\"]).to.eq(seatId);\r",
+							"    pm.expect(jsonData[\"seatId\"]).to.eq(parseInt(seatId));\r",
 							"});\r",
 							"\r",
 							"\r",

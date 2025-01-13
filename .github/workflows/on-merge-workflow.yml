@@ -9,7 +9,8 @@ on:
       - "LocalVenue.Tests/**"
       - ".github/workflows/on-merge-workflow.yml"
       - ".github/workflows/dotnet-build-test-publish.yml"
-      - "LocalVenue Tests.postman_collection.json"
+      - "Shows_Tickets.postman_collection.json"
+      - "User_Seats.postman_collection.json"
 
 jobs:
   # xunit-test-with-sonarcloud:
