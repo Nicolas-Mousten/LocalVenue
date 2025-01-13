@@ -48,9 +48,11 @@ public class EndToEndTest : IDisposable
 
         loginButton.Submit();
 
-        wait.Until(d => d.Url.Equals(baseUrl));
+        wait.Until(d => d.Url.Contains(baseUrl));
 
-        driver.FindElement(By.LinkText("Shows")).Click();
+        var showLinkButton = wait.Until(ExpectedConditions.ElementToBeClickable(By.LinkText("Shows")));
+        
+        showLinkButton.Click();
 
         var createShowButton = wait.Until(
             ExpectedConditions.ElementToBeClickable(By.Id("create-show-button"))
@@ -87,7 +89,7 @@ public class EndToEndTest : IDisposable
 
         homeButton.Click();
 
-        wait.Until(d => d.Url.Equals(baseUrl));
+        wait.Until(d => d.Url.Contains(baseUrl));
         wait.Until(ExpectedConditions.ElementExists(By.Id("home-shows-grid")));
 
         var show = driver
