@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "5fb7cca4-8422-4e2f-a135-fe99ab65b445",
+		"_postman_id": "6c7ec5d9-4717-49ab-925b-cb68f50017ee",
 		"name": "Seats",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33447732"
+		"_exporter_id": "19420382"
 	},
 	"item": [
 		{
@@ -13,10 +13,6 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Admin email \" + pm.globals.get(\"EMAIL\") + \" PASSWORD \" + pm.globals.get(\"PASSWORD\") , function() {\r",
-							"    pm.response.to.have.status(200);\r",
-							"});\r",
-							"\r",
 							"var expected_reponse_time = parseInt(pm.globals.get(\"RESPONSE_TIME\"));\r",
 							"\r",
 							"pm.test(\"Response time is less than the expected \" + expected_reponse_time + \"ms\", function () {\r",
@@ -37,6 +33,13 @@
 						],
 						"type": "text/javascript",
 						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"packages": {},
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -636,7 +639,7 @@
 							"});\r",
 							"\r",
 							"var jsonData = pm.response.json();\r",
-							"var seatId = pm.environment.get(\"CREATED_SEAT_ID\");\r",
+							"var seatId = pm.variables.get(\"CREATED_SEAT_ID\");\r",
 							"\r",
 							"pm.test(\"Has seatId. Same as the requested seatId\", function() {\r",
 							"    pm.expect(jsonData[\"seatId\"]).to.be.a('number');\r",
