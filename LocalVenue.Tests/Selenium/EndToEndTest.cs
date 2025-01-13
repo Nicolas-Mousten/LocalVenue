@@ -123,7 +123,7 @@ public class EndToEndTest : IDisposable {
 
         deleteButton.Click();
     
-        await Task.Delay(2000);
+        wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".modal-footer")));
     
         driver.FindElement(By.CssSelector("td:nth-child(1)")).Click();
         driver.FindElement(By.CssSelector(".btn-danger:nth-child(2)")).Click();
