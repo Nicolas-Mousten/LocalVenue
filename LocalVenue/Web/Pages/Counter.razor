@@ -15,9 +15,9 @@
 @code {
     private int currentCount = 0;
 
-    private void IncrementCount()
+    private async void IncrementCount()
     {
-        Toast.SimpleToast(ToastType.Success, currentCount.ToString(),Js);
+        await Toast.SimpleToast(ToastType.Success, currentCount.ToString(),Js);
         currentCount++;
     }
 
