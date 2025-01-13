@@ -16,7 +16,8 @@ public class SeatServiceTest
         var services = new ServiceCollection();
         services.AddDbContextFactory<VenueContext>(options =>
         {
-            options.UseInMemoryDatabase("InMemoryDb")
+            options
+                .UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString())
                 .ConfigureWarnings(b => b.Ignore(InMemoryEventId.TransactionIgnoredWarning));
         });
 
@@ -28,10 +29,18 @@ public class SeatServiceTest
     {
         // Arrange
         var seatId = 1;
-        var expectedSeat = new Seat { SeatId = seatId, Section = "Front", Row = 1, Number = 1 };
+        var expectedSeat = new Seat
+        {
+            SeatId = seatId,
+            Section = "Front",
+            Row = 1,
+            Number = 1,
+        };
 
-        var dbContextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
-    
+        var dbContextFactory = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
+
         await using (var context = await dbContextFactory.CreateDbContextAsync())
         {
             context.Seats.Add(expectedSeat);
@@ -39,19 +48,20 @@ public class SeatServiceTest
         }
 
         // Act
-        var contextFactoryRetrieve = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+        var contextFactoryRetrieve = serviceProvider.GetRequiredService<
+            IDbContextFactory<VenueContext>
+        >();
 
         var service = new SeatService(contextFactoryRetrieve);
         var result = await service.GetSeat(seatId);
-        
+
         // Assert
         Assert.NotNull(result);
         Assert.Equal(expectedSeat.SeatId, result.SeatId);
         Assert.Equal(expectedSeat.Section, result.Section);
         Assert.Equal(expectedSeat.Row, result.Row);
         Assert.Equal(expectedSeat.Number, result.Number);
-        
+
         await serviceProvider.DisposeAsync();
-        
     }
 }

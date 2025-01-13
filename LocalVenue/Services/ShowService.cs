@@ -10,14 +10,30 @@ using Ticket = LocalVenue.Core.Entities.Ticket;
 
 namespace LocalVenue.Services;
 
-public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper mapper, IActorService actorService, ITicketService ticketService) : GenericCRUDService<Show>(contextFactory), IShowService
+public class ShowService(
+    IDbContextFactory<VenueContext> contextFactory,
+    IMapper mapper,
+    IActorService actorService,
+    ITicketService ticketService
+) : GenericCRUDService<Show>(contextFactory), IShowService
 {
     private readonly IDbContextFactory<VenueContext> _contextFactory = contextFactory;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<PagedList<Show>> GetShows(int page, int pageSize, string? searchParameter, string? searchProperty = "Title")
+    public async Task<PagedList<Show>> GetShows(
+        int page,
+        int pageSize,
+        string? searchParameter,
+        string? searchProperty = "Title"
+    )
     {
-        return await base.GetItems(page, pageSize, searchParameter, searchProperty ?? "Title", show => show.Tickets!);
+        return await base.GetItems(
+            page,
+            pageSize,
+            searchParameter,
+            searchProperty ?? "Title",
+            show => show.Tickets!
+        );
     }
 
     public async Task<Show> GetShow(long id)
@@ -26,8 +42,10 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
 
         var show = await base.GetItem(id, show => show.Tickets!);
         // include seats for tickets
-        show.Tickets?.ToList().ForEach(ticket => context.Entry(ticket).Reference(t => t.Seat).Load());
-        show.Tickets?.ToList().ForEach(ticket => context.Entry(ticket).Reference(t => t.Customer).Load());
+        show.Tickets?.ToList()
+            .ForEach(ticket => context.Entry(ticket).Reference(t => t.Seat).Load());
+        show.Tickets?.ToList()
+            .ForEach(ticket => context.Entry(ticket).Reference(t => t.Customer).Load());
         // grab a random set of actors for the show
         show.Actors = await actorService.GetRandomActors();
 
@@ -43,14 +61,18 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
     {
         await using var context = await _contextFactory.CreateDbContextAsync();
 
-        var ticket = await context.Shows.Include(show => show.Tickets).FirstOrDefaultAsync(show => show.ShowId == showId);
+        var ticket = await context
+            .Shows.Include(show => show.Tickets)
+            .FirstOrDefaultAsync(show => show.ShowId == showId);
 
         if (ticket == null)
         {
             throw new KeyNotFoundException($"Show with id {showId} not found");
         }
 
-        return ticket!.Tickets!.Where(ticket => ticket.Status == Core.Enums.Status.Available).ToList();
+        return ticket!
+            .Tickets!.Where(ticket => ticket.Status == Core.Enums.Status.Available)
+            .ToList();
     }
 
     public async Task<Show> AddShow(Show show)
@@ -66,7 +88,7 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
             {
                 ShowId = returnedShow.ShowId,
                 SeatId = seat.SeatId,
-                Status = Core.Enums.Status.Available
+                Status = Core.Enums.Status.Available,
             };
 
             await ticketService.AddTicket(newTicket, context);
@@ -154,18 +176,23 @@ public class ShowService(IDbContextFactory<VenueContext> contextFactory, IMapper
         {
             return [];
         }
-        
+
         var refundList = new List<RefundList>();
-        
-        foreach (var ticket in show.Tickets!.Where(y => y.CustomerId is not null).GroupBy(x => x.CustomerId))
+
+        foreach (
+            var ticket in show.Tickets!.Where(y => y.CustomerId is not null)
+                .GroupBy(x => x.CustomerId)
+        )
         {
-            refundList.Add(new RefundList
-            {
-                TicketCount = ticket.Count(),
-                CustomerName = ticket.First().Customer!.FirstName,
-                CustomerEmail = ticket.First().Customer!.Email,
-                TotalAmount = ticket.Sum(ticketPrice => ticketPrice.Price)
-            });
+            refundList.Add(
+                new RefundList
+                {
+                    TicketCount = ticket.Count(),
+                    CustomerName = ticket.First().Customer!.FirstName,
+                    CustomerEmail = ticket.First().Customer!.Email,
+                    TotalAmount = ticket.Sum(ticketPrice => ticketPrice.Price),
+                }
+            );
         }
 
         return refundList;

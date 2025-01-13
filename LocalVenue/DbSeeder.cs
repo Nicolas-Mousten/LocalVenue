@@ -32,7 +32,7 @@ public static class DbSeeder
                     Description = show.Description,
                     StartTime = DateTime.Now.AddHours(offset),
                     EndTime = DateTime.Now.AddHours(offset + 2),
-                    Genre = show.Genre
+                    Genre = show.Genre,
                 };
                 showsToUpdate.Add(newShow);
                 offset += 2;
@@ -47,30 +47,234 @@ public static class DbSeeder
         }
 
         // Seed Seats
-        UpsertSeat(context, new Seat { SeatId = 1, Section = "Front", Row = 1, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 2, Section = "Front", Row = 1, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 3, Section = "Front", Row = 1, Number = 3 });
-        UpsertSeat(context, new Seat { SeatId = 4, Section = "Front", Row = 1, Number = 4 });
-        UpsertSeat(context, new Seat { SeatId = 5, Section = "Left", Row = 2, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 6, Section = "Left", Row = 2, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 7, Section = "Left", Row = 2, Number = 3 });
-        UpsertSeat(context, new Seat { SeatId = 8, Section = "Left", Row = 2, Number = 4 });
-        UpsertSeat(context, new Seat { SeatId = 9, Section = "Right", Row = 3, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 10, Section = "Right", Row = 3, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 11, Section = "Right", Row = 3, Number = 3 });
-        UpsertSeat(context, new Seat { SeatId = 12, Section = "Right", Row = 3, Number = 4 });
-        UpsertSeat(context, new Seat { SeatId = 13, Section = "Standing", Row = 4, Number = 1 });
-        UpsertSeat(context, new Seat { SeatId = 14, Section = "Standing", Row = 4, Number = 2 });
-        UpsertSeat(context, new Seat { SeatId = 15, Section = "Standing", Row = 4, Number = 3 });
-        UpsertSeat(context, new Seat { SeatId = 16, Section = "Standing", Row = 4, Number = 4 });
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 1,
+                Section = "Front",
+                Row = 1,
+                Number = 1,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 2,
+                Section = "Front",
+                Row = 1,
+                Number = 2,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 3,
+                Section = "Front",
+                Row = 1,
+                Number = 3,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 4,
+                Section = "Front",
+                Row = 1,
+                Number = 4,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 5,
+                Section = "Left",
+                Row = 2,
+                Number = 1,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 6,
+                Section = "Left",
+                Row = 2,
+                Number = 2,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 7,
+                Section = "Left",
+                Row = 2,
+                Number = 3,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 8,
+                Section = "Left",
+                Row = 2,
+                Number = 4,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 9,
+                Section = "Right",
+                Row = 3,
+                Number = 1,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 10,
+                Section = "Right",
+                Row = 3,
+                Number = 2,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 11,
+                Section = "Right",
+                Row = 3,
+                Number = 3,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 12,
+                Section = "Right",
+                Row = 3,
+                Number = 4,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 13,
+                Section = "Standing",
+                Row = 4,
+                Number = 1,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 14,
+                Section = "Standing",
+                Row = 4,
+                Number = 2,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 15,
+                Section = "Standing",
+                Row = 4,
+                Number = 3,
+            }
+        );
+        UpsertSeat(
+            context,
+            new Seat
+            {
+                SeatId = 16,
+                Section = "Standing",
+                Row = 4,
+                Number = 4,
+            }
+        );
         context.SaveChanges();
 
         // Seed Shows
-        UpsertShow(context, new Show { ShowId = 1, Title = "Comedy Night", Description = "A night full of laughs", StartTime = DateTime.Now.AddHours(1), EndTime = DateTime.Now.AddHours(3), Genre = Genre.Comedy, OpeningNight = true });
-        UpsertShow(context, new Show { ShowId = 2, Title = "Magic Show", Description = "A magical evening", StartTime = DateTime.Now.AddHours(3), EndTime = DateTime.Now.AddHours(5), Genre = Genre.Romance, OpeningNight = true });
-        UpsertShow(context, new Show { ShowId = 3, Title = "Rock Concert", Description = "Rock the night away", StartTime = DateTime.Now.AddHours(5), EndTime = DateTime.Now.AddHours(7), Genre = Genre.Horror, OpeningNight = true });
-        UpsertShow(context, new Show { ShowId = 4, Title = "Dance Performance", Description = "An evening of dance", StartTime = DateTime.Now.AddHours(7), EndTime = DateTime.Now.AddHours(9), Genre = Genre.Documentary, OpeningNight = false });
-        UpsertShow(context, new Show { ShowId = 5, Title = "Drama Play", Description = "A dramatic performance", StartTime = DateTime.Now.AddHours(9), EndTime = DateTime.Now.AddHours(11), Genre = Genre.Drama, OpeningNight = false });
+        UpsertShow(
+            context,
+            new Show
+            {
+                ShowId = 1,
+                Title = "Comedy Night",
+                Description = "A night full of laughs",
+                StartTime = DateTime.Now.AddHours(1),
+                EndTime = DateTime.Now.AddHours(3),
+                Genre = Genre.Comedy,
+                OpeningNight = true,
+            }
+        );
+        UpsertShow(
+            context,
+            new Show
+            {
+                ShowId = 2,
+                Title = "Magic Show",
+                Description = "A magical evening",
+                StartTime = DateTime.Now.AddHours(3),
+                EndTime = DateTime.Now.AddHours(5),
+                Genre = Genre.Romance,
+                OpeningNight = true,
+            }
+        );
+        UpsertShow(
+            context,
+            new Show
+            {
+                ShowId = 3,
+                Title = "Rock Concert",
+                Description = "Rock the night away",
+                StartTime = DateTime.Now.AddHours(5),
+                EndTime = DateTime.Now.AddHours(7),
+                Genre = Genre.Horror,
+                OpeningNight = true,
+            }
+        );
+        UpsertShow(
+            context,
+            new Show
+            {
+                ShowId = 4,
+                Title = "Dance Performance",
+                Description = "An evening of dance",
+                StartTime = DateTime.Now.AddHours(7),
+                EndTime = DateTime.Now.AddHours(9),
+                Genre = Genre.Documentary,
+                OpeningNight = false,
+            }
+        );
+        UpsertShow(
+            context,
+            new Show
+            {
+                ShowId = 5,
+                Title = "Drama Play",
+                Description = "A dramatic performance",
+                StartTime = DateTime.Now.AddHours(9),
+                EndTime = DateTime.Now.AddHours(11),
+                Genre = Genre.Drama,
+                OpeningNight = false,
+            }
+        );
         context.SaveChanges();
 
         //Seed Tickets
@@ -82,8 +286,22 @@ public static class DbSeeder
         {
             foreach (Seat seat in seats)
             {
-                var ticket = new Ticket { TicketId = ticketId++, Price = 0, SeatId = seat.SeatId, Seat = seats.FirstOrDefault(s => s.SeatId == seat.SeatId), ShowId = show.ShowId, Show = shows.FirstOrDefault(s => s.ShowId == show.ShowId), Status = Status.Available };
-                ticket.Price = ShowPriceCalculator.CalculatePrice(show, ticket, show.OpeningNight, mapper);
+                var ticket = new Ticket
+                {
+                    TicketId = ticketId++,
+                    Price = 0,
+                    SeatId = seat.SeatId,
+                    Seat = seats.FirstOrDefault(s => s.SeatId == seat.SeatId),
+                    ShowId = show.ShowId,
+                    Show = shows.FirstOrDefault(s => s.ShowId == show.ShowId),
+                    Status = Status.Available,
+                };
+                ticket.Price = ShowPriceCalculator.CalculatePrice(
+                    show,
+                    ticket,
+                    show.OpeningNight,
+                    mapper
+                );
                 UpsertTicket(context, ticket);
             }
         }
@@ -98,23 +316,18 @@ public static class DbSeeder
             Email = "admin@hotmail.com",
             NormalizedUserName = "ADMIN",
             NormalizedEmail = "ADMIN@HOTMAIL.COM",
-            UserName = "admin"
+            UserName = "admin",
         };
 
         if (context.Users.Find("1") == null)
         {
-
             var passwordHasher = new PasswordHasher<Customer>();
 
             admin.PasswordHash = passwordHasher.HashPassword(admin, "123");
 
             context.Users.Add(admin);
 
-            var role = new IdentityRole
-            {
-                Name = "Admin",
-                NormalizedName = "ADMIN",
-            };
+            var role = new IdentityRole { Name = "Admin", NormalizedName = "ADMIN" };
 
             context.SaveChanges();
 
@@ -122,16 +335,11 @@ public static class DbSeeder
 
             context.Roles.Add(role);
 
-            var roleMapping = new IdentityUserRole<string>
-            {
-                RoleId = role.Id,
-                UserId = admin.Id
-            };
+            var roleMapping = new IdentityUserRole<string> { RoleId = role.Id, UserId = admin.Id };
 
             context.UserRoles.Add(roleMapping);
 
             context.SaveChanges();
-
         }
     }
 

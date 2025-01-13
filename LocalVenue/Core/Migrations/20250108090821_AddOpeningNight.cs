@@ -15,15 +15,14 @@ namespace LocalVenue.Migrations
                 table: "Shows",
                 type: "tinyint(1)",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "OpeningNight",
-                table: "Shows");
+            migrationBuilder.DropColumn(name: "OpeningNight", table: "Shows");
         }
     }
 }

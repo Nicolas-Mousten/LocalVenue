@@ -9,7 +9,8 @@ on:
       - "LocalVenue.Tests/**"
       - ".github/workflows/on-merge-workflow.yml"
       - ".github/workflows/dotnet-build-test-publish.yml"
-      - "LocalVenue Tests.postman_collection.json"
+      - "Shows_Tickets.postman_collection.json"
+      - "User_Seats.postman_collection.json"
 
 jobs:
   xunit-test-with-sonarcloud:
@@ -40,7 +41,7 @@ jobs:
           package: .
 
   postman-tests:
-    name: Postman tests
+    name: Postman test
     runs-on: ubuntu-latest
     needs: deploy
 
@@ -69,12 +70,24 @@ jobs:
           done
         shell: bash
 
-      - name: Run Postman tests
+      - name: Run Postman tests - Users and Seats
         run: |
-          newman run "LocalVenue Tests.postman_collection.json" \
-            --env-var "webUrl=https://localvenue-webapp-casp0006.azurewebsites.net/" \
+          newman run "User_Seats.postman_collection.json" \
+            --global-var "BASE_URL=https://localvenue-webapp-casp0006.azurewebsites.net" \
+            --global-var "RESPONSE_TIME=3000" \
+            --global-var "EMAIL=${{ secrets.ADMIN_EMAIL }}" \
+            --global-var "PASSWORD=${{ secrets.ADMIN_PASSWORD }}" \
             --reporters cli,htmlextra \
-            --reporter-htmlextra-export testResults/runreport.html \
+            --reporter-htmlextra-export testResults/runreport1.html \
+            --reporter-htmlextra-darkTheme
+
+      - name: Run Postman tests - Shows and Tickets
+        run: |
+          newman run "Shows_Tickets.postman_collection.json" \
+            --global-var "BASE_URL=https://localvenue-webapp-casp0006.azurewebsites.net" \
+            --global-var "RESPONSE_TIME=3000" \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export testResults/runreport2.html \
             --reporter-htmlextra-darkTheme
 
       - name: Publish Postman results

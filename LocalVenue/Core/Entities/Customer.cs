@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace LocalVenue.Core.Entities;
 
@@ -8,6 +8,7 @@ public class Customer : IdentityUser
     [Required]
     [MaxLength(255)]
     public required string FirstName { get; set; }
+
     [Required]
     [MaxLength(255)]
     public required string LastName { get; set; }

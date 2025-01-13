@@ -7,22 +7,40 @@ namespace LocalVenue.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(SignInManager<Customer> signInManager, UserManager<Customer> userManager) : ControllerBase
+public class UserController : ControllerBase
 {
-    [HttpPost]
+    private readonly SignInManager<Customer> _signInManager;
+    private readonly UserManager<Customer> _userManager;
+
+    public UserController(SignInManager<Customer> signInManager, UserManager<Customer> userManager)
+    {
+        _signInManager = signInManager;
+        _userManager = userManager;
+    }
+
+    [HttpPost("login")]
     public async Task<ActionResult> Login(LoginRequest request)
     {
-        var user = await userManager.FindByEmailAsync(request.Email);
+        var user = await _userManager.FindByEmailAsync(request.Email);
         if (user == null)
         {
             return BadRequest("Invalid login attempt.");
         }
 
-        var result = await signInManager.PasswordSignInAsync(user, request.Password, isPersistent: false, lockoutOnFailure: false);
+        var result = await _signInManager.PasswordSignInAsync(
+            user,
+            request.Password,
+            isPersistent: false,
+            lockoutOnFailure: false
+        );
         if (result.Succeeded)
         {
             // Get the authentication cookie
-            var authCookie = HttpContext.Response.Headers["Set-Cookie"].FirstOrDefault(header => header.StartsWith(".AspNetCore.Identity.Application"));
+            var authCookie = HttpContext
+                .Response.Headers["Set-Cookie"]
+                .FirstOrDefault(header =>
+                    header != null && header.StartsWith(".AspNetCore.Identity.Application")
+                );
 
             if (authCookie != null)
             {

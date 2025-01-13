@@ -4,17 +4,23 @@ services:
     container_name: LocalVenueMySQL
     environment:
       - MYSQL_ROOT_PASSWORD=!BAT4CHAT
-      - Name LocalVenueMySQL
+      - Name=LocalVenueMySQL
     ports:
       - "3306:3306"
-  
+    networks:
+      - app-network
+
   app:
     build:
-      context: LocalVenue
       dockerfile: Dockerfile
     container_name: LocalVenue
     depends_on:
       - self-service-mysql
     ports:
       - "8080:8080"
-  
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

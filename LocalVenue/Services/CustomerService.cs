@@ -15,7 +15,12 @@ public class CustomerService(UserManager<Core.Entities.Customer> userManager) : 
             Email = customer.Email,
             UserName = customer.FirstName,
         };
-
+        if (string.IsNullOrEmpty(password))
+        {
+            return IdentityResult.Failed(
+                new IdentityError { Description = "Password is required" }
+            );
+        }
 
         return await userManager.CreateAsync(businessCustomer, password);
     }

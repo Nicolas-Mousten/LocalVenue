@@ -1,10 +1,9 @@
-﻿using LocalVenue.Core.Entities;
+﻿using System.Collections.Concurrent;
+using LocalVenue.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections.Concurrent;
 
 namespace Shared.WebComponents;
-
 
 public class LoginInfo
 {
@@ -15,29 +14,34 @@ public class LoginInfo
     public string? ReturnUrl { get; set; } = "/";
 }
 
-public class BlazorCookieLoginMiddleware
+public class BlazorCookieLoginMiddleware(RequestDelegate next)
 {
-    public static IDictionary<Guid, LoginInfo> Logins { get; private set; }
-        = new ConcurrentDictionary<Guid, LoginInfo>();
+    public static IDictionary<Guid, LoginInfo> Logins { get; private set; } =
+        new ConcurrentDictionary<Guid, LoginInfo>();
 
-
-    private readonly RequestDelegate _next;
-
-    public BlazorCookieLoginMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
-    public async Task Invoke(HttpContext context, SignInManager<Customer> signInMgr, UserManager<Customer> userManager)
+    public async Task Invoke(
+        HttpContext context,
+        SignInManager<Customer> signInMgr,
+        UserManager<Customer> userManager
+    )
     {
         if (context.Request.Path == "/login" && context.Request.Query.ContainsKey("key"))
         {
-            if (!context.Request.Query.TryGetValue("key", out var keyString) || string.IsNullOrEmpty(keyString))
+            if (
+                !context.Request.Query.TryGetValue("key", out var keyString)
+                || string.IsNullOrEmpty(keyString)
+            )
             {
                 context.Response.Redirect("/loginfailed");
                 return;
             }
-            Guid.TryParse(keyString, out var key);
+            var parseResult = Guid.TryParse(keyString, out var key);
+            if (parseResult == false)
+            {
+                context.Response.Redirect("/loginfailed");
+                return;
+            }
+
             var info = Logins[key];
 
             var user = await userManager.FindByEmailAsync(info.Email);
@@ -48,28 +52,30 @@ public class BlazorCookieLoginMiddleware
                 return;
             }
 
-            var result = await signInMgr.PasswordSignInAsync(user, info.Password, false, lockoutOnFailure: true);
-            string.IsNullOrEmpty(info.Password);
+            var result = await signInMgr.PasswordSignInAsync(
+                user,
+                info.Password,
+                false,
+                lockoutOnFailure: true
+            );
+
             if (result.Succeeded)
             {
                 Logins.Remove(key);
                 context.Response.Redirect(info.ReturnUrl ?? "/");
-                return;
             }
             else if (result.RequiresTwoFactor)
             {
                 context.Response.Redirect("/loginwith2fa/" + key);
-                return;
             }
             else
             {
                 context.Response.Redirect("/loginfailed");
-                return;
             }
         }
         else
         {
-            await _next.Invoke(context);
+            await next.Invoke(context);
         }
     }
 }

@@ -21,7 +21,10 @@ public class TicketController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [SwaggerOperation(Summary = "Gets a ticket by ID", Description = "Retrieves a specific ticket by its ID.")]
+    [SwaggerOperation(
+        Summary = "Gets a ticket by ID",
+        Description = "Retrieves a specific ticket by its ID."
+    )]
     [SwaggerResponse(200, "Returns the ticket", typeof(Ticket))]
     [SwaggerResponse(404, "If the ticket is not found", typeof(string))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
@@ -43,10 +46,17 @@ public class TicketController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Creates a new ticket", Description = "Creates a new ticket with the provided details.")]
+    [SwaggerOperation(
+        Summary = "Creates a new ticket",
+        Description = "Creates a new ticket with the provided details."
+    )]
     [SwaggerResponse(201, "Returns the created ticket", typeof(Ticket))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
-    [SwaggerResponse(409, "If a ticket for assigned show with assigned seat exists", typeof(string))]
+    [SwaggerResponse(
+        409,
+        "If a ticket for assigned show with assigned seat exists",
+        typeof(string)
+    )]
     public async Task<ActionResult<Ticket>> AddTicket(TicketRequest ticketRequestDTO)
     {
         var ticket = _mapper.Map<Ticket>(ticketRequestDTO);
@@ -59,7 +69,11 @@ public class TicketController : ControllerBase
         }
         catch (Exception e)
         {
-            if (e.Message.Contains($"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned"))
+            if (
+                e.Message.Contains(
+                    $"Ticket for show '{ticket.ShowId}' already has seat '{ticket.SeatId}' assigned"
+                )
+            )
             {
                 return Conflict(e.Message);
             }
@@ -68,7 +82,10 @@ public class TicketController : ControllerBase
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "Updates an existing ticket", Description = "Updates the details of an existing ticket.")]
+    [SwaggerOperation(
+        Summary = "Updates an existing ticket",
+        Description = "Updates the details of an existing ticket."
+    )]
     [SwaggerResponse(200, "Returns the updated ticket", typeof(Ticket))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     [SwaggerResponse(404, "If the ticket is not found", typeof(string))]
@@ -91,7 +108,10 @@ public class TicketController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Deletes a ticket", Description = "Deletes a specific ticket by its ID.")]
+    [SwaggerOperation(
+        Summary = "Deletes a ticket",
+        Description = "Deletes a specific ticket by its ID."
+    )]
     [SwaggerResponse(200, "Returns the deleted ticket", typeof(Ticket))]
     [SwaggerResponse(400, "If there is an error", typeof(string))]
     public async Task<ActionResult<Ticket>> DeleteTicket(int id)
