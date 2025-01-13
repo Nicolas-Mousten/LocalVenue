@@ -30,7 +30,7 @@ public class GetRefundListAsyncTest
     }
 
     [Fact]
-    public async Task TestTicketServiceBuySeat()
+    public async Task TestRefundList()
     {
         // Arrange
         var dbContextFactory = serviceProvider.GetRequiredService<
