@@ -153,6 +153,7 @@ public class ShowServiceTest
 
         await using (var context = await contextFactory.CreateDbContextAsync())
         {
+            // Create seats for the database
             context.Seats.Add(
                 new Seat
                 {
@@ -286,8 +287,7 @@ public class ShowServiceTest
     [Fact]
     public async Task TestShowServiceCreateShowWithTickets()
     {
-        // create a lot of seats for the database
-
+        // Create seats for the database
         var dbContextFactory = serviceProvider.GetRequiredService<
             IDbContextFactory<VenueContext>
         >();
@@ -352,7 +352,7 @@ public class ShowServiceTest
 
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<MappingProfile>(); // Assuming ShowProfile contains your mappings
+            cfg.AddProfile<MappingProfile>();
         });
         var mapper = config.CreateMapper();
 
