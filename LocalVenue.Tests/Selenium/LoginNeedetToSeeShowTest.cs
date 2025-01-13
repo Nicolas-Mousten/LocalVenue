@@ -5,34 +5,40 @@ using SeleniumExtras.WaitHelpers;
 
 namespace LocalVenue.Tests.Selenium;
 
-public class LoginNeedetToSeeShowTest : IDisposable {
+public class LoginNeedetToSeeShowTest : IDisposable
+{
+    public IWebDriver driver { get; private set; }
+    public IDictionary<String, Object> vars { get; private set; }
+    public IJavaScriptExecutor js { get; private set; }
 
-    public IWebDriver driver {get; private set;}
-    public IDictionary<String, Object> vars {get; private set;}
-    public IJavaScriptExecutor js {get; private set;}
     public LoginNeedetToSeeShowTest()
     {
         driver = new ChromeDriver();
         js = (IJavaScriptExecutor)driver;
         vars = new Dictionary<String, Object>();
     }
+
     public void Dispose()
     {
         driver.Quit();
     }
+
     [Fact]
-    public void TestLoginNeededToSeeShow() {
+    public void TestLoginNeededToSeeShow()
+    {
         driver.Navigate().GoToUrl("https://localhost:44367/");
         driver.Manage().Window.Size = new System.Drawing.Size(1936, 1048);
-        
+
         // Wait until the element is visible and clickable
         WebDriverWait wait = new(driver, TimeSpan.FromSeconds(10));
-        var firstShowLink = wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("#home-shows-grid .col")));
-        
+        var firstShowLink = wait.Until(
+            ExpectedConditions.ElementToBeClickable(By.CssSelector("#home-shows-grid .col"))
+        );
+
         firstShowLink.Click();
-        
+
         wait.Until(d => d.Url.Contains("/Account/Login"));
-        
+
         Assert.Contains("https://localhost:44367/Account/Login", driver.Url);
     }
 }
