@@ -364,7 +364,7 @@ public class ShowServiceTest
 
         var show = new Show
         {
-            Id = 111,
+            Id = 0, //EF should auto increment starting at 1
             Title = "Test show",
             Description = "Test description",
             StartTime = DateTime.Now,
@@ -373,13 +373,16 @@ public class ShowServiceTest
             OpeningNight = false,
         };
 
+        // Assert item does not exist before creating
+        await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.GetShow(1));
+
         await service.CreateShowAsync(show);
 
-        var dataBaseShow = await service.GetShow(111);
+        var dataBaseShow = await service.GetShow(1);
 
         // Assert
         Assert.NotNull(dataBaseShow);
-        Assert.Equal(show.Id, dataBaseShow.ShowId);
+        Assert.Equal(1, dataBaseShow.ShowId);
         Assert.Equal(show.Title, dataBaseShow.Title);
         Assert.Equal(show.Description, dataBaseShow.Description);
         Assert.Equal(show.StartTime, dataBaseShow.StartTime);

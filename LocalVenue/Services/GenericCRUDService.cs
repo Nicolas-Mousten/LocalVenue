@@ -130,6 +130,17 @@ public class GenericCRUDService<T>
 
         IQueryable<T> query = IncludeProperties(includes!);
 
+        var keyProperty =
+            typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), false).Any())
+            ?? typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.Name.EndsWith("Id", StringComparison.OrdinalIgnoreCase))
+            ?? throw new ArgumentNullException($"No key property found on type '{typeof(T).Name}'");
+
+        item.GetType().GetProperty(keyProperty.Name)?.SetValue(item, 0);
+
         _context.Set<T>().Add(item);
         await _context.SaveChangesAsync();
 
