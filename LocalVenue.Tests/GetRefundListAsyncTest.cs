@@ -141,7 +141,7 @@ public class GetRefundListAsyncTest
 
         var config = new MapperConfiguration(cfg =>
         {
-            cfg.AddProfile<MappingProfile>(); // Assuming ShowProfile contains your mappings
+            cfg.AddProfile<MappingProfile>();
         });
         var mapper = config.CreateMapper();
 
