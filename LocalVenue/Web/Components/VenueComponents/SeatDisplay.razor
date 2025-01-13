@@ -114,7 +114,6 @@
 {
     return;
 }
-<p>ShowId: @ShowId</p>
 <div class="seat-display">
     @foreach (var row in Tickets.GroupBy(s => s.Seat.Row).OrderBy(g => g.Key))
     {
@@ -156,7 +155,7 @@
     @if (_tickets.Count != 0)
     {
         <p>Tickets: @_tickets.Count, Total Price: @(_tickets.Sum(t => t.Price).ToString("C2"))</p>
-        <button @onclick="BuyTickets">Buy Tickets</button>
+        <button id="buy-tickets-button" @onclick="BuyTickets">Buy Tickets</button>
     }
 
     @if (ticketsToReturn.Count != 0)

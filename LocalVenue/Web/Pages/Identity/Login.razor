@@ -38,7 +38,7 @@
                     <InputText id="password" @bind-Value="loginModel!.Password" type="password" class="form-control" />
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 mb-3" disabled="@isSubmitting">
+                <button id="login-button" type="submit" class="btn btn-primary w-100 mb-3" disabled="@isSubmitting">
                     @if (isSubmitting)
                     {
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
