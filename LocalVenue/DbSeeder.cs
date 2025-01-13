@@ -15,28 +15,41 @@ public static class DbSeeder
     {
         if (context.Shows.Any(show => show.EndTime < DateTime.Now))
         {
-            int offset = 1;
+            int timeOffsetHours = 1;
             var showsToUpdate = new List<Show>();
-            foreach (var show in context.Shows)
-            {
-                var existingShow = context.Shows.Find(show.ShowId);
-                if (existingShow != null)
-                {
-                    context.Entry(existingShow).State = EntityState.Detached;
-                }
+            var showsList = context.Shows.AsNoTracking().ToList();
 
+            for (int i = 0; i < showsList.Count() - 1; i++)
+            {
+                var show = showsList[i];
                 var newShow = new Show
                 {
                     ShowId = show.ShowId,
                     Title = show.Title,
                     Description = show.Description,
-                    StartTime = DateTime.Now.AddHours(offset),
-                    EndTime = DateTime.Now.AddHours(offset + 2),
+                    StartTime = DateTime.Now.AddHours(timeOffsetHours),
+                    EndTime = DateTime.Now.AddHours(timeOffsetHours + 2),
                     Genre = show.Genre,
                 };
                 showsToUpdate.Add(newShow);
-                offset += 2;
+                timeOffsetHours += 2;
             }
+
+            var showFurtherOutThan24Hours = context
+                .Shows.AsNoTracking()
+                .FirstOrDefault(s => s.ShowId == 6);
+            if (showFurtherOutThan24Hours != null)
+            {
+                showFurtherOutThan24Hours.StartTime = DateTime.Now.AddHours(36);
+                showFurtherOutThan24Hours.EndTime = DateTime.Now.AddHours(38);
+                showsToUpdate.Add(showFurtherOutThan24Hours);
+            }
+
+            foreach (var show in showsToUpdate)
+            {
+                context.Entry(show).State = EntityState.Detached;
+            }
+
             context.Shows.UpdateRange(showsToUpdate);
             context.SaveChanges();
         }
@@ -272,6 +285,19 @@ public static class DbSeeder
                 StartTime = DateTime.Now.AddHours(9),
                 EndTime = DateTime.Now.AddHours(11),
                 Genre = Genre.Drama,
+                OpeningNight = false,
+            }
+        );
+        UpsertShow(
+            context,
+            new Show
+            {
+                ShowId = 6,
+                Title = "Ballet",
+                Description = "A night of ballet",
+                StartTime = DateTime.Now.AddHours(36),
+                EndTime = DateTime.Now.AddHours(38),
+                Genre = Genre.Romance,
                 OpeningNight = false,
             }
         );
