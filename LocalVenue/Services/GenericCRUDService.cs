@@ -180,11 +180,7 @@ public class GenericCRUDService<T>
     {
         await using var _context = await contextFactory.CreateDbContextAsync();
 
-        var item = await GetItem(id, includes);
-        if (item == null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
+        var item = await GetItem(id, includes); // Throws KeyNotFoundException if item not found
         _context.Set<T>().Remove(item);
         await _context.SaveChangesAsync();
 
