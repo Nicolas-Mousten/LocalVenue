@@ -5,7 +5,7 @@ namespace LocalVenue.Helpers;
 
 public class Toast
 {
-    public static async void SimpleToast(
+    public static async Task SimpleToast(
         ToastType toastType,
         string message,
         IJSRuntime jsRuntime,
