@@ -40,9 +40,6 @@ public class LoginNeedetToSeeShowTest : IDisposable
 
         wait.Until(d => d.Url.Contains("/Account/Login"));
 
-        Assert.Contains(
-            $"{baseUrl}/Account/Login",
-            driver.Url
-        );
+        Assert.Contains($"{baseUrl}/Account/Login", driver.Url);
     }
 }

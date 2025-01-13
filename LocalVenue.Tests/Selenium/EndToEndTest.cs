@@ -28,9 +28,7 @@ public class EndToEndTest : IDisposable
     [Fact]
     public async Task EndToEnd()
     {
-        await driver
-            .Navigate()
-            .GoToUrlAsync(baseUrl);
+        await driver.Navigate().GoToUrlAsync(baseUrl);
         driver.Manage().Window.Size = new System.Drawing.Size(1936, 1048);
         driver.FindElement(By.Id("main-layout-login-link")).Click();
 
