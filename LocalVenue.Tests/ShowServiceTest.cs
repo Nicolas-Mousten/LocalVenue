@@ -29,6 +29,89 @@ public class ShowServiceTest
         serviceProvider = services.BuildServiceProvider();
     }
 
+    [Theory]
+    [InlineData(1, 10, "TestTitleTwo", "Title", 1, null)] //find one object with title "TestTitleTwo"
+    [InlineData(1, 10, "TestTitleTwo", null, 1, null)] //find one object with title "TestTitleTwo"
+    [InlineData(1, 10, "TestDescriptionTwo", "Description", 1, null)] //find one object with description "TestDescriptionTwo"
+    [InlineData(1, 2, null, null, 2, 2)] //expect two items on page #1 with pagesize 2 with a next page of 2
+    [InlineData(2, 2, null, null, 1, null)] //expect one item on page #2 with pagesize 2 with no next page
+    public async Task TestGetPagedListShow(
+        int pageNumber,
+        int pageSize,
+        string searchParameter,
+        string? searchProperty,
+        int expectedCount,
+        int? expectedNext
+    )
+    {
+        // Arrange
+        var contextFactory = serviceProvider.GetRequiredService<IDbContextFactory<VenueContext>>();
+
+        var config = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<MappingProfile>();
+        });
+        var mapper = config.CreateMapper();
+
+        var ticketService = new TicketService(contextFactory, mapper);
+        var mockFactory = HttpClientFactoryHelper.GetActorServiceMockClientFactory();
+        var actorService = new ActorService(mockFactory.Object);
+
+        var service = new ShowService(contextFactory, mapper, actorService, ticketService);
+
+        var show1 = new Show
+        {
+            Id = 0,
+            Title = "TestTitle",
+            Description = "TestDescription",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Genre = Genre.Musical,
+            OpeningNight = false,
+        };
+        var show2 = new Show
+        {
+            Id = 0,
+            Title = "TestTitleTwo",
+            Description = "TestDescriptionTwo",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Genre = Genre.Musical,
+            OpeningNight = false,
+        };
+        var show3 = new Show
+        {
+            Id = 0,
+            Title = "TestTitleThree",
+            Description = "TestDescriptionThree",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Genre = Genre.Musical,
+            OpeningNight = false,
+        };
+
+        await service.CreateShowAsync(show1);
+        await service.CreateShowAsync(show2);
+        await service.CreateShowAsync(show3);
+
+        // Act
+        var pagedShows = await service.GetShows(
+            pageNumber,
+            pageSize,
+            searchParameter,
+            searchProperty
+        );
+
+        // Assert
+        Assert.NotNull(pagedShows);
+        Assert.Equal(expectedCount, pagedShows.Count);
+        Assert.Equal(expectedNext, pagedShows.Next);
+        Assert.IsType<List<Core.Entities.Show>>(pagedShows.Results);
+        Assert.True(pagedShows.Results.Count <= pageSize);
+
+        await serviceProvider.DisposeAsync();
+    }
+
     [Fact]
     public async Task TestDeleteShow()
     {
