@@ -199,11 +199,11 @@
 
         if (success)
         {
-            Toast.SimpleToast(ToastType.Success, "Show oprettet", Js);
+            await Toast.SimpleToast(ToastType.Success, "Show oprettet", Js);
         }
         else
         {
-            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke oprette show, prøv igen", Js);
+            await Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke oprette show, prøv igen", Js);
         }
     }
 
@@ -218,7 +218,7 @@
     {
         if (show is null)
         {
-            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke slette show, prøv igen", Js);
+            await Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke slette show, prøv igen", Js);
             return; 
         }
         
@@ -229,11 +229,11 @@
 
         if (deleteShow is not null)
         {
-            Toast.SimpleToast(ToastType.Success, "Show slettet", Js);
+            await Toast.SimpleToast(ToastType.Success, "Show slettet", Js);
         }
         else
         {
-            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke slette show, prøv igen", Js);
+            await Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke slette show, prøv igen", Js);
         }
     }
     
@@ -250,11 +250,11 @@
 
         if (success)
         {
-            Toast.SimpleToast(ToastType.Success, "Show opdateret", Js);
+            await Toast.SimpleToast(ToastType.Success, "Show opdateret", Js);
         }
         else
         {
-            Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke opdatere show, prøv igen", Js);
+            await Toast.SimpleToast(ToastType.Error, "Fejl, kunne ikke opdatere show, prøv igen", Js);
         }
     }
 
