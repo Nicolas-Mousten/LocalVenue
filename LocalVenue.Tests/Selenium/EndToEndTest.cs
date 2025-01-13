@@ -11,6 +11,7 @@ public class EndToEndTest : IDisposable
     public IWebDriver driver { get; private set; }
     public IDictionary<String, Object> vars { get; private set; }
     public IJavaScriptExecutor js { get; private set; }
+    private string baseUrl = "https://localvenue-webapp-casp0006.azurewebsites.net";
 
     public EndToEndTest()
     {
@@ -27,7 +28,9 @@ public class EndToEndTest : IDisposable
     [Fact]
     public async Task EndToEnd()
     {
-        await driver.Navigate().GoToUrlAsync("https://localhost:44367/");
+        await driver
+            .Navigate()
+            .GoToUrlAsync(baseUrl);
         driver.Manage().Window.Size = new System.Drawing.Size(1936, 1048);
         driver.FindElement(By.Id("main-layout-login-link")).Click();
 
@@ -46,7 +49,7 @@ public class EndToEndTest : IDisposable
 
         loginButton.Submit();
 
-        wait.Until(d => d.Url.Equals("https://localhost:44367/"));
+        wait.Until(d => d.Url.Equals(baseUrl));
 
         driver.FindElement(By.LinkText("Shows")).Click();
 
@@ -85,7 +88,7 @@ public class EndToEndTest : IDisposable
 
         homeButton.Click();
 
-        wait.Until(d => d.Url.Equals("https://localhost:44367/"));
+        wait.Until(d => d.Url.Equals(baseUrl));
         wait.Until(ExpectedConditions.ElementExists(By.Id("home-shows-grid")));
 
         var show = driver

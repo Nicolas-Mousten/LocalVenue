@@ -10,6 +10,7 @@ public class LoginNeedetToSeeShowTest : IDisposable
     public IWebDriver driver { get; private set; }
     public IDictionary<String, Object> vars { get; private set; }
     public IJavaScriptExecutor js { get; private set; }
+    private string baseUrl = "https://localvenue-webapp-casp0006.azurewebsites.net";
 
     public LoginNeedetToSeeShowTest()
     {
@@ -26,7 +27,7 @@ public class LoginNeedetToSeeShowTest : IDisposable
     [Fact]
     public void TestLoginNeededToSeeShow()
     {
-        driver.Navigate().GoToUrl("https://localhost:44367/");
+        driver.Navigate().GoToUrl(baseUrl);
         driver.Manage().Window.Size = new System.Drawing.Size(1936, 1048);
 
         // Wait until the element is visible and clickable
@@ -39,6 +40,9 @@ public class LoginNeedetToSeeShowTest : IDisposable
 
         wait.Until(d => d.Url.Contains("/Account/Login"));
 
-        Assert.Contains("https://localhost:44367/Account/Login", driver.Url);
+        Assert.Contains(
+            $"{baseUrl}/Account/Login",
+            driver.Url
+        );
     }
 }
