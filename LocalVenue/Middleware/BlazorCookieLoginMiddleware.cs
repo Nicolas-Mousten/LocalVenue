@@ -14,17 +14,10 @@ public class LoginInfo
     public string? ReturnUrl { get; set; } = "/";
 }
 
-public class BlazorCookieLoginMiddleware
+public class BlazorCookieLoginMiddleware(RequestDelegate next)
 {
     public static IDictionary<Guid, LoginInfo> Logins { get; private set; } =
         new ConcurrentDictionary<Guid, LoginInfo>();
-
-    private readonly RequestDelegate _next;
-
-    public BlazorCookieLoginMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
 
     public async Task Invoke(
         HttpContext context,
@@ -42,7 +35,13 @@ public class BlazorCookieLoginMiddleware
                 context.Response.Redirect("/loginfailed");
                 return;
             }
-            Guid.TryParse(keyString, out var key);
+            var parseResult = Guid.TryParse(keyString, out var key);
+            if (parseResult == false)
+            {
+                context.Response.Redirect("/loginfailed");
+                return;
+            }
+
             var info = Logins[key];
 
             var user = await userManager.FindByEmailAsync(info.Email);
@@ -59,27 +58,24 @@ public class BlazorCookieLoginMiddleware
                 false,
                 lockoutOnFailure: true
             );
-            string.IsNullOrEmpty(info.Password);
+
             if (result.Succeeded)
             {
                 Logins.Remove(key);
                 context.Response.Redirect(info.ReturnUrl ?? "/");
-                return;
             }
             else if (result.RequiresTwoFactor)
             {
                 context.Response.Redirect("/loginwith2fa/" + key);
-                return;
             }
             else
             {
                 context.Response.Redirect("/loginfailed");
-                return;
             }
         }
         else
         {
-            await _next.Invoke(context);
+            await next.Invoke(context);
         }
     }
 }
