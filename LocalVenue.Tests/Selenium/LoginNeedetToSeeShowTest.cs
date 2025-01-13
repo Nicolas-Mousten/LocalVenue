@@ -1,3 +1,4 @@
+using LocalVenue.Tests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -24,7 +25,7 @@ public class LoginNeedetToSeeShowTest : IDisposable
         driver.Quit();
     }
 
-    [Fact]
+    [IgnoreOnBuildServerFact]
     public void TestLoginNeededToSeeShow()
     {
         driver.Navigate().GoToUrl(baseUrl);

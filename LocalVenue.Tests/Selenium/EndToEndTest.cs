@@ -1,4 +1,5 @@
 using System.Globalization;
+using LocalVenue.Tests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -25,7 +26,7 @@ public class EndToEndTest : IDisposable
         driver.Quit();
     }
 
-    [Fact]
+    [IgnoreOnBuildServerFact]
     public async Task EndToEnd()
     {
         await driver.Navigate().GoToUrlAsync(baseUrl);
