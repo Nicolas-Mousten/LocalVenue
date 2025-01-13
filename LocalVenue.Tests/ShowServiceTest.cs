@@ -226,9 +226,9 @@ public class ShowServiceTest
     }
 
     [Theory]
-    [InlineData("TestTitle", "Title")]
-    [InlineData("TestTitle", null)]
-    [InlineData("TestDescription", "Description")]
+    [InlineData("TestTitleTwo", "Title")]
+    [InlineData("TestTitleTwo", null)]
+    [InlineData("TestDescriptionTwo", "Description")]
     public async Task TestGetShowSearch(string searchParameter, string? searchProperty)
     {
         // Arrange
@@ -246,9 +246,9 @@ public class ShowServiceTest
 
         var service = new ShowService(contextFactory, mapper, actorService, ticketService);
 
-        var show = new Show
+        var show1 = new Show
         {
-            Id = 1,
+            Id = 0,
             Title = "TestTitle",
             Description = "TestDescription",
             StartTime = DateTime.Now,
@@ -256,8 +256,19 @@ public class ShowServiceTest
             Genre = Genre.Musical,
             OpeningNight = false,
         };
+        var show2 = new Show
+        {
+            Id = 0,
+            Title = "TestTitleTwo",
+            Description = "TestDescriptionTwo",
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(2),
+            Genre = Genre.Musical,
+            OpeningNight = false,
+        };
 
-        await service.CreateShowAsync(show);
+        await service.CreateShowAsync(show1);
+        await service.CreateShowAsync(show2);
 
         // Act
         var dataBaseShow = new Core.Entities.Show();
@@ -272,14 +283,15 @@ public class ShowServiceTest
 
         // Assert
         Assert.NotNull(dataBaseShow);
-        Assert.Equal(show.Id, dataBaseShow.ShowId);
-        Assert.Equal(show.Title, dataBaseShow.Title);
-        Assert.Equal(show.Description, dataBaseShow.Description);
-        Assert.True(new TimeSpan(0, 0, 10) > dataBaseShow.StartTime - show.StartTime); // Test if the time is within 10 seconds
+        Assert.Equal(2, dataBaseShow.ShowId);
+        Assert.Equal(show2.Title, dataBaseShow.Title);
+        Assert.Equal(show2.Description, dataBaseShow.Description);
+        Assert.True(new TimeSpan(0, 0, 10) > dataBaseShow.StartTime - show2.StartTime); // Test if the time is within 10 seconds
+        Assert.True(new TimeSpan(0, 0, 10) > dataBaseShow.EndTime - show2.EndTime); // Test if the time is within 10 seconds
         // Assert.Equal(show.StartTime, dataBaseShow.StartTime);
         // Assert.Equal(show.EndTime, dataBaseShow.EndTime);
-        Assert.Equal(show.Genre, dataBaseShow.Genre);
-        Assert.Equal(show.OpeningNight, dataBaseShow.OpeningNight);
+        Assert.Equal(show2.Genre, dataBaseShow.Genre);
+        Assert.Equal(show2.OpeningNight, dataBaseShow.OpeningNight);
 
         await serviceProvider.DisposeAsync();
     }
