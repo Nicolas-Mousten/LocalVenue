@@ -41,7 +41,7 @@ jobs:
   #         package: .
 
   postman-tests:
-    name: Postman tests
+    name: Postman test
     runs-on: ubuntu-latest
     #needs: deploy
 

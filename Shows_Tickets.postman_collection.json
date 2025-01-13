@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "a6e6bd85-33eb-42d3-883e-da2200586a4e",
+		"_postman_id": "2ccfb5af-970d-489e-89fa-2386fcf41d74",
 		"name": "Shows",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "33447732"
+		"_exporter_id": "19420382"
 	},
 	"item": [
 		{
@@ -897,7 +897,7 @@
 							"});\r",
 							"\r",
 							"\r",
-							"var seatId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"var seatId = pm.variables.get(\"NON_EXISTENT_ID\");\r",
 							"\r",
 							"pm.test(\"Returns expected error message\", function () {\r",
 							"    var responseText = pm.response.text();\r",
@@ -1290,7 +1290,7 @@
 							"    pm.response.to.have.status(404);\r",
 							"});\r",
 							"\r",
-							"var showId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"var showId = pm.variables.get(\"NON_EXISTENT_ID\");\r",
 							"pm.test(\"Correct error message\", function () {\r",
 							"    var responseText = pm.response.text();\r",
 							"    pm.expect(responseText).to.include(\"Show with id \" + showId + \" not found\" );\r",
@@ -1487,7 +1487,7 @@
 							"    pm.response.to.have.status(404);\r",
 							"});\r",
 							"\r",
-							"var showId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"var showId = pm.variables.get(\"NON_EXISTENT_ID\");\r",
 							"\r",
 							"pm.test(\"Returns expected error message\", function () {\r",
 							"    var responseText = pm.response.text();\r",
@@ -1694,7 +1694,7 @@
 							"    pm.response.to.have.status(404);\r",
 							"});\r",
 							"\r",
-							"var showId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"var showId = pm.variables.get(\"NON_EXISTENT_ID\");\r",
 							"\r",
 							"pm.test(\"Returns expected error message\", function () {\r",
 							"    var responseText = pm.response.text();\r",
@@ -1796,7 +1796,7 @@
 							"});\r",
 							"\r",
 							"\r",
-							"var seatId = pm.variables.get(\"NON_EXISTING_ID\");\r",
+							"var seatId = pm.variables.get(\"NON_EXISTENT_ID\");\r",
 							"\r",
 							"pm.test(\"Returns expected error message\", function () {\r",
 							"    var responseText = pm.response.text();\r",
