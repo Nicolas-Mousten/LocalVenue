@@ -147,9 +147,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
         }
-
-        //add the customer to those seats
-        //TO-DO change it to call database so it dosn't take data from frontend only id's
+        
         foreach (var ticket in tickets)
         {
             Ticket newTicket = new Ticket
