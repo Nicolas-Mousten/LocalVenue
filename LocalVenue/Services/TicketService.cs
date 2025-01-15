@@ -147,7 +147,7 @@ public class TicketService(IDbContextFactory<VenueContext> contextFactory, IMapp
         {
             throw new ArgumentException($"Customer with id '{customerId}' does not exist");
         }
-        
+
         foreach (var ticket in tickets)
         {
             Ticket newTicket = new Ticket
